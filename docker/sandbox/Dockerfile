@@ -16,14 +16,17 @@ RUN pip install --no-cache-dir aider-chat open-interpreter
 RUN git clone https://github.com/frdel/agent-zero.git /opt/agent-zero && \
     cd /opt/agent-zero && pip install --no-cache-dir -r requirements.txt
 
-# Pin httpx<0.28: openai 1.42 / litellm 1.44 still pass `proxies` kwarg
-# which httpx 0.28+ removed. Without this, all chat completions fail.
-RUN pip install --no-cache-dir "httpx<0.28"
-
 # AZ Telegram plugin requires `uv` to bootstrap aiogram on first use.
 # Pre-install both so the plugin works without runtime network installs.
+# Note: aiogram pulls httpx>=0.28 transitively, so the httpx pin must
+# come AFTER this layer to win.
 RUN pip install --no-cache-dir uv && \
     uv pip install --system aiogram
+
+# Pin httpx<0.28: openai 1.42 / litellm 1.44 still pass `proxies` kwarg
+# which httpx 0.28+ removed. Without this, all chat completions fail.
+# MUST be the last pip layer touching httpx.
+RUN pip install --no-cache-dir "httpx<0.28"
 
 # Create a shared config directory inside the container
 RUN mkdir -p /config/aider /config/opencode /config/agent-zero
