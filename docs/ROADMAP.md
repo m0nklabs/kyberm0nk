@@ -1,72 +1,59 @@
-# Roadmap
+# Roadmap & Vision: The Local Agentic Coding Cockpit
 
-## Phase 0 - Foundation
+## The Core Hierarchy (Strategic to Operational)
 
-Goal: create a clean repository and workspace for planning and implementation.
+The KyberM0nk stack maps directly to specific roles to form a cohesive, self-contained AI coding cockpit.
 
-Deliverables:
+### 1. The Motor (Inference Backend)
+- **Tool**: `llama.cpp` (GGUF) via Guardian.
+- **Role**: The brain driving all other tools.
+- **Setup**: Runs purely on the host (outside Docker). Configured to offload to GPU (`-ngl 99` for 35B models on 28GB VRAM). Uses the `qwen3-35b-uncensored` alias as the baseline.
 
-- documentation skeleton
-- private GitHub repository
-- workspace file
-- `.env.example`
-- initial safety rules
+### 2. The General / Architect (Cockpit)
+- **Tool**: OpenCode (or open-source Claude Code wrappers).
+- **Role**: Strategic planning and autonomous orchestration. Sits "above" the rest. Understands the entire project scope, determines new architectures, and delegates chunks of work.
 
-## Phase 1 - Minimal Local Loop
+### 3. The Executioner / Special Ops (Sandbox)
+- **Tool**: Agent Zero.
+- **Role**: Handles the dirty, system-level work. Stands parallel to OpenCode. Executes heavy scripts, complex installations, and environment debugging.
+- **Safety**: Locked inside Docker with strictly mapped read-write targets and read-only reference mounts.
 
-Goal: prove one tool can talk to Guardian from a container.
+### 4. The Master Carpenter (Scalpel)
+- **Tool**: Aider.
+- **Role**: Extremely fast, precise code editor. Driven from the terminal while OpenCode sets the big picture. Highly token-efficient, performing surgical strikes on specific files.
 
-Deliverables:
+### 5. The IDE-Glasses (Assistant)
+- **Tool**: Continue (VS Code / JetBrains extension).
+- **Role**: Direct line of sight into the code. Provides inline autocomplete and chat context. Does not perform massive autonomous structural changes, but accelerates manual typing and offers a window into the local proxy.
 
-- Guardian health check script
-- minimal Docker base image
-- Aider container profile as the first edit-loop smoke test
-- OpenCode config immediately afterwards as the first strategic self-building tool
-- active project mount validation
+---
 
-## Phase 2 - Tool Stack
+## Rollout Phases
 
-Goal: add the full local coding cockpit.
+### Phase 0 - Foundation (✅ DONE)
+- [x] Clean repository and workspace creation.
+- [x] Documentation skeleton, security rules, architectural boundaries.
 
-Deliverables:
+### Phase 1, 2 & 3 - Setup & Observability (✅ DONE)
+- [x] Guardian host & container health checks.
+- [x] Dockerfile construction for Aider, OpenCode, and Agent Zero.
+- [x] Shell wrappers with safety, mount validation, and ISO 8601 logging.
 
-- OpenCode runtime config
-- Aider runtime config
-- Agent Zero runtime config
-- Continue config template
-- scripts for launching each tool
+### Phase 4 - Aider Smoke-Test (The Scalpel First)
+- Goal: Prove the "Master Carpenter" works flawlessly with Guardian.
+- Deliverables: Send first prompt via Aider to edit a local file. Confirm token efficiency and editing workflow against the deep model.
 
-## Phase 3 - Orchestration
+### Phase 5 - OpenCode Orchestration (The General)
+- Goal: Setup the autonomous planner.
+- Deliverables: Configure OpenCode, verify planning capabilities, verify its capability to read the repo context and generate actionable sub-tasks.
 
-Goal: make the tools pleasant to operate together.
+### Phase 6 - Agent Zero Sandbox (Special Ops)
+- Goal: Secure execution of complex tasks.
+- Deliverables: Finalize strict mount mappings (read-write active, read-only reference), verify external script execution limitations, evaluate Docker socket safety.
 
-Deliverables:
+### Phase 7 - Continue IDE Integration (The Glasses)
+- Goal: Tie the proxy directly into VS Code.
+- Deliverables: Set up `config.json` for Continue, hooking `autocomplete` and `chat` models strictly into the `127.0.0.1:11434/v1` Guardian proxy.
 
-- status command
-- active-project selector
-- read-only reference mount generator
-- per-tool log layout
-- model target summary
-
-## Phase 4 - Agent-Forge Reuse
-
-Goal: bring over proven ideas from Agent-Forge without importing old complexity.
-
-Candidates:
-
-- role registry concepts
-- monitoring dashboard ideas
-- GitHub workflow automation patterns
-- issue lifecycle rules
-- log and health status patterns
-
-## Phase 5 - Optional UI
-
-Goal: add a thin local cockpit UI only if CLI wrappers are not enough.
-
-Deliverables:
-
-- local dashboard
-- tool process status
-- Guardian model status
-- active project and mount visibility
+### Phase 8 - E2E Orchestration & Polish
+- Goal: Seamless handoffs (e.g. OpenCode plans -> User guides Aider for quick edits -> Agent Zero runs the build).

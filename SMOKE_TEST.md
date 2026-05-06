@@ -1,0 +1,1 @@
+Aider worked via command

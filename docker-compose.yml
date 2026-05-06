@@ -1,0 +1,58 @@
+version: "3.8"
+
+x-common: &common
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  env_file: .env
+
+services:
+  guardian-health:
+    <<: *common
+    image: curlimages/curl
+    command: ["-s", "-f", "-m", "5", "http://host.docker.internal:11434/v1/models"]
+
+  aider:
+    <<: *common
+    build:
+      context: .
+      dockerfile: docker/aider/Dockerfile
+    environment:
+      - OPENAI_API_BASE=${GUARDIAN_BASE_URL}
+      - OPENAI_API_KEY=${GUARDIAN_API_KEY}
+      - AIDER_MODEL=openai/${DEFAULT_MODEL}
+    volumes:
+      - ${ACTIVE_PROJECT}:/workspace/project:rw
+      - ./configs/aider:/config/aider:ro
+      - ./logs/aider:/logs/aider:rw
+    working_dir: /workspace/project
+    entrypoint: ["aider"]
+
+  opencode:
+    <<: *common
+    build:
+      context: .
+      dockerfile: docker/opencode/Dockerfile
+    environment:
+      - OPENAI_API_BASE=${GUARDIAN_BASE_URL}
+      - OPENAI_API_KEY=${GUARDIAN_API_KEY}
+    volumes:
+      - ${ACTIVE_PROJECT}:/workspace/project:rw
+      - ./configs/opencode:/config/opencode:ro
+      - ./logs/opencode:/logs/opencode:rw
+    working_dir: /workspace/project
+    entrypoint: ["interpreter"]
+
+  agent-zero:
+    <<: *common
+    build:
+      context: .
+      dockerfile: docker/agent-zero/Dockerfile
+    environment:
+      - OPENAI_API_BASE=${GUARDIAN_BASE_URL}
+      - OPENAI_API_KEY=${GUARDIAN_API_KEY}
+    volumes:
+      - ${ACTIVE_PROJECT}:/workspace/project:rw
+      - ./configs/agent-zero:/config/agent-zero:ro
+      - ./logs/agent-zero:/logs/agent-zero:rw
+      # Agent zero needs limited scope mappings and possibly dockersocket if ALLOW_DOCKER_SOCKET is true
+    working_dir: /workspace/project
