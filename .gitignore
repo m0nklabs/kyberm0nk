@@ -27,3 +27,4 @@ build/
 # Editors
 .DS_Store
 *.swp
+*.code-workspace
