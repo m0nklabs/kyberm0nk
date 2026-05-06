@@ -4,8 +4,9 @@
 
 - [x] Choose project name: KyberM0nk.
 - [x] Create documentation-first repository skeleton.
-- [ ] Create private GitHub repository under `m0nklabs`.
-- [ ] Push initial skeleton to GitHub.
+- [x] Create private GitHub repository under `m0nklabs`.
+- [x] Push initial skeleton to GitHub.
+- [x] Create local VS Code workspace file at `/home/flip/kyberm0nk.code-workspace`.
 - [ ] Open KyberM0nk in its own VS Code workspace.
 
 ## Phase 1 - Tool Discovery
