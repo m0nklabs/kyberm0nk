@@ -40,6 +40,7 @@ Start here:
 - [docs/SECURITY.md](docs/SECURITY.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
 - [docs/TODO_LIST.md](docs/TODO_LIST.md)
+- [docs/AGENT_HANDOFF_PROMPT.md](docs/AGENT_HANDOFF_PROMPT.md)
 
 ## Repository Status
 

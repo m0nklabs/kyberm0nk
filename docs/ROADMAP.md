@@ -20,7 +20,8 @@ Deliverables:
 
 - Guardian health check script
 - minimal Docker base image
-- Aider container profile
+- Aider container profile as the first edit-loop smoke test
+- OpenCode config immediately afterwards as the first strategic self-building tool
 - active project mount validation
 
 ## Phase 2 - Tool Stack

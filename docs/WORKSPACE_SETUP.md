@@ -48,8 +48,8 @@ Important variables:
 1. Open the new workspace.
 2. Verify Guardian health from the host.
 3. Verify Guardian health from inside a minimal Docker container.
-4. Add the Aider container first.
-5. Add OpenCode after Aider is stable.
+4. Add the Aider container first as the smallest Guardian/edit-loop smoke test.
+5. Add OpenCode immediately after Aider as the strategic self-building agent.
 6. Add Agent Zero last, with strict mount rules.
 7. Configure Continue separately in VS Code.
 

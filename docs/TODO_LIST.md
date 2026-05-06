@@ -7,10 +7,12 @@
 - [x] Create private GitHub repository under `m0nklabs`.
 - [x] Push initial skeleton to GitHub.
 - [x] Create local VS Code workspace file at `/home/flip/kyberm0nk.code-workspace`.
+- [x] Add agent handoff prompt for the next workspace session.
 - [ ] Open KyberM0nk in its own VS Code workspace.
 
 ## Phase 1 - Tool Discovery
 
+- [ ] Add Guardian health-check script for host and Docker.
 - [ ] Verify the current OpenCode install path and Docker support.
 - [ ] Verify Aider configuration against Guardian `/v1`.
 - [ ] Verify Agent Zero Docker deployment and mount strategy.
