@@ -50,9 +50,9 @@
 
 ## Phase 6 - Agent Zero Sandbox (Special Ops)
 
-- [ ] Verify Agent Zero strict mounts (rw on active, ro on references).
-- [ ] Run a test script via Agent Zero to confirm execution bounds.
-- [ ] Restrict Agent Zero from modifying parent/host resources unexpectedly.
+- [x] Verify Agent Zero strict mounts (rw on active, ro on references).
+- [x] Run a test script via Agent Zero to confirm execution bounds.
+- [x] Restrict Agent Zero from modifying parent/host resources unexpectedly (impl. via Docker `cap_drop` and `security_opt: no-new-privileges` in compose).
 
 ## Phase 7 - Continue IDE Integration (The Glasses)
 

@@ -54,5 +54,9 @@ services:
       - ${ACTIVE_PROJECT}:/workspace/project:rw
       - ./configs/agent-zero:/config/agent-zero:ro
       - ./logs/agent-zero:/logs/agent-zero:rw
-      # Agent zero needs limited scope mappings and possibly dockersocket if ALLOW_DOCKER_SOCKET is true
+    # Restrict Agent Zero capabilities
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     working_dir: /workspace/project
