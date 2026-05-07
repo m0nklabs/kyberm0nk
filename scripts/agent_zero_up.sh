@@ -14,7 +14,7 @@ UI_PORT="${AGENT_ZERO_PORT:-50001}"
 echo "[agent-zero] ensuring sandbox container is up..."
 docker compose up -d sandbox >/dev/null
 
-echo "[agent-zero] copying Guardian model config into AZ usr/ tree..."
+echo "[agent-zero] ensuring config directories exist..."
 docker compose exec -T sandbox bash -lc '
 set -euo pipefail
 mkdir -p /opt/agent-zero/usr/plugins/_model_config
@@ -22,12 +22,13 @@ mkdir -p /opt/agent-zero/usr/plugins/_model_config
 cp /config/agent-zero/model_config.json /opt/agent-zero/usr/plugins/_model_config/config.json
 # remove any leftover yaml override that the plugin would ignore anyway
 rm -f /opt/agent-zero/usr/plugins/_model_config/config.yaml
+
 echo "  config.json in place:"
 head -8 /opt/agent-zero/usr/plugins/_model_config/config.json
 '
 
 echo "[agent-zero] checking if Agent Zero is already running..."
-if docker compose exec -T sandbox bash -lc 'pgrep -f run_ui.py >/dev/null 2>&1'; then
+if docker compose exec -T sandbox bash -lc 'pgrep -f "[r]un_ui.py" >/dev/null 2>&1'; then
     echo "[agent-zero] already running; restart with: $0 stop && $0"
 else
     echo "[agent-zero] starting run_ui.py in background (logs: ./logs/agent-zero/web.log)..."
@@ -35,10 +36,7 @@ else
     docker compose exec -d sandbox bash -lc '
 cd /opt/agent-zero
 mkdir -p /logs/agent-zero
-# --dockerized=true: AZs arg parser only picks up unknown args in key=value form.
-# Without this it falls into is_development() and tries RFC calls to a nonexistent host.
-nohup python run_ui.py --dockerized=true --host 0.0.0.0 --port '"$UI_PORT"' </dev/null \
-    >/logs/agent-zero/web.log 2>&1 &
+python run_ui.py --dockerized=true --host 0.0.0.0 --port '"$UI_PORT"' </dev/null >/logs/agent-zero/web.log 2>&1
 '
 fi
 
