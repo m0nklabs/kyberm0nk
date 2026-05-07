@@ -11,6 +11,15 @@ services:
     image: curlimages/curl
     command: ["-s", "-f", "-m", "5", "http://host.docker.internal:11434/v1/models"]
 
+  searxng:
+    <<: *common
+    image: searxng/searxng:latest
+    restart: unless-stopped
+    volumes:
+      - ./configs/searxng:/etc/searxng:ro
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080/
+      
   sandbox:
     <<: *common
     build:
@@ -47,6 +56,7 @@ services:
       # AZ patches mounted directly into the source
       - ./configs/agent-zero/patches/modules.py:/opt/agent-zero/helpers/modules.py:ro
       - ./configs/agent-zero/patches/code_execution_tool.py:/opt/agent-zero/plugins/_code_execution/tools/code_execution_tool.py:ro
+      - ./configs/agent-zero/patches/searxng.py:/opt/agent-zero/helpers/searxng.py:ro
       - ./logs:/logs:rw
     security_opt:
       - no-new-privileges:true
