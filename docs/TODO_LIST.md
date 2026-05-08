@@ -59,3 +59,18 @@
 - [x] Generate standard `config.json` (or `.yaml`) payload for Continue linking to Guardian.
 - [x] Place `config.yaml` in `configs/continue/` as a template for easy copying to `~/.continue/`.
 - [x] Verify autocomplete model routes to local endpoint.
+
+## Phase 8 - Guardian Context Benchmarking
+
+- [x] Add a reusable Guardian context benchmark script.
+- [x] Record GPU utilization, power, memory, request timing, and timeout status.
+- [x] Write benchmark outputs to ignored `logs/guardian-context-benchmarks/` files.
+- [x] Document smoke, ramp, Agent Zero, and full-context benchmark presets.
+- [x] Add matrix benchmarking across input sizes, completion caps, task modes, and thinking modes.
+- [x] Add trend rendering for benchmark CSV outputs.
+- [x] Add decision-first ordering for faster ballpark tuning runs.
+- [x] Use benchmark data to choose safer Agent Zero context defaults.
+- [x] Apply benchmark-based OpenCode defaults.
+- [x] Document local agent model settings.
+- [x] Validate OpenCode and Agent Zero after applying balanced settings.
+- [ ] Add Guardian/AZ cancellation regression tests for orphaned `llama-server` requests.

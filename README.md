@@ -39,6 +39,8 @@ Start here:
 - [docs/WORKSPACE_SETUP.md](docs/WORKSPACE_SETUP.md)
 - [docs/SECURITY.md](docs/SECURITY.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
+- [docs/LOCAL_AGENT_MODEL_SETTINGS.md](docs/LOCAL_AGENT_MODEL_SETTINGS.md)
+- [docs/VALIDATION_LOG.md](docs/VALIDATION_LOG.md)
 - [docs/TODO_LIST.md](docs/TODO_LIST.md)
 - [docs/AGENT_HANDOFF_PROMPT.md](docs/AGENT_HANDOFF_PROMPT.md)
 

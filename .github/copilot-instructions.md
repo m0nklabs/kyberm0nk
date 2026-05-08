@@ -27,3 +27,12 @@ KyberM0nk is a local agentic coding cockpit. It coordinates coding tools around 
 ## Current Primary Model Target
 
 Use Guardian alias `qwen3-35b-uncensored` as the initial deep model target unless the operator changes Guardian policy.
+
+## Local Agent Model Defaults
+
+- Use benchmark-based balanced defaults for local coding agents; do not default to maximum context plus maximum output.
+- OpenCode default profile: `65536` context, `4096` max tokens, `0.2` temperature.
+- Agent Zero default profile: `65536` chat context with `ctx_history: 0.55`; utility model stays at `32768` with `ctx_input: 0.45`.
+- Avoid `32768` output-token caps for normal coding-agent work; benchmark data shows long-decode failures around the 600-second boundary.
+- Prefer staged context gathering, summaries, and durable handoff notes over dumping full repositories into a single prompt.
+- See `docs/LOCAL_AGENT_MODEL_SETTINGS.md` before changing tool model budgets.

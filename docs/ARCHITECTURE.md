@@ -90,6 +90,19 @@ qwen3-35b-uncensored
 
 Guardian remains the source of truth for actual model paths, context sizes, VRAM policy, pinned model behavior, and switch allowlists.
 
+## Agent Model Budgets
+
+KyberM0nk tools should use balanced coding-agent budgets rather than maximum stress-test budgets.
+
+Default policy:
+
+- OpenCode: `65536` context, `4096` max tokens, `0.2` temperature.
+- Agent Zero chat: `65536` context with `ctx_history: 0.55`.
+- Agent Zero utility: `32768` context with `ctx_input: 0.45`.
+- Avoid `32768` output-token caps for normal autonomous coding tasks.
+
+The benchmark suite and trend renderer in `scripts/` provide the evidence trail for changing these values.
+
 ## Non-Goals
 
 - KyberM0nk does not replace Guardian.

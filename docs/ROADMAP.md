@@ -57,3 +57,11 @@ The KyberM0nk stack maps directly to specific roles to form a cohesive, self-con
 
 ### Phase 8 - E2E Orchestration & Polish
 - Goal: Seamless handoffs (e.g. OpenCode plans -> User guides Aider for quick edits -> Agent Zero runs the build).
+
+### Phase 9 - Evidence-Based Model Tuning
+- Goal: Keep local agents close to Copilot-style working patterns: broad available context, targeted retrieval, bounded output, and staged summaries.
+- Deliverables:
+	- Maintain Guardian context benchmark scripts and trend reports.
+	- Use decision-order benchmarks for fast ballpark tuning before exhaustive matrices.
+	- Keep OpenCode and Agent Zero defaults aligned with the latest stable benchmark evidence.
+	- Avoid defaulting agent tools to maximum context plus maximum output unless an explicit deep benchmark or stress test requires it.

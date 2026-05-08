@@ -2,6 +2,24 @@
 
 ## 2026-05-08
 
+- **Guardian context benchmark suite:**
+  - Replaced the ad-hoc 32k context test with `scripts/benchmark_guardian_context.py`.
+  - Added context-size presets, JSONL/CSV output, `nvidia-smi` GPU sampling, and timeout reset protection for runaway `llama-server` requests.
+  - Added a `max` preset for near-limit tests up to the current Qwen `131072` context setting.
+  - Added a `reasoning-stress` task mode for comparing context prefill against long reasoning/decode behavior.
+  - Added a `long-decode` task mode to force high completion-token benchmarks.
+  - Expanded the benchmark into a full matrix suite across input sizes, completion caps, task modes, and thinking modes.
+  - Added context budget metadata and estimated content-vs-reasoning token split columns.
+  - Persist benchmark JSONL/CSV after every matrix case so long runs keep partial results if interrupted.
+  - Added `--resume` support for continuing interrupted matrix runs from existing JSONL output.
+  - Added `--order decision` and `--order shuffle` so runs can gather early tuning signal or spread bias instead of always walking the matrix sequentially.
+  - Added `scripts/render_benchmark_trends.py` to turn benchmark CSV files into standalone trend reports.
+  - Applied benchmark-based balanced defaults to Agent Zero and OpenCode.
+  - Documented the local coding-agent model budget in `docs/LOCAL_AGENT_MODEL_SETTINGS.md`.
+  - Added `docs/VALIDATION_LOG.md` with final validation results for the tuned OpenCode and Agent Zero settings.
+  - Documented the workflow in `docs/GUARDIAN_CONTEXT_BENCHMARKS.md`.
+  - Removed a hardcoded Guardian API key from `scripts/test_aider_headless.sh`.
+
 - **Agent Zero Architecture overhaul:**
   - Removed brittle shell `sed` patching from `agent_zero_up.sh`.
   - Introduced clean, read-only volume-mounted patches (`configs/agent-zero/patches/*`).

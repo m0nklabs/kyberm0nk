@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 # Unified system dependencies (build-essential, nodejs, etc.)
 RUN apt-get update && apt-get install -y \
-    git curl wget jq nodejs npm sudo build-essential python3-dev \
+    git curl wget jq nodejs npm sudo build-essential python3-dev python3-tk \
     && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip and pre-install heavy math/ML dependencies for Agent Zero
