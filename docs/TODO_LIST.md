@@ -16,7 +16,7 @@
 - [x] Verify the current OpenCode install path and Docker support.
 - [x] Verify Aider configuration against Guardian `/v1`.
 - [x] Verify Agent Zero Docker deployment and mount strategy.
-- [ ] Verify Continue local provider config format.
+- [x] Verify Continue local provider config format.
 
 ## Phase 2 - Docker Stack
 
@@ -56,6 +56,6 @@
 
 ## Phase 7 - Continue IDE Integration (The Glasses)
 
-- [ ] Generate standard `config.json` payload for Continue linking to Guardian.
-- [ ] Place `config.json` in `configs/continue/` as a template for easy copying to `~/.continue/`.
-- [ ] Verify autocomplete model routes to local endpoint.
+- [x] Generate standard `config.json` (or `.yaml`) payload for Continue linking to Guardian.
+- [x] Place `config.yaml` in `configs/continue/` as a template for easy copying to `~/.continue/`.
+- [x] Verify autocomplete model routes to local endpoint.

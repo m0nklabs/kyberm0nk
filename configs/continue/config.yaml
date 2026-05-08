@@ -1,0 +1,12 @@
+models:
+  - title: Guardian (Qwen)
+    provider: openai
+    model: qwen3-35b-uncensored
+    apiKey: continue_sk_8f7b2c9a1d4e6f3b0c5e9a2d8f7b1c4e # Vergeet deze niet ook in Guardian te whitelisten!
+    apiBase: http://192.168.1.35:11434/v1
+
+tabAutocompleteModel:
+  title: Guardian Autocomplete
+  provider: openai
+  model: qwen3-35b-uncensored
+  apiBase: http://192.168.1.35:11434/v1

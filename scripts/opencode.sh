@@ -3,22 +3,22 @@ set -e
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if [ ! -f "$DIR/.env" ]; then
-    echo "❌ ERROR: .env file missing in $DIR"
-    exit 1
-fi
-export $(grep -v '^#' "$DIR/.env" | xargs)
+if [ ! -f "$DIR/.env" ]; then echo "❌ ERROR: .env file missing in $DIR"; exit 1; fi
+export $(grep -v "^#" "$DIR/.env" | xargs)
 
-if [ -z "$ACTIVE_PROJECT" ] || [ ! -d "$ACTIVE_PROJECT" ]; then
-    echo "❌ ERROR: ACTIVE_PROJECT is not set or does not exist: $ACTIVE_PROJECT"
-    exit 1
-fi
+if [ -z "$ACTIVE_PROJECT" ] || [ ! -d "$ACTIVE_PROJECT" ]; then echo "❌ ERROR: ACTIVE_PROJECT is not set or does not exist: $ACTIVE_PROJECT"; exit 1; fi
 
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 LOG_FILE="$DIR/logs/opencode/opencode_$TIMESTAMP.log"
 
-echo "🚀 Starting OpenCode via Docker Compose..."
+echo "🚀 Checking Sandbox container..."
+cd "$DIR"
+if ! docker-compose ps --services --filter "status=running" | grep -q "^sandbox$"; then
+    echo "📦 Starting unified KyberM0nk sandbox..."
+    docker-compose up -d sandbox
+fi
+
 echo "📂 Active project: $ACTIVE_PROJECT"
 echo "📝 Logging to: $LOG_FILE"
 
-docker-compose run --rm opencode --model "openai/${DEFAULT_MODEL}" --system_message "$(cat "$DIR/configs/opencode/system_message.txt")" "$@" 2>&1 | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }' | tee -a "$LOG_FILE"
+docker-compose exec sandbox interpreter --model "openai/${DEFAULT_MODEL}" --system_message "$(cat "$DIR/configs/opencode/system_message.txt")" "$@" 2>&1 | awk "{ print strftime("[%Y-%m-%d %H:%M:%S]"), \$0 }" | tee -a "$LOG_FILE"

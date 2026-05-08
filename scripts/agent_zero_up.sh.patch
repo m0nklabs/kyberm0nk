@@ -1,0 +1,8 @@
+# HOTPATCH: Log exact tool load failures so they are not silently swallowed into "Unknown"
+sed -i "s/except Exception:/except Exception as e:\n                self.logger.error(f'Error loading too {name} from {path}: {e}')/g" /opt/agent-zero/agent.py
+# HOTPATCH: Log exact tool load failures
+sed -i "s/except Exception:/except Exception as e:\n                import traceback\n                traceback.print_exc()/g" /opt/agent-zero/agent.py
+# HOTPATCH: Log exact tool load failures
+sed -i "s/except Exception:/except Exception as e:\n                import traceback\n                traceback.print_exc()/g" /opt/agent-zero/agent.py
+# HOTPATCH: Log exact tool load failures
+python3 -c "import sys; c=sys.stdin.read().replace('except Exception:', 'except Exception as e:\n                import traceback\n                traceback.print_exc()'); sys.stdout.write(c)" < /opt/agent-zero/agent.py > /tmp/agent.py && mv /tmp/agent.py /opt/agent-zero/agent.py

@@ -35,9 +35,7 @@ services:
       - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY:-}
       # Agent Zero: route the generic "other" OpenAI-compatible provider to Guardian
       - OTHER_API_KEY=${GUARDIAN_API_KEY}
-      # Agent Zero internal overrides (Timouts and KB skip)
-      - A0_SET_chat_model_kwargs={"timeout":45.0}
-      - A0_SET_utility_model_kwargs={"timeout":45.0}
+      # Agent Zero internal overrides (Knowledge base skip)
       - A0_SET_agent_knowledge_subdir=disabled
       - WEB_UI_HOST=0.0.0.0
       - WEB_UI_PORT=50001
