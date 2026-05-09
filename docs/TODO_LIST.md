@@ -73,5 +73,7 @@
 - [x] Apply benchmark-based OpenCode defaults.
 - [x] Document local agent model settings.
 - [x] Validate OpenCode and Agent Zero after applying balanced settings.
+- [x] Smoke-test Agent Zero with Guardian `gemma4-agent` after Qwen-backed runs stalled.
 - [ ] Add Guardian/AZ cancellation regression tests for orphaned `llama-server` requests.
+- [ ] Complete a longer Agent Zero `gemma4-agent` whole-plan run and record whether memory consolidation stays stable.
 - [ ] Evaluate a replacement primary agentic framework for local reasoning-on workflows; prioritize OpenCode/interpreter, Aider, Continue/Roo-style IDE agents, and Goose-style CLI agents over Agent Zero for interactive coding.

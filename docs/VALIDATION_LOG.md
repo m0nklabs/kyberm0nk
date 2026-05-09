@@ -1,5 +1,30 @@
 # Validation Log
 
+## 2026-05-09 - Agent Zero Gemma4 Compatibility Smoke
+
+Scope:
+
+- Add Guardian alias `gemma4-agent` for a 65k-context Gemma4 26B A4B profile.
+- Temporarily route Agent Zero chat and utility models to `gemma4-agent`.
+- Verify direct Guardian inference, Agent Zero's LiteLLM wrapper, and the real Agent Zero UI/API message path.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Guardian YAML and AZ JSON syntax | Passed | Parsed `config/models.yaml` and `configs/agent-zero/model_config.json` successfully |
+| Direct Guardian smoke | Passed | `gemma4-agent` returned `GEMMA4_OK` at about 40 tokens/sec decode |
+| Agent Zero model-wrapper smoke | Passed | AZ LiteLLM route returned `AZ_GEMMA4_OK` |
+| Agent Zero UI/API message smoke | Passed with observation | UI/API accepted a message and logged a `response` tool payload with `AZ_UI_GEMMA4_OK` |
+| Whole-plan tool-loop observation | In progress | AZ created `/opt/agent-zero/usr/workdir/rimworld_sim/entities.py` through a subordinate/tool loop |
+| GPU cleanup | Passed | Guardian `/admin/unload` stopped `llama-server`; only Frigate remained on GPU0 after cleanup |
+
+Operational note:
+
+- The UI/API message request exceeded a 20-second client timeout during first-run VectorDB/knowledge initialization, but Agent Zero continued and logged the correct response payload.
+- Agent Zero logged `Memory consolidation timeout for area fragments` during the longer run, then continued and wrote the file. Treat this as AZ framework overhead to watch, not a Gemma4 inference failure.
+- Keep the run bounded and monitor GPU status while deciding whether AZ is viable with Gemma4.
+
 ## 2026-05-08 - Balanced Local Agent Settings
 
 Scope:

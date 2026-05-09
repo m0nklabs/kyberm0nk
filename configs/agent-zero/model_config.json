@@ -2,7 +2,7 @@
   "allow_chat_override": true,
   "chat_model": {
     "provider": "other",
-    "name": "qwen3-35b-uncensored-agent",
+    "name": "gemma4-agent",
     "api_base": "http://host.docker.internal:11434/v1",
     "ctx_length": 65536,
     "ctx_history": 0.55,
@@ -15,7 +15,7 @@
   },
   "utility_model": {
     "provider": "other",
-    "name": "qwen3-35b-uncensored-agent",
+    "name": "gemma4-agent",
     "api_base": "http://host.docker.internal:11434/v1",
     "ctx_length": 32768,
     "ctx_input": 0.45,

@@ -7,6 +7,9 @@
   - Switched the local default model alias to `qwen3-35b-reasoning-agent`, a Guardian profile with Qwen reasoning enabled but bounded.
   - Kept Agent Zero on the non-thinking alias for sandbox experiments while OpenCode/interpreter and Aider become the preferred local-agent path.
 
+- **Agent Zero Gemma4 compatibility attempt:**
+  - Temporarily switched Agent Zero chat and utility models to Guardian alias `gemma4-agent` for a bounded compatibility smoke test against the Gemma4 26B local model.
+
 - **Agent Zero non-thinking Guardian route:**
   - Switched Agent Zero chat and utility models to Guardian alias `qwen3-35b-uncensored-agent`.
   - Added hard LiteLLM output caps in `configs/agent-zero/model_config.json` (`4096` chat tokens, `2048` utility tokens).
