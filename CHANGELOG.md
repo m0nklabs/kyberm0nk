@@ -2,6 +2,13 @@
 
 ## 2026-05-08
 
+- **Windows Unreal executor SSH access for Agent Zero:**
+  - Added a dedicated sandbox SSH config for the `unreal-windows` executor alias.
+  - Mounted only the dedicated Windows Unreal private key into the sandbox as a read-only secret path.
+  - Documented the Windows executor security model and environment variables.
+  - Added a live provisioning script that drops the Windows Unreal SSH config and key into an already-running Agent Zero sandbox without rebuilding the image or recreating the container.
+  - Added a host/container smoke-test script for validating Agent Zero can execute commands on the Windows Unreal machine.
+
 - **Agent Zero parked for primary coding-agent work:**
   - Stopped treating Agent Zero as the default interactive cockpit after repeated GPU-heavy stalls with poor progress feedback.
   - Switched the local default model alias to `qwen3-35b-reasoning-agent`, a Guardian profile with Qwen reasoning enabled but bounded.

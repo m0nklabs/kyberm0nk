@@ -11,6 +11,8 @@ Planned scripts:
 - `status.sh`: show active project, model target, and tool status.
 - `benchmark_guardian_context.py`: benchmark Guardian latency and GPU load across multiple context sizes.
 - `render_benchmark_trends.py`: render benchmark CSV files into standalone HTML trend reports.
+- `provision_windows_unreal_ssh.sh`: copy the dedicated Windows Unreal SSH config and key into the running Agent Zero sandbox without rebuilding or recreating it.
+- `test_windows_unreal_ssh.sh`: verify host and Agent Zero sandbox SSH access to the Windows Unreal executor.
 
 Scripts must be non-interactive by default and log with timestamps where practical.
 
