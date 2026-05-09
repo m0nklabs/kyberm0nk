@@ -74,3 +74,4 @@
 - [x] Document local agent model settings.
 - [x] Validate OpenCode and Agent Zero after applying balanced settings.
 - [ ] Add Guardian/AZ cancellation regression tests for orphaned `llama-server` requests.
+- [ ] Evaluate a replacement primary agentic framework for local reasoning-on workflows; prioritize OpenCode/interpreter, Aider, Continue/Roo-style IDE agents, and Goose-style CLI agents over Agent Zero for interactive coding.

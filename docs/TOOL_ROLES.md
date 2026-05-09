@@ -46,6 +46,8 @@ Continue is configured outside Docker as a VS Code extension, pointed at Guardia
 
 Agent Zero is the sandboxed task runner for heavier system work.
 
+Current status: experimental and parked as a primary interactive coding agent. Its UI can leave long-running local reasoning calls looking idle while GPUs are busy, so do not use it as the default cockpit.
+
 Use it for:
 
 - installing tool dependencies inside a container

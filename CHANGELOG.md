@@ -2,6 +2,11 @@
 
 ## 2026-05-08
 
+- **Agent Zero parked for primary coding-agent work:**
+  - Stopped treating Agent Zero as the default interactive cockpit after repeated GPU-heavy stalls with poor progress feedback.
+  - Switched the local default model alias to `qwen3-35b-reasoning-agent`, a Guardian profile with Qwen reasoning enabled but bounded.
+  - Kept Agent Zero on the non-thinking alias for sandbox experiments while OpenCode/interpreter and Aider become the preferred local-agent path.
+
 - **Agent Zero non-thinking Guardian route:**
   - Switched Agent Zero chat and utility models to Guardian alias `qwen3-35b-uncensored-agent`.
   - Added hard LiteLLM output caps in `configs/agent-zero/model_config.json` (`4096` chat tokens, `2048` utility tokens).
