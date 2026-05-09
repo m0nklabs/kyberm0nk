@@ -71,8 +71,8 @@ Agent Zero may access the Windows Unreal executor through a dedicated SSH key fo
 
 Rules:
 
-- Mount only the dedicated private key into the sandbox, never the full host `~/.ssh` directory.
-- Keep the private key outside Git and mount it read-only at `/run/kyberm0nk/secrets/windows_unreal_ed25519`.
+- Provision only the dedicated private key into the sandbox, never the full host `~/.ssh` directory.
+- Keep the private key outside Git and copy it to `/run/kyberm0nk/secrets/windows_unreal_ed25519` with `0600` permissions.
 - Use the sandbox SSH config alias `unreal-windows`, which targets the Windows OpenSSH server with `IdentitiesOnly yes` and `BatchMode yes`.
 - Treat the Windows node as a privileged executor: give Agent Zero specific tasks and project paths, not broad exploratory host-control prompts.
 

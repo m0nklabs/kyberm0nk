@@ -21,7 +21,7 @@ The dedicated private key stays on the Linux host at:
 ```
 
 
-Docker Compose mounts that single key read-only into the sandbox at:
+The provisioning script copies that single key into the sandbox at:
 
 ```text
 /run/kyberm0nk/secrets/windows_unreal_ed25519
@@ -29,7 +29,7 @@ Docker Compose mounts that single key read-only into the sandbox at:
 
 Do not mount the full host SSH directory into the sandbox.
 
-For an already-running Agent Zero sandbox, do not rebuild the image just to add this key. Provision the current container in place:
+Do not rebuild or recreate the image just to add this key. Provision the current container in place:
 
 ```bash
 scripts/provision_windows_unreal_ssh.sh

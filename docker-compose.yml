@@ -54,8 +54,6 @@ services:
       - ./configs/aider:/config/aider:ro
       - ./configs/opencode:/config/opencode:ro
       - ./configs/agent-zero:/config/agent-zero:ro
-      - ./configs/ssh/windows-unreal.config:/root/.ssh/config:ro
-      - ${WINDOWS_UNREAL_SSH_KEY_PATH:-/home/flip/.ssh/kyberm0nk_windows_unreal_ed25519}:/run/kyberm0nk/secrets/windows_unreal_ed25519:ro
       # AZ patches mounted directly into the source
       - ./configs/agent-zero/patches/modules.py:/opt/agent-zero/helpers/modules.py:ro
       - ./configs/agent-zero/patches/code_execution_tool.py:/opt/agent-zero/plugins/_code_execution/tools/code_execution_tool.py:ro

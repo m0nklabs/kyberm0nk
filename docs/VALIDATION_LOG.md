@@ -1,5 +1,26 @@
 # Validation Log
 
+
+## 2026-05-09 - Agent Zero Gemma4 Vision Route
+
+Scope:
+
+- Enable Agent Zero's Gemma4 chat route to advertise vision support.
+- Keep Agent Zero on Guardian alias `gemma4-agent`, with Guardian carrying the Gemma4 multimodal projector.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Guardian direct vision smoke | Passed | `gemma4-agent` loaded with `--mmproj` and identified a generated red PNG as `red` |
+| Agent Zero runtime config | Passed | `/opt/agent-zero/usr/plugins/_model_config/config.json` reports `chat_model.vision == true` |
+| Agent Zero wrapper vision smoke | Passed | AZ `get_chat_model` / `LiteLLMChatWrapper` accepted a LangChain `HumanMessage` with `image_url` content and returned `red` |
+| Windows executor regression smoke | Passed | `scripts/test_windows_unreal_ssh.sh` still reaches `14700K` from host and sandbox after the sandbox cleanup |
+
+Operational note:
+
+- `agent_zero_up.sh` previously used `docker compose up -d sandbox`, which allowed Compose to recreate the sandbox when service config drifted. It now starts an existing container directly and only creates a container with `--no-build` when none exists.
+
 ## 2026-05-09 - Agent Zero Gemma4 Compatibility Smoke
 
 Scope:

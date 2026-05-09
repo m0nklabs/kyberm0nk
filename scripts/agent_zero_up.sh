@@ -12,7 +12,14 @@ cd "$(dirname "$0")/.."
 UI_PORT="${AGENT_ZERO_PORT:-50001}"
 
 echo "[agent-zero] ensuring sandbox container is up..."
-docker compose up -d sandbox >/dev/null
+container_id="$(docker compose ps -q sandbox)"
+if [[ -n "${container_id}" ]]; then
+    if [[ "$(docker inspect --format '{{.State.Running}}' "${container_id}")" != "true" ]]; then
+        docker start "${container_id}" >/dev/null
+    fi
+else
+    docker compose up -d --no-build sandbox >/dev/null
+fi
 
 echo "[agent-zero] ensuring config directories exist..."
 docker compose exec -T sandbox bash -lc '

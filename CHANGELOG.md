@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-05-09
+
+- **Agent Zero Gemma4 vision route:**
+  - Enabled `vision: true` for the Agent Zero `gemma4-agent` chat model route.
+  - Kept Agent Zero on Guardian's bounded Gemma4 agent alias instead of switching to the full-context OpenWebUI profile.
+  - Hardened `agent_zero_up.sh` so it starts an existing sandbox instead of allowing Compose to silently recreate it during config drift.
+  - Removed Windows Unreal SSH key bind mounts from Compose; the dedicated key is now copied into the running sandbox by the provisioning script.
+
 ## 2026-05-08
 
 - **Windows Unreal executor SSH access for Agent Zero:**

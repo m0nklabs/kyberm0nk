@@ -6,7 +6,7 @@
     "api_base": "http://host.docker.internal:11434/v1",
     "ctx_length": 65536,
     "ctx_history": 0.55,
-    "vision": false,
+    "vision": true,
     "max_embeds": 10,
     "rl_requests": 0,
     "rl_input": 0,
