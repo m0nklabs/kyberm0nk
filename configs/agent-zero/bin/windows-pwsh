@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -eq 0 ]]; then
+  printf 'Usage: windows-pwsh <PowerShell command>\n' >&2
+  exit 2
+fi
+
+command_text="\$ProgressPreference = 'SilentlyContinue'; $*"
+encoded_command="$(python3 - "$command_text" <<'PY'
+import base64
+import sys
+
+print(base64.b64encode(sys.argv[1].encode("utf-16le")).decode("ascii"))
+PY
+)"
+
+exec ssh -o LogLevel=ERROR unreal-windows "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand ${encoded_command}"

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_path="${1:-J:\\Unreal Projects\\NewNexus}"
+
+script="\$ErrorActionPreference = 'SilentlyContinue'; \$projectPath = '${project_path}'; \$knownUbt = 'J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe'; \$roots = @('J:\UNREAL_ENGINE', 'C:\Program Files\Epic Games', 'C:\Program Files (x86)\Epic Games') | Where-Object { Test-Path -LiteralPath \$_ }; \$ubt = @(); if (Test-Path -LiteralPath \$knownUbt) { \$ubt += \$knownUbt }; foreach (\$root in \$roots) { \$ubt += Get-ChildItem -LiteralPath \$root -Filter 'UnrealBuildTool.exe' -Recurse | Select-Object -First 10 -ExpandProperty FullName }; \$ubt = @(\$ubt | Select-Object -Unique); [pscustomobject]@{ computer = \$env:COMPUTERNAME; user = \$env:USERNAME; project_path = \$projectPath; project_exists = Test-Path -LiteralPath \$projectPath; uproject_exists = Test-Path -LiteralPath (Join-Path \$projectPath 'NewNexus.uproject'); unreal_engine_root = 'J:\UNREAL_ENGINE\UE_5.7'; preferred_unreal_build_tool = \$knownUbt; unreal_build_tools = \$ubt } | ConvertTo-Json -Compress"
+
+exec windows-pwsh "$script"

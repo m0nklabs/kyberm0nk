@@ -8,6 +8,7 @@
   - Added `scripts/ensure_newnexus_checkout.sh` and ignored `.agent-projects/` so the persistent NewNexus working checkout stays local to the host and out of KyberM0nk commits.
   - Hardened project provisioning to trust the mounted NewNexus checkout for Git and remove stale runtime-only Windows helper binaries from older sandbox sessions.
   - Clarified that Agent Zero should edit `/a0/usr/projects/newnexus` and use Windows SSH for build/run validation, not as the primary source editor.
+  - Added minimal `windows-pwsh` and `windows-unreal-probe` sandbox helpers so Agent Zero can obey quote-loop guard instructions without editing source through the Windows checkout.
   - Documented the Agent Zero project restore flow in `docs/AGENT_ZERO_PROJECTS.md`.
 
 - **Agent Zero Windows SSH diagnosis scope correction:**

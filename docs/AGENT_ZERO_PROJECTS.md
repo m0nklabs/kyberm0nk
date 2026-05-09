@@ -16,6 +16,8 @@ scripts/provision_agent_zero_projects.sh
 
 The script starts the existing sandbox if needed, copies missing tracked project templates into `/opt/agent-zero/usr/projects/`, and creates the corresponding `/a0/usr/projects/` workspace entry.
 
+The same restore flow provisions the minimal Windows helper commands `windows-pwsh` and `windows-unreal-probe` into the existing sandbox. These helpers avoid Windows SSH quote loops for build/probe work without rebuilding or recreating the Agent Zero container.
+
 Use `--force` only when the tracked template should overwrite the current runtime metadata:
 
 ```bash
@@ -40,3 +42,9 @@ The workspace path is restored as:
 ```
 
 That gives Agent Zero a stable project workspace while the actual game source remains in the NewNexus repository.
+
+For Windows validation, the project instructions point Agent Zero at:
+
+```text
+J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe
+```

@@ -1,6 +1,30 @@
 # Validation Log
 
 
+## 2026-05-09 - Agent Zero Windows Helper Compatibility
+
+Scope:
+
+- Keep Agent Zero compatible with quote-loop guard guidance that tells it to use `windows-pwsh` and `windows-unreal-probe`.
+- Avoid a Docker rebuild or sandbox recreation.
+- Preserve the rule that source edits happen in `/a0/usr/projects/newnexus`, not directly through the Windows checkout.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Helper shell syntax | Passed | `bash -n` passed for `configs/agent-zero/bin/windows-pwsh`, `configs/agent-zero/bin/windows-unreal-probe`, and `scripts/provision_agent_zero_projects.sh` |
+| Project JSON syntax | Passed | NewNexus `project.json` parses successfully after helper instruction updates |
+| Helper provisioning | Passed | `scripts/provision_agent_zero_projects.sh --force` copied both helper commands into `/usr/local/bin/` in the running sandbox |
+| PowerShell smoke | Passed | `windows-pwsh "Write-Output AZ_WINDOWS_PWSH_CLEAN"` returned clean output without CLIXML progress records or SSH known-host warnings |
+| Unreal probe | Passed | `windows-unreal-probe` found `J:\UNREAL_ENGINE\UE_5.7` and the preferred `UnrealBuildTool.exe` path |
+
+Operational note:
+
+- The helpers are narrow wrappers for Windows discovery/build/run validation. They are not source-editing tools.
+- The running Agent Zero chat may still contain older helper guidance; providing the helpers avoids turning that guidance into a dead end.
+
+
 ## 2026-05-09 - Tracked Agent Zero NewNexus Project
 
 Scope:

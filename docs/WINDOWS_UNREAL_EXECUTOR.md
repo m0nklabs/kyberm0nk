@@ -37,6 +37,25 @@ scripts/provision_windows_unreal_ssh.sh
 
 That script copies only the sandbox SSH config and the dedicated private key into the existing container. It preserves the Agent Zero runtime directory and workdir.
 
+## Agent Zero Helpers
+
+The Agent Zero sandbox also has two small helper commands provisioned by `scripts/provision_agent_zero_projects.sh`:
+
+```bash
+windows-pwsh "<PowerShell command>"
+windows-unreal-probe
+```
+
+Use these helpers for Windows discovery, Unreal builds, editor launches, and validation commands that involve Windows paths. They are intentionally not source-editing tools; Agent Zero should edit NewNexus under `/a0/usr/projects/newnexus` and use Windows only after syncing for build/run validation.
+
+Known NewNexus Unreal paths:
+
+```text
+Project: J:\Unreal Projects\NewNexus
+Engine root: J:\UNREAL_ENGINE\UE_5.7
+UnrealBuildTool: J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe
+```
+
 ## Validation
 
 Run:
@@ -59,7 +78,8 @@ Give Agent Zero explicit Windows executor instructions like this:
 Use the Windows Unreal executor over SSH.
 
 Connection:
-- Run commands with: ssh unreal-windows "<command>"
+- Prefer helper commands in the sandbox: windows-pwsh "<PowerShell command>" or windows-unreal-probe
+- Use raw ssh unreal-windows "<command>" only for simple commands without nested Windows path quoting
 - The target is Windows host 14700K as user onyou.
 - Do not use teams-host; use unreal-windows only.
 
