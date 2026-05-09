@@ -25,6 +25,19 @@ echo "[agent-zero] ensuring config directories exist..."
 docker compose exec -T sandbox bash -lc '
 set -euo pipefail
 mkdir -p /opt/agent-zero/usr/plugins/_model_config
+mkdir -p /opt/agent-zero/usr/uploads /a0/usr
+if [[ -L /a0/usr/uploads ]]; then
+    current_target="$(readlink /a0/usr/uploads)"
+    if [[ "${current_target}" != "/opt/agent-zero/usr/uploads" ]]; then
+        rm -f /a0/usr/uploads
+        ln -s /opt/agent-zero/usr/uploads /a0/usr/uploads
+    fi
+elif [[ ! -e /a0/usr/uploads ]]; then
+    ln -s /opt/agent-zero/usr/uploads /a0/usr/uploads
+fi
+if [[ -f /config/agent-zero/patches/vision_load.py ]]; then
+    cp /config/agent-zero/patches/vision_load.py /opt/agent-zero/tools/vision_load.py
+fi
 # user-override is config.json (yaml only used for defaults)
 cp /config/agent-zero/model_config.json /opt/agent-zero/usr/plugins/_model_config/config.json
 # remove any leftover yaml override that the plugin would ignore anyway

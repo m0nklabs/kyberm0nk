@@ -16,10 +16,14 @@ Validation results:
 | Agent Zero runtime config | Passed | `/opt/agent-zero/usr/plugins/_model_config/config.json` reports `chat_model.vision == true` |
 | Agent Zero wrapper vision smoke | Passed | AZ `get_chat_model` / `LiteLLMChatWrapper` accepted a LangChain `HumanMessage` with `image_url` content and returned `red` |
 | Windows executor regression smoke | Passed | `scripts/test_windows_unreal_ssh.sh` still reaches `14700K` from host and sandbox after the sandbox cleanup |
+| Clipboard upload path smoke | Passed | `/a0/usr/uploads` now resolves to `/opt/agent-zero/usr/uploads`, where pasted clipboard images are stored |
+| Clipboard image conversion smoke | Passed | A real pasted `/a0/usr/uploads/clipboard-*.png` file converted to a `data:image/png;base64,...` URL and produced a Gemma4 vision response through AZ's wrapper |
 
 Operational note:
 
 - `agent_zero_up.sh` previously used `docker compose up -d sandbox`, which allowed Compose to recreate the sandbox when service config drifted. It now starts an existing container directly and only creates a container with `--no-build` when none exists.
+- Agent Zero's UI records pasted files as `/a0/usr/uploads/...`, while the container stores them under `/opt/agent-zero/usr/uploads/...`; the startup script now maintains a symlink for that path.
+- Agent Zero's upstream `vision_load` passes local file paths as `image_url.url`; the Kyber patch converts those files to data URLs because Guardian/llama.cpp cannot read container-local paths from an OpenAI-compatible request.
 
 ## 2026-05-09 - Agent Zero Gemma4 Compatibility Smoke
 

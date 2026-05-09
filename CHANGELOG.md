@@ -7,6 +7,8 @@
   - Kept Agent Zero on Guardian's bounded Gemma4 agent alias instead of switching to the full-context OpenWebUI profile.
   - Hardened `agent_zero_up.sh` so it starts an existing sandbox instead of allowing Compose to silently recreate it during config drift.
   - Removed Windows Unreal SSH key bind mounts from Compose; the dedicated key is now copied into the running sandbox by the provisioning script.
+  - Added a persistent `/a0/usr/uploads` alias to Agent Zero's real `/opt/agent-zero/usr/uploads` directory so pasted clipboard images can be found by `vision_load`.
+  - Patched Agent Zero's `vision_load` tool to convert local uploaded images into `data:image/...;base64,...` URLs before sending them to Guardian.
 
 ## 2026-05-08
 
