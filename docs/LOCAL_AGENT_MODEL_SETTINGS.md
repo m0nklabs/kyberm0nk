@@ -1,14 +1,16 @@
 # Local Agent Model Settings
 
-KyberM0nk routes local coding agents through Guardian alias `qwen3-35b-uncensored`. The current benchmark evidence shows that the machine can handle large contexts, but the best day-to-day agent settings are not the maximum possible settings.
+KyberM0nk routes local coding agents through Guardian alias `qwen3-35b-uncensored-agent`. The current benchmark evidence shows that the machine can handle large contexts, but the best day-to-day agent settings are not the maximum possible settings.
+
+The generic deep alias `qwen3-35b-uncensored` stays available for explicit reasoning runs. Agent tools use the `-agent` alias because Agent Zero's own installation guide warns that reasoning/thinking can increase latency and recommends disabling it with provider-specific parameters when a model supports it. Qwen's llama.cpp documentation says the hard `enable_thinking=False` switch is not exposed directly in llama.cpp and recommends a custom non-thinking chat template; Guardian implements that workaround in `config/qwen3_nonthinking.jinja`.
 
 ## Current Recommendation
 
 | Tool | Context | History/Input Share | Normal Output | Timeout | Reasoning Policy |
 |------|---------|---------------------|---------------|---------|------------------|
 | OpenCode | `65536` | tool-managed | `4096` | wrapper/runtime default | Use targeted planning; avoid huge dumps |
-| Agent Zero chat | `65536` | `ctx_history: 0.55` | prompt-disciplined | `420s` | Prefer concise tool-facing answers |
-| Agent Zero utility | `32768` | `ctx_input: 0.45` | prompt-disciplined | `240s` | Keep utility work fast |
+| Agent Zero chat | `65536` | `ctx_history: 0.55` | `4096` | `420s` | Guardian non-thinking alias |
+| Agent Zero utility | `32768` | `ctx_input: 0.45` | `2048` | `240s` | Guardian non-thinking alias |
 | Deep manual benchmark mode | `98304` or higher | task-specific | `8192` max | `900s+` | Only for explicit deep-analysis runs |
 
 Do not use `131072` context plus `32768` output as a default agent setting. That shape is useful for stress tests, but too slow and fragile for normal coding work.
@@ -23,6 +25,7 @@ The Qwen3.6 benchmark matrix showed:
 - `4096` output is a good normal cap for planning and code explanations.
 - `8192` output is a reasonable explicit deep-task cap.
 - Reasoning output may appear in `reasoning_content` instead of normal `content`; tool-facing agents should avoid relying on huge hidden reasoning for final actionable output.
+- Agent Zero can appear to hang while Qwen emits hidden reasoning. The `-agent` alias uses Qwen's non-thinking template so output is visible quickly and bounded by request-level `max_tokens`.
 
 ## Operational Pattern
 
@@ -59,8 +62,9 @@ The supported and configured fields are:
 - `ctx_history` for chat history share.
 - `ctx_input` for utility model input share.
 - `kwargs.timeout` for request timeout.
+- `kwargs.max_tokens` for hard output caps passed through LiteLLM.
 
-Output caps are not currently exposed in the Agent Zero model config fields verified in this repository. Keep output discipline in Agent Zero through prompts, role instructions, task size, and Guardian-side policy when needed.
+The configured Guardian model name is `qwen3-35b-uncensored-agent`, not the unrestricted deep-reasoning alias. Keep `qwen3-35b-uncensored` for explicit deep/manual runs where hidden reasoning is worth the latency.
 
 ## Benchmark Artifacts
 

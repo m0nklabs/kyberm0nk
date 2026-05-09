@@ -2,6 +2,11 @@
 
 ## 2026-05-08
 
+- **Agent Zero non-thinking Guardian route:**
+  - Switched Agent Zero chat and utility models to Guardian alias `qwen3-35b-uncensored-agent`.
+  - Added hard LiteLLM output caps in `configs/agent-zero/model_config.json` (`4096` chat tokens, `2048` utility tokens).
+  - Documented why Agent Zero should use a non-thinking Qwen profile for routine tool work: Agent Zero's own installation guide warns reasoning/thinking can increase latency, and Qwen's llama.cpp guide requires a custom non-thinking chat template for the hard switch.
+
 - **Guardian context benchmark suite:**
   - Replaced the ad-hoc 32k context test with `scripts/benchmark_guardian_context.py`.
   - Added context-size presets, JSONL/CSV output, `nvidia-smi` GPU sampling, and timeout reset protection for runaway `llama-server` requests.
