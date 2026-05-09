@@ -16,7 +16,9 @@ scripts/provision_agent_zero_projects.sh
 
 The script starts the existing sandbox if needed, copies missing tracked project templates into `/opt/agent-zero/usr/projects/`, and creates the corresponding `/a0/usr/projects/` workspace entry.
 
-The same restore flow provisions the minimal Windows helper commands `windows-pwsh` and `windows-unreal-probe` into the existing sandbox. These helpers avoid Windows SSH quote loops for build/probe work without rebuilding or recreating the Agent Zero container.
+The same restore flow provisions the minimal Windows helper commands `windows-pwsh`, `windows-unreal-probe`, and `newnexus-windows-build` into the existing sandbox. These helpers avoid Windows SSH quote loops for build/probe work without rebuilding or recreating the Agent Zero container.
+
+`newnexus-windows-build` is the preferred Windows validation interface for NewNexus. It supports `status`, `pull`, `query-targets`, and `build`, and keeps Agent Zero away from brittle hand-built PowerShell edits on the Windows checkout.
 
 GitHub push access is provisioned separately because it depends on a local secret token. Put a fresh GitHub token in:
 
@@ -43,7 +45,7 @@ scripts/provision_agent_zero_projects.sh --force
 The tracked `newnexus` project restores:
 
 - Agent Zero project title and instructions.
-- Project model config matching the current Guardian `gemma4-agent` route.
+- Project model config matching the current Guardian `gemma4-31b-uncensored-max-agent` route.
 - Project knowledge and instruction files.
 - A stable `/a0/usr/projects/newnexus` workspace path.
 

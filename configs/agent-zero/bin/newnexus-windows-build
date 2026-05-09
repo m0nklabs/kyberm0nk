@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mode="${1:-build}"
+
+case "${mode}" in
+  status)
+    script="\$ErrorActionPreference = 'Stop'; Set-Location -LiteralPath 'J:\Unreal Projects\NewNexus'; git status --short --branch; git rev-parse HEAD"
+    ;;
+  pull)
+    script="\$ErrorActionPreference = 'Stop'; Set-Location -LiteralPath 'J:\Unreal Projects\NewNexus'; git pull --ff-only; git status --short --branch; git rev-parse HEAD"
+    ;;
+  query-targets)
+    script="\$ErrorActionPreference = 'Stop'; \$projectPath = 'J:\Unreal Projects\NewNexus'; \$ubt = 'J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe'; Set-Location -LiteralPath \$projectPath; git pull --ff-only; & \$ubt -Mode=QueryTargets -Project=\"\$projectPath\NewNexus.uproject\" -Output=\"\$projectPath\Intermediate\TargetInfo.json\"; exit \$LASTEXITCODE"
+    ;;
+  build)
+    script="\$ErrorActionPreference = 'Stop'; \$projectPath = 'J:\Unreal Projects\NewNexus'; \$ubt = 'J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe'; Set-Location -LiteralPath \$projectPath; git pull --ff-only; & \$ubt NewNexusEditor Win64 Development -Project=\"\$projectPath\NewNexus.uproject\" -WaitMutex -NoHotReloadFromIDE; exit \$LASTEXITCODE"
+    ;;
+  *)
+    printf 'Usage: newnexus-windows-build [status|pull|query-targets|build]\n' >&2
+    exit 2
+    ;;
+esac
+
+exec windows-pwsh "${script}"

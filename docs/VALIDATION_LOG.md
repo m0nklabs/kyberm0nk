@@ -1,6 +1,49 @@
 # Validation Log
 
 
+## 2026-05-09 - Agent Zero Gemma4 31B Uncensored Correction
+
+Scope:
+
+- Correct Agent Zero away from the accidental Qwen32 max-agent route.
+- Use the local Gemma4 31B uncensored model matching `TrevorJS/gemma-4-31B-it-uncensored`.
+- Keep max reasoning enabled while preventing loops through source-edit guardrails.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Local model availability | Passed | `/home/flip/models/gemma-4-31B-it-uncensored-heretic-Q4_K_M.gguf` and `/home/flip/models/gemma-4-31B-it-mmproj-BF16.gguf` exist |
+| Hugging Face source | Confirmed | `TrevorJS/gemma-4-31B-it-uncensored` is Gemma4, image-text-to-text, about 32.7B parameters, Apache-2.0 |
+| Target Guardian alias | Passed | `gemma4-31b-uncensored-max-agent` returned `GEMMA31_OK` through Guardian `/v1/chat/completions` |
+| Agent Zero runtime config | Passed | Running sandbox config reports `gemma4-31b-uncensored-max-agent` for chat and utility models |
+| Windows source guard | Passed | `windows-pwsh` blocks source inspection through the Windows checkout with `WINDOWS_SOURCE_EDIT_BLOCKED` |
+| Windows validation helper | Passed | `newnexus-windows-build status` runs successfully from the sandbox |
+
+Operational note:
+
+- This is not the earlier Gemma4 26B A4B compatibility profile and not the Qwen3-VL 32B route. It is the Gemma4 31B uncensored route the user requested.
+
+
+## 2026-05-09 - Agent Zero Windows Source Edit Guard
+
+Scope:
+
+- Stop Agent Zero from repeatedly trying brittle PowerShell source edits against `J:\Unreal Projects\NewNexus`.
+- Keep Windows available for pull/build/editor validation only.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Guard design | Ready for live validation | `windows-pwsh` blocks `Get-Content`, `Set-Content`, `Add-Content`, redirection, and Git write operations against the Windows NewNexus checkout |
+| Dedicated build helper | Ready for live validation | Added `newnexus-windows-build status|pull|query-targets|build` to avoid hand-built PowerShell command strings |
+
+Operational note:
+
+- If Agent Zero needs to inspect or edit source, it must use `/a0/usr/projects/newnexus`. Windows is now only the Unreal validation executor.
+
+
 ## 2026-05-09 - Agent Zero NewNexus GitHub Push Plumbing
 
 Scope:

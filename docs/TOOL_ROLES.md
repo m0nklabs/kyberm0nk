@@ -46,7 +46,7 @@ Continue is configured outside Docker as a VS Code extension, pointed at Guardia
 
 Agent Zero is the sandboxed task runner for heavier system work.
 
-Current status: experimental. Qwen-backed Agent Zero runs were parked as a primary interactive coding path because the UI can leave long-running local reasoning calls looking idle while GPUs are busy. A 2026-05-09 `gemma4-agent` compatibility smoke looked materially better: AZ produced visible subordinate/tool-loop progress and wrote a file through its sandbox. Keep monitoring memory-consolidation timeouts before promoting it back to a primary executor.
+Current status: experimental. A 2026-05-09 Gemma4 run produced visible progress, but then fell into repetitive thinking around brittle Windows source-edit attempts. Agent Zero now uses `gemma4-31b-uncensored-max-agent`: max reasoning remains enabled on the 31B uncensored Gemma4 model, while Windows-source mutation is blocked and NewNexus validation goes through dedicated helpers. Keep monitoring memory-consolidation timeouts before promoting it back to a primary executor.
 
 Use it for:
 
@@ -54,7 +54,7 @@ Use it for:
 - reproducing environment issues
 - running scripts and diagnostics
 - temporary automation experiments
-- bounded whole-plan experiments with `gemma4-agent`
+- max-reasoning NewNexus experiments with `gemma4-31b-uncensored-max-agent`
 
 Agent Zero must not get broad host access by default.
 

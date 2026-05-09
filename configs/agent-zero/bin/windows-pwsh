@@ -6,7 +6,37 @@ if [[ $# -eq 0 ]]; then
   exit 2
 fi
 
-command_text="\$ProgressPreference = 'SilentlyContinue'; $*"
+raw_command="$*"
+lower_command="${raw_command,,}"
+
+if [[ "${KYBERM0NK_ALLOW_WINDOWS_SOURCE_EDIT:-0}" != "1" ]]; then
+  windows_project_path='j:\unreal projects\newnexus'
+  windows_project_path_alt='j:/unreal projects/newnexus'
+  targets_newnexus=false
+  if [[ "${lower_command}" == *"${windows_project_path}"* || "${lower_command}" == *"${windows_project_path_alt}"* ]]; then
+    targets_newnexus=true
+  fi
+
+  if [[ "${targets_newnexus}" == true ]]; then
+    blocked_reason=""
+    if [[ "${lower_command}" =~ (set-content|add-content|out-file|new-item|remove-item|move-item|copy-item|rename-item|clear-content) ]]; then
+      blocked_reason="Windows source mutation commands are blocked for NewNexus"
+    elif [[ "${lower_command}" == *">"* ]]; then
+      blocked_reason="Windows redirection into the NewNexus checkout is blocked"
+    elif [[ "${lower_command}" == *"get-content"* && ( "${lower_command}" == *"\\source\\"* || "${lower_command}" == *"/source/"* || "${lower_command}" == *"newnexus.uproject"* ) ]]; then
+      blocked_reason="Reading NewNexus source through Windows is blocked; inspect /a0/usr/projects/newnexus instead"
+    elif [[ "${lower_command}" =~ git[[:space:]].*(add|commit|push|checkout|reset|clean|merge|rebase|switch|restore) ]]; then
+      blocked_reason="Git write operations through the Windows checkout are blocked"
+    fi
+
+    if [[ -n "${blocked_reason}" ]]; then
+      printf 'WINDOWS_SOURCE_EDIT_BLOCKED: %s. Edit, inspect, commit, and push from /a0/usr/projects/newnexus. Use newnexus-windows-build status|pull|query-targets|build for Windows validation.\n' "${blocked_reason}" >&2
+      exit 64
+    fi
+  fi
+fi
+
+command_text="\$ProgressPreference = 'SilentlyContinue'; ${raw_command}"
 encoded_command="$(python3 - "$command_text" <<'PY'
 import base64
 import sys

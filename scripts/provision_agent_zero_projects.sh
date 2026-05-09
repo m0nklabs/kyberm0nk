@@ -40,7 +40,8 @@ docker compose exec -T sandbox sh -lc 'mkdir -p /opt/agent-zero/usr/projects /a0
 
 docker compose cp configs/agent-zero/bin/windows-pwsh sandbox:/usr/local/bin/windows-pwsh
 docker compose cp configs/agent-zero/bin/windows-unreal-probe sandbox:/usr/local/bin/windows-unreal-probe
-docker compose exec -T sandbox sh -lc 'chmod 755 /usr/local/bin/windows-pwsh /usr/local/bin/windows-unreal-probe'
+docker compose cp configs/agent-zero/bin/newnexus-windows-build sandbox:/usr/local/bin/newnexus-windows-build
+docker compose exec -T sandbox sh -lc 'chmod 755 /usr/local/bin/windows-pwsh /usr/local/bin/windows-unreal-probe /usr/local/bin/newnexus-windows-build'
 
 for project_dir in "${template_root}"/*; do
   [[ -d "${project_dir}" ]] || continue

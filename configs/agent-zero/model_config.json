@@ -2,7 +2,7 @@
   "allow_chat_override": true,
   "chat_model": {
     "provider": "other",
-    "name": "gemma4-agent",
+    "name": "gemma4-31b-uncensored-max-agent",
     "api_base": "http://host.docker.internal:11434/v1",
     "ctx_length": 65536,
     "ctx_history": 0.55,
@@ -11,18 +11,18 @@
     "rl_requests": 0,
     "rl_input": 0,
     "rl_output": 0,
-    "kwargs": {"timeout": 420.0, "max_tokens": 4096}
+    "kwargs": {"timeout": 900.0, "max_tokens": 8192}
   },
   "utility_model": {
     "provider": "other",
-    "name": "gemma4-agent",
+    "name": "gemma4-31b-uncensored-max-agent",
     "api_base": "http://host.docker.internal:11434/v1",
     "ctx_length": 32768,
     "ctx_input": 0.45,
     "rl_requests": 0,
     "rl_input": 0,
     "rl_output": 0,
-    "kwargs": {"timeout": 240.0, "max_tokens": 2048}
+    "kwargs": {"timeout": 420.0, "max_tokens": 4096}
   },
   "embedding_model": {
     "provider": "huggingface",
