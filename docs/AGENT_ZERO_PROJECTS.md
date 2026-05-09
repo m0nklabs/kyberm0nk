@@ -45,7 +45,7 @@ scripts/provision_agent_zero_projects.sh --force
 The tracked `newnexus` project restores:
 
 - Agent Zero project title and instructions.
-- Project model config matching the current Guardian `gemma4-31b-uncensored-max-agent` route.
+- Project model config matching the current Guardian `gemma4-26b-agent` route.
 - Project knowledge and instruction files.
 - A stable `/a0/usr/projects/newnexus` workspace path.
 

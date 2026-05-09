@@ -1,6 +1,29 @@
 # Validation Log
 
 
+## 2026-05-09 - Agent Zero 26B Default Restore
+
+Scope:
+
+- Stop Agent Zero from switching back to the slow Gemma4 31B uncensored profile by default.
+- Keep the 31B profile available for explicit benchmarks and tuning only.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Live Guardian state before restore | Passed | Guardian was already loaded on `Huihui-gemma-4-26B-A4B-it-abliterated-Agent` and healthy |
+| Source config validation | Passed | Global and NewNexus Agent Zero configs target `gemma4-26b-agent` for chat and utility models |
+| Live Agent Zero config copy | Passed | Runtime `/opt/agent-zero/usr/plugins/_model_config/config.json` now reports `gemma4-26b-agent`, `4096`, `gemma4-26b-agent`, `2048` |
+| `gemma4-agent` alias smoke | Passed with switch delay | Returned `GEMMA_AGENT_26B_OK`; request took about 75s because it had to switch away from the already-loaded 31B profile |
+| Post-switch Guardian model | Partial | Guardian reported current model `Huihui-gemma-4-26B-A4B-it-abliterated-Agent`; backend health flag was still false immediately after the switch |
+| Explicit 26B functional smoke | Blocked by active backend work | A follow-up `gemma4-26b-agent` request timed out after 120s while `llama-server` showed active GPU utilization, so the active AZ run was not interrupted |
+
+Operational note:
+
+- Do not remove the 31B profile; it may be smarter, but it is too slow for the default AZ loop until separately tuned.
+
+
 ## 2026-05-09 - Agent Zero Gemma4 31B Uncensored Correction
 
 Scope:

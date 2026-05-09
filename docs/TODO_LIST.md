@@ -75,8 +75,8 @@
 - [x] Validate OpenCode and Agent Zero after applying balanced settings.
 - [x] Smoke-test Agent Zero with Guardian `gemma4-agent` after Qwen-backed runs stalled.
 - [ ] Add Guardian/AZ cancellation regression tests for orphaned `llama-server` requests.
-- [x] Move `gemma4-agent` to the local Gemma4 31B uncensored max-reasoning profile instead of the earlier 26B compatibility profile.
-- [ ] Complete a longer Agent Zero `gemma4-31b-uncensored-max-agent` NewNexus run and record whether memory consolidation stays stable.
+- [x] Keep Agent Zero default on `gemma4-26b-agent` after the 31B route proved too slow for routine work.
+- [ ] Benchmark/tune `gemma4-31b-uncensored-max-agent` separately before using it as an Agent Zero default.
 - [x] Add dedicated Windows Unreal SSH executor access for Agent Zero without mounting the full host SSH directory.
 - [x] Track and restore the Agent Zero `NewNexus` project metadata after Docker rebuilds.
 - [ ] Evaluate a replacement primary agentic framework for local reasoning-on workflows; prioritize OpenCode/interpreter, Aider, Continue/Roo-style IDE agents, and Goose-style CLI agents over Agent Zero for interactive coding.

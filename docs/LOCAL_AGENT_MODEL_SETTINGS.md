@@ -2,15 +2,15 @@
 
 KyberM0nk routes local coding agents through Guardian alias `qwen3-35b-reasoning-agent` by default. The current benchmark evidence shows that the machine can handle large contexts, but the best day-to-day agent settings are not the maximum possible settings.
 
-The generic deep alias `qwen3-35b-uncensored` stays available for explicit max-reasoning runs. Daily local-agent tools use `qwen3-35b-reasoning-agent`: Qwen reasoning stays enabled, but Guardian caps the reasoning budget so frameworks cannot burn minutes in invisible deep-think loops. Agent Zero is the exception: it now uses `gemma4-31b-uncensored-max-agent`, a Gemma4 31B uncensored profile based on `TrevorJS/gemma-4-31B-it-uncensored` with unrestricted reasoning. Loop control is handled by tool guardrails and output caps, not by disabling reasoning.
+The generic deep alias `qwen3-35b-uncensored` stays available for explicit max-reasoning runs. Daily local-agent tools use `qwen3-35b-reasoning-agent`: Qwen reasoning stays enabled, but Guardian caps the reasoning budget so frameworks cannot burn minutes in invisible deep-think loops. Agent Zero currently uses `gemma4-26b-agent` because the 26B Gemma4 route is responsive enough for default NewNexus work. The 31B uncensored route remains available as `gemma4-31b-uncensored-max-agent` for explicit quality tests.
 
 ## Current Recommendation
 
 | Tool | Context | History/Input Share | Normal Output | Timeout | Reasoning Policy |
 |------|---------|---------------------|---------------|---------|------------------|
 | OpenCode / interpreter | `65536` | tool-managed | `4096` | wrapper/runtime default | Guardian bounded reasoning alias |
-| Agent Zero chat | `65536` | `ctx_history: 0.55` | `8192` | `900s` | Guardian `gemma4-31b-uncensored-max-agent` unrestricted reasoning profile |
-| Agent Zero utility | `32768` | `ctx_input: 0.45` | `4096` | `420s` | Guardian `gemma4-31b-uncensored-max-agent` unrestricted reasoning profile |
+| Agent Zero chat | `65536` | `ctx_history: 0.55` | `4096` | `420s` | Guardian `gemma4-26b-agent` stable Gemma4 route |
+| Agent Zero utility | `32768` | `ctx_input: 0.45` | `2048` | `240s` | Guardian `gemma4-26b-agent` stable Gemma4 route |
 | Deep manual benchmark mode | `98304` or higher | task-specific | `8192` max | `900s+` | Only for explicit deep-analysis runs |
 
 Do not use `131072` context plus `32768` output as a default agent setting. That shape is useful for stress tests, but too slow and fragile for normal coding work.
@@ -66,7 +66,7 @@ The supported and configured fields are:
 - `kwargs.timeout` for request timeout.
 - `kwargs.max_tokens` for hard output caps passed through LiteLLM.
 
-The configured Agent Zero Guardian model name is currently `gemma4-31b-uncensored-max-agent`. This is a max-reasoning Gemma4 31B uncensored profile with vision support, 65k context, unrestricted reasoning budget, and anti-repeat sampler settings. Keep AZ as an experimental sandbox until longer NewNexus runs prove that the framework loop, memory consolidation, and tool writes remain stable.
+The configured Agent Zero Guardian model name is currently `gemma4-26b-agent`. This keeps AZ on the faster Gemma4 26B route for default NewNexus work. Use `gemma4-31b-uncensored-max-agent` only for explicit 31B quality/tuning tests until it has a proven sampler/context profile that is not too slow for routine AZ loops.
 
 ## Benchmark Artifacts
 

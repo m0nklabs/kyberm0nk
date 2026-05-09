@@ -12,7 +12,7 @@
   - Installed and documented the required Windows .NET 8 runtime for UE 5.7 `UnrealBuildTool`; the next observed build blocker is the optional `VisualStudioTools` plugin reference in `NewNexus.uproject`.
   - Added live Agent Zero GitHub credential provisioning so NewNexus commits can be pushed from the sandbox instead of routing GitHub work through the Windows Unreal workstation.
   - Added a `newnexus-windows-build` helper and hardened `windows-pwsh` to block brittle source edits through the Windows checkout.
-  - Switched Agent Zero to Guardian's max-reasoning `gemma4-31b-uncensored-max-agent` profile based on `TrevorJS/gemma-4-31B-it-uncensored`.
+  - Tested Guardian's max-reasoning `gemma4-31b-uncensored-max-agent` profile based on `TrevorJS/gemma-4-31B-it-uncensored`, then restored Agent Zero to the stable `gemma4-26b-agent` route after 31B proved too slow for default work.
   - Documented the Agent Zero project restore flow in `docs/AGENT_ZERO_PROJECTS.md`.
 
 - **Agent Zero Windows SSH diagnosis scope correction:**
