@@ -6,6 +6,8 @@
   - Added a durable `NewNexus` Agent Zero project template under `configs/agent-zero/projects/newnexus` so project metadata survives Docker rebuilds.
   - Added `scripts/provision_agent_zero_projects.sh` and wired it into `scripts/agent_zero_up.sh` to restore missing project templates without recreating the sandbox.
   - Added `scripts/ensure_newnexus_checkout.sh` and ignored `.agent-projects/` so the persistent NewNexus working checkout stays local to the host and out of KyberM0nk commits.
+  - Hardened project provisioning to trust the mounted NewNexus checkout for Git and remove stale runtime-only Windows helper binaries from older sandbox sessions.
+  - Clarified that Agent Zero should edit `/a0/usr/projects/newnexus` and use Windows SSH for build/run validation, not as the primary source editor.
   - Documented the Agent Zero project restore flow in `docs/AGENT_ZERO_PROJECTS.md`.
 
 - **Agent Zero Windows SSH diagnosis scope correction:**

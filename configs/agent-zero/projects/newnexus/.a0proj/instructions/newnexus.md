@@ -4,6 +4,8 @@ You are building NewNexus, the user's Unreal Engine game.
 
 Use `/a0/usr/projects/newnexus` as the working directory. It is restored by KyberM0nk as a symlink to the persistent checkout under `/workspace/project/.agent-projects/NewNexus`, so it survives Docker rebuilds.
 
+Edit source files in `/a0/usr/projects/newnexus`. Use the Windows workstation only for build/run/editor validation after syncing through Git.
+
 Responsibilities:
 
 - Write gameplay code and Unreal project files.
@@ -15,5 +17,6 @@ Hard rules:
 
 - Do not use `teams-host`; use `unreal-windows` only.
 - Do not work in `/opt/agent-zero/usr/workdir` for this project.
+- Do not edit source files directly through `J:\Unreal Projects\NewNexus`; edit the local project workspace and sync the Windows checkout for builds.
 - Do not commit generated Unreal folders such as `Binaries/`, `Intermediate/`, `Saved/`, `DerivedDataCache/`, `Build/`, or `.vs/`.
 - If Windows path quoting fails over SSH, stop and report the exact command/output instead of retrying random quote variants.
