@@ -160,6 +160,12 @@ class CodeExecution(Tool):
     async def execute_terminal_command(
         self, cfg: dict, session: int, command: str, reset: bool = False
     ):
+        if guard_message := _guard_windows_unreal_ssh_command(command):
+            response = self.agent.read_prompt("fw.code.info.md", info=guard_message)
+            if self.log:
+                self.log.update(content=response)
+            return response
+
         prefix = (
             ("bash>" if not runtime.is_windows() or cfg["ssh_enabled"] else "PS>")
             + self.format_command_for_output(command)
@@ -528,6 +534,35 @@ def _parse_patterns(raw, flags=0) -> list[re.Pattern]:
 
 
 _TIMEOUT_KEYS = ("first_output_timeout", "between_output_timeout", "max_exec_timeout", "dialog_timeout")
+
+
+def _guard_windows_unreal_ssh_command(command: str) -> str | None:
+    normalized = " ".join(command.split())
+    targets_windows_executor = re.search(
+        r"(^|[;&|])\s*ssh\s+(?:unreal-windows|kyberm0nk-unreal)\b",
+        normalized,
+        re.IGNORECASE,
+    )
+    if not targets_windows_executor:
+        return None
+
+    lower_command = command.lower()
+    risky_windows_path = any(
+        marker in lower_command
+        for marker in ("c:\\", "d:\\", "program files", "epic games", ".uproject")
+    )
+    nested_quotes = command.count('"') >= 3
+    already_using_helper = "windows-pwsh" in lower_command or "windows-unreal-probe" in lower_command
+
+    if risky_windows_path and nested_quotes and not already_using_helper:
+        return (
+            "Blocked a risky Windows SSH command before it could start another quote loop. "
+            "Use `windows-unreal-probe` for discovery, or `windows-pwsh '<PowerShell command>'` "
+            "for custom commands involving Windows paths. Do not retry raw ssh quote variants; "
+            "report the exact blocked command and switch to the helper."
+        )
+
+    return None
 
 
 def _parse_timeouts(cfg: dict, prefix: str, defaults: tuple[int, ...]) -> dict:

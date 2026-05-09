@@ -2,6 +2,14 @@
 
 ## 2026-05-09
 
+- **Windows Unreal executor PowerShell helpers:**
+  - Added `scripts/windows_pwsh.sh` to run Windows PowerShell commands through SSH with `-EncodedCommand`, avoiding nested quote failures for paths like `C:\Program Files\Epic Games`.
+  - Added automatic PowerShell stdin fallback for larger scripts so the Unreal probe does not hit Windows command-line length limits.
+  - Added `scripts/windows_unreal_probe.sh` to discover Unreal Engine installs and `.uproject` candidates as structured JSON.
+  - Updated sandbox provisioning to copy `windows-pwsh` and `windows-unreal-probe` into the running Agent Zero container without rebuilding or recreating it.
+  - Updated Agent Zero Windows executor instructions with a loop guard: after one failed remote directory command, stop and use the helper instead of retrying quote variants.
+  - Added a targeted Agent Zero code-execution guard that blocks risky raw `ssh unreal-windows` commands with nested Windows path quotes and points the agent to the helper.
+
 - **Agent Zero Gemma4 vision route:**
   - Enabled `vision: true` for the Agent Zero `gemma4-agent` chat model route.
   - Kept Agent Zero on Guardian's bounded Gemma4 agent alias instead of switching to the full-context OpenWebUI profile.

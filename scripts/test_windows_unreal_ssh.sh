@@ -8,6 +8,7 @@ alias_name="${WINDOWS_UNREAL_SSH_ALIAS:-unreal-windows}"
 echo "[windows-unreal] host SSH alias: ${alias_name}"
 ssh "${alias_name}" "whoami"
 ssh "${alias_name}" "hostname"
+./scripts/windows_pwsh.sh '[System.Environment]::MachineName'
 
 echo "[windows-unreal] ensuring sandbox is running..."
 ./scripts/provision_windows_unreal_ssh.sh
@@ -18,6 +19,8 @@ set -eu
 test -r /run/kyberm0nk/secrets/windows_unreal_ed25519
 ssh unreal-windows "whoami"
 ssh unreal-windows "hostname"
+windows-pwsh "[System.Environment]::MachineName"
+windows-unreal-probe
 '
 
 echo "[windows-unreal] OK"
