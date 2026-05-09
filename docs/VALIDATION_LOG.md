@@ -1,6 +1,27 @@
 # Validation Log
 
 
+## 2026-05-09 - Agent Zero NewNexus GitHub Push Plumbing
+
+Scope:
+
+- Let Agent Zero push NewNexus changes from the Linux sandbox instead of routing GitHub work through the Windows Unreal workstation.
+- Keep GitHub tokens out of Git remotes, logs, and tracked files.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Deploy-key attempt | Blocked by GitHub policy | GitHub returned `Deploy keys are disabled for this repository` for `m0nklabs/NewNexus` |
+| Credential helper design | Ready for live token | The sandbox reads `/run/kyberm0nk/secrets/github_token` through a Git credential helper instead of storing tokens in remotes |
+| Full push smoke | Passed | Fresh token stored at `/home/flip/.secrets/kyberm0nk_github_token`; sandbox dry-run push returned `Everything up-to-date` |
+| Stale credential cleanup | Passed | Removed the old `~/.secrets/github-tokens/` token files and the unused failed deploy-key files |
+
+Operational note:
+
+- Source work stays in `/a0/usr/projects/newnexus`. Agent Zero pushes from the sandbox, then the Windows checkout pulls the pushed commit before Unreal build/editor validation.
+
+
 ## 2026-05-09 - Windows Unreal .NET 8 Runtime
 
 Scope:

@@ -10,6 +10,7 @@
   - Clarified that Agent Zero should edit `/a0/usr/projects/newnexus` and use Windows SSH for build/run validation, not as the primary source editor.
   - Added minimal `windows-pwsh` and `windows-unreal-probe` sandbox helpers so Agent Zero can obey quote-loop guard instructions without editing source through the Windows checkout.
   - Installed and documented the required Windows .NET 8 runtime for UE 5.7 `UnrealBuildTool`; the next observed build blocker is the optional `VisualStudioTools` plugin reference in `NewNexus.uproject`.
+  - Added live Agent Zero GitHub credential provisioning so NewNexus commits can be pushed from the sandbox instead of routing GitHub work through the Windows Unreal workstation.
   - Documented the Agent Zero project restore flow in `docs/AGENT_ZERO_PROJECTS.md`.
 
 - **Agent Zero Windows SSH diagnosis scope correction:**

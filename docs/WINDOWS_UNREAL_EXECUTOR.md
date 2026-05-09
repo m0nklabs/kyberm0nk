@@ -48,6 +48,8 @@ windows-unreal-probe
 
 Use these helpers for Windows discovery, Unreal builds, editor launches, and validation commands that involve Windows paths. They are intentionally not source-editing tools; Agent Zero should edit NewNexus under `/a0/usr/projects/newnexus` and use Windows only after syncing for build/run validation.
 
+Do not route GitHub commits or pushes through this Windows executor. Agent Zero should commit and push from `/a0/usr/projects/newnexus` in the sandbox, then use Windows only to pull the pushed revision and run Unreal validation.
+
 Known NewNexus Unreal paths:
 
 ```text

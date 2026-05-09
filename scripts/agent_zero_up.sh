@@ -50,6 +50,14 @@ head -8 /opt/agent-zero/usr/plugins/_model_config/config.json
 echo "[agent-zero] restoring tracked project templates..."
 ./scripts/provision_agent_zero_projects.sh
 
+github_token_path="${KYBERM0NK_GITHUB_TOKEN_PATH:-${GITHUB_TOKEN_FILE:-${HOME}/.secrets/kyberm0nk_github_token}}"
+if [[ -r "${github_token_path}" ]]; then
+    echo "[agent-zero] provisioning GitHub push credentials..."
+    ./scripts/provision_agent_zero_github.sh
+else
+    echo "[agent-zero] GitHub token file not found at ${github_token_path}; skipping push credential provisioning"
+fi
+
 echo "[agent-zero] checking if Agent Zero is already running..."
 if docker compose exec -T sandbox bash -lc 'pgrep -f "[r]un_ui.py" >/dev/null 2>&1'; then
     echo "[agent-zero] already running; restart with: $0 stop && $0"
