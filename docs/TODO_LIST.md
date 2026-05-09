@@ -77,5 +77,4 @@
 - [ ] Add Guardian/AZ cancellation regression tests for orphaned `llama-server` requests.
 - [ ] Complete a longer Agent Zero `gemma4-agent` whole-plan run and record whether memory consolidation stays stable.
 - [x] Add dedicated Windows Unreal SSH executor access for Agent Zero without mounting the full host SSH directory.
-- [x] Add encoded PowerShell helpers so Agent Zero can inspect Windows Unreal paths without nested SSH quote loops.
 - [ ] Evaluate a replacement primary agentic framework for local reasoning-on workflows; prioritize OpenCode/interpreter, Aider, Continue/Roo-style IDE agents, and Goose-style CLI agents over Agent Zero for interactive coding.

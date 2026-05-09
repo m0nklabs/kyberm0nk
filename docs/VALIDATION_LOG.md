@@ -1,33 +1,6 @@
 # Validation Log
 
 
-## 2026-05-09 - Windows Unreal Executor Probe Helpers
-
-Scope:
-
-- Stop Agent Zero from looping on raw `ssh unreal-windows "dir ..."` quote variants.
-- Add helper commands that safely execute Windows PowerShell paths through SSH.
-- Provision the helpers into the existing sandbox without rebuilding or recreating the Agent Zero container.
-
-Validation results:
-
-| Check | Result | Notes |
-|-------|--------|-------|
-| Shell syntax | Passed | `bash -n` passed for Windows helper/provision/test scripts and Agent Zero startup script |
-| Docker Compose config | Passed with warning | Compose config is valid; Compose still warns that top-level `version` is obsolete |
-| Sandbox provisioning | Passed | `scripts/provision_windows_unreal_ssh.sh` copied SSH config/key plus `windows-pwsh` and `windows-unreal-probe` into the running sandbox |
-| Host SSH smoke | Passed | `unreal-windows` returned `14700k\\onyou`, `14700K`, and encoded PowerShell returned `14700K` |
-| Sandbox SSH smoke | Passed | Container alias returned `14700k\\onyou`, `14700K`, and encoded PowerShell returned `14700K` |
-| Unreal probe | Passed with discovery result | `windows-unreal-probe` returned JSON from host `14700K`; it found `C:\\Program Files (x86)\\Epic Games` but no Unreal Engine install or `.uproject` candidates in the checked common paths |
-| VS Code diagnostics | Passed | No errors reported for the Agent Zero code-execution patch or Windows helper scripts |
-
-Operational note:
-
-- The first `windows-unreal-probe` validation hit Windows' command-line length limit when the full PowerShell probe was sent through `-EncodedCommand`; `windows-pwsh` now keeps small commands encoded and automatically switches larger scripts to PowerShell stdin.
-- The Agent Zero code-execution guard blocks risky raw `ssh unreal-windows` commands with nested Windows path quotes and points the agent to `windows-unreal-probe` or `windows-pwsh`.
-- The guard lives in the mounted Agent Zero patch file; an already-running Agent Zero Python process may need a normal UI process restart before that guard is loaded, but the helper binaries are already present in the current sandbox.
-
-
 ## 2026-05-09 - Agent Zero Gemma4 Vision Route
 
 Scope:
