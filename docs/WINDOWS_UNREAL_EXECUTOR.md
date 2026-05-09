@@ -54,7 +54,10 @@ Known NewNexus Unreal paths:
 Project: J:\Unreal Projects\NewNexus
 Engine root: J:\UNREAL_ENGINE\UE_5.7
 UnrealBuildTool: J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe
+.NET runtime: Microsoft.NETCore.App 8.0.26 installed in C:\Program Files\dotnet
 ```
+
+UnrealBuildTool requires the .NET 8 runtime family. If Windows only has .NET 9, UBT fails before any Unreal build work starts with a missing `Microsoft.NETCore.App 8.0.0` error.
 
 ## Validation
 

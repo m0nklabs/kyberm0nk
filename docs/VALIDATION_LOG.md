@@ -1,6 +1,28 @@
 # Validation Log
 
 
+## 2026-05-09 - Windows Unreal .NET 8 Runtime
+
+Scope:
+
+- Resolve UnrealBuildTool failing on the Windows host because only .NET 9 was installed.
+- Verify Agent Zero can continue through `windows-pwsh` after installing the required runtime.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Initial runtime inventory | Failed as expected | Windows had `Microsoft.NETCore.App 9.0.15` and `Microsoft.WindowsDesktop.App 9.0.15`, but no .NET 8 runtime |
+| Runtime install | Passed | Installed `Microsoft.DotNet.Runtime.8` version `8.0.26` with `winget` |
+| Runtime inventory after install | Passed | `dotnet --list-runtimes` now reports `Microsoft.NETCore.App 8.0.26` and `9.0.15` |
+| UBT launch smoke | Passed | UBT no longer fails on missing .NET and wrote `J:\Unreal Projects\NewNexus\Intermediate\TargetInfo.json` |
+| UBT build smoke | Reached next blocker | `NewNexusEditor Win64 Development` now reaches Unreal rules loading and fails on optional `VisualStudioTools` module rules |
+
+Operational note:
+
+- The next build blocker is not .NET. The project enables `VisualStudioTools` in `NewNexus.uproject`; UBT reports a `VisualStudioTools` module-rules error. Treat that plugin as optional IDE integration unless the user explicitly wants the Visual Studio plugin fixed instead of disabled.
+
+
 ## 2026-05-09 - Agent Zero Windows Helper Compatibility
 
 Scope:

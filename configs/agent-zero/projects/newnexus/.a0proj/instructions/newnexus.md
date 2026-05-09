@@ -12,6 +12,8 @@ Known Windows Unreal install:
 
 - Engine root: `J:\UNREAL_ENGINE\UE_5.7`
 - Preferred UnrealBuildTool: `J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe`
+- Required .NET 8 runtime is installed on Windows; UBT no longer fails on the missing `Microsoft.NETCore.App 8.0.0` runtime.
+- If UBT fails with `Expecting to find a type to be declared in a module rules named 'VisualStudioTools'`, treat `VisualStudioTools` as optional IDE integration. The likely focused fix is to disable/remove the `VisualStudioTools` plugin reference from `NewNexus.uproject`, then rerun the build.
 
 Responsibilities:
 
