@@ -11,6 +11,7 @@ logs/
 data/
 tmp/
 .cache/
+.agent-projects/
 
 # Python
 __pycache__/

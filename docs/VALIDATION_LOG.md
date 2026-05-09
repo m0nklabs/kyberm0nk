@@ -1,6 +1,32 @@
 # Validation Log
 
 
+## 2026-05-09 - Tracked Agent Zero NewNexus Project
+
+Scope:
+
+- Track the Agent Zero `NewNexus` project metadata in the KyberM0nk repo so Docker rebuilds do not delete it permanently.
+- Restore the project into the running sandbox without rebuilding or recreating the container.
+- Point the Agent Zero project workspace at a persistent NewNexus checkout.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Shell syntax | Passed | `bash -n` passed for `ensure_newnexus_checkout.sh`, `provision_agent_zero_projects.sh`, `agent_zero_up.sh`, and existing provision/test scripts |
+| Project JSON syntax | Passed | `project.json`, `agents.json`, and project model `config.json` parse successfully |
+| Docker Compose config | Passed with warning | Compose config is valid; Compose still warns that top-level `version` is obsolete |
+| Persistent checkout | Passed | `.agent-projects/NewNexus` exists as a normal clone of `m0nklabs/NewNexus` |
+| Agent Zero project restore | Passed | `scripts/provision_agent_zero_projects.sh --force` restored `/opt/agent-zero/usr/projects/newnexus/.a0proj/project.json` |
+| Agent Zero workspace path | Passed | `/a0/usr/projects/newnexus` is a symlink to `/workspace/project/.agent-projects/NewNexus` and contains `NewNexus.uproject` plus `.git` |
+| Agent Zero health | Passed | `/api/health` returned successfully after provisioning |
+
+Operational note:
+
+- `scripts/agent_zero_up.sh` now restores tracked project templates on startup. Existing runtime projects are preserved unless `scripts/provision_agent_zero_projects.sh --force` is used.
+- `.agent-projects/` is ignored by KyberM0nk because the game source belongs to the NewNexus repository, not this cockpit repository.
+
+
 ## 2026-05-09 - Agent Zero Gemma4 Vision Route
 
 Scope:

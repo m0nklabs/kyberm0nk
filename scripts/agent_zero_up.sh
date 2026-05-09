@@ -47,6 +47,9 @@ echo "  config.json in place:"
 head -8 /opt/agent-zero/usr/plugins/_model_config/config.json
 '
 
+echo "[agent-zero] restoring tracked project templates..."
+./scripts/provision_agent_zero_projects.sh
+
 echo "[agent-zero] checking if Agent Zero is already running..."
 if docker compose exec -T sandbox bash -lc 'pgrep -f "[r]un_ui.py" >/dev/null 2>&1'; then
     echo "[agent-zero] already running; restart with: $0 stop && $0"

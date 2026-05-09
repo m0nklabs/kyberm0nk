@@ -47,6 +47,10 @@ Important variables:
 
 For an already-running Agent Zero sandbox, use `scripts/provision_windows_unreal_ssh.sh` to copy the Windows Unreal SSH config and dedicated key into the container without rebuilding the image or recreating Agent Zero.
 
+Tracked Agent Zero projects live under `configs/agent-zero/projects/`. `scripts/agent_zero_up.sh` calls `scripts/provision_agent_zero_projects.sh` so project metadata is restored after a Docker rebuild without overwriting an existing runtime project unless `--force` is used.
+
+The `NewNexus` Agent Zero project is restored from `configs/agent-zero/projects/newnexus`. Its working directory inside Agent Zero is `/a0/usr/projects/newnexus`, which points to the persistent host checkout at `.agent-projects/NewNexus`.
+
 ## First Implementation Steps
 
 1. Open the new workspace.
