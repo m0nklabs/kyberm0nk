@@ -15,6 +15,9 @@ Planned scripts:
 - `superset-opencode-agent.sh`: Superset terminal-agent wrapper for OpenCode routed through Guardian.
 - `superset-aider-agent.sh`: Superset terminal-agent wrapper for Aider routed through Guardian.
 - `seed_superset_agents.py`: idempotently add Kyber agent rows to the local Superset host DB.
+- `crewai_studio_bootstrap.sh`: clone/update the `m0nklabs/CrewAI-Studio` fork under `.agent-projects/`, write ignored runtime env, and start the Studio UI on port 8505.
+- `crewai_studio_status.sh`: show CrewAI-Studio Docker status and Streamlit health.
+- `crewai_studio_seed_main_quest.sh`: copy the tracked Kyber main quest crew JSON into the local Studio import folder.
 - `ensure_newnexus_checkout.sh`: ensure the persistent local NewNexus checkout exists under `.agent-projects/NewNexus`.
 - `provision_agent_zero_projects.sh`: restore tracked Agent Zero project templates into the running sandbox after rebuilds.
 - `agent_zero_unstick.sh`: stop a repetitive Agent Zero UI run, reprovision tracked config, and start the UI with fresh runtime state.

@@ -1,0 +1,134 @@
+{
+  "id": "C_kyber_main_quest_game_pm",
+  "name": "Kyber Main Quest Game Project Manager",
+  "process": "hierarchical",
+  "verbose": true,
+  "memory": true,
+  "cache": true,
+  "planning": true,
+  "planning_llm": "OpenRouter: deepseek/deepseek-v4-flash",
+  "max_rpm": 30,
+  "manager_llm": "OpenRouter: deepseek/deepseek-v4-pro",
+  "manager_agent": null,
+  "created_at": "2026-05-10T00:00:00",
+  "agents": [
+    {
+      "id": "A_main_quest_project_manager",
+      "role": "Main Quest Project Manager",
+      "backstory": "You are the operator-facing project manager for a game-development crew. You keep the run visible, slice goals into small verifiable tasks, prefer local Guardian workers for routine work, and escalate to OpenRouter only when value justifies the spend.",
+      "goal": "Turn the operator's game goal into a playable, testable slice while keeping a concise steering log and asking for operator approval before accepting major direction changes.",
+      "allow_delegation": true,
+      "verbose": true,
+      "cache": false,
+      "llm_provider_model": "OpenRouter: deepseek/deepseek-v4-pro",
+      "temperature": 0.15,
+      "max_iter": 16,
+      "tool_ids": []
+    },
+    {
+      "id": "A_local_game_researcher",
+      "role": "Local Game Researcher",
+      "backstory": "You are a local Guardian worker optimized for cheap context gathering. You read project structure, summarize existing code, and compress findings so cloud agents do not waste tokens on raw exploration.",
+      "goal": "Produce compact implementation context for the current game task, including files to inspect, existing patterns, risks, and the smallest useful next step.",
+      "allow_delegation": false,
+      "verbose": true,
+      "cache": true,
+      "llm_provider_model": "Guardian: gemma4-26b-agent",
+      "temperature": 0.1,
+      "max_iter": 12,
+      "tool_ids": []
+    },
+    {
+      "id": "A_local_game_builder",
+      "role": "Local Game Builder",
+      "backstory": "You are a Guardian coding worker. You implement routine code, scripts, and content changes from focused briefs. You avoid broad rewrites and report exact blockers instead of repeating failed actions.",
+      "goal": "Draft the smallest implementation plan or patch set that advances the current playable slice and can be verified by tests, builds, or a smoke run.",
+      "allow_delegation": false,
+      "verbose": true,
+      "cache": false,
+      "llm_provider_model": "Guardian: qwen3-35b-reasoning-agent",
+      "temperature": 0.2,
+      "max_iter": 12,
+      "tool_ids": []
+    },
+    {
+      "id": "A_qa_playtest_reviewer",
+      "role": "QA Playtest Reviewer",
+      "backstory": "You are a critical reviewer focused on whether the current game slice is playable, testable, and coherent. You prioritize bugs, missing verification, and user-visible rough edges.",
+      "goal": "Review the proposed work and produce a short pass/fail report with concrete fixes and verification commands.",
+      "allow_delegation": false,
+      "verbose": true,
+      "cache": false,
+      "llm_provider_model": "OpenRouter: google/gemini-3.1-pro-preview-customtools",
+      "temperature": 0.1,
+      "max_iter": 8,
+      "tool_ids": []
+    },
+    {
+      "id": "A_expert_escalation_engineer",
+      "role": "Expert Escalation Engineer",
+      "backstory": "You are the expensive specialist. You are called only after local workers fail twice or when the issue requires stronger reasoning about architecture, engine constraints, or hard debugging.",
+      "goal": "Resolve the narrow blocker with a minimal, high-confidence recommendation and explain exactly why the local route failed.",
+      "allow_delegation": false,
+      "verbose": true,
+      "cache": false,
+      "llm_provider_model": "OpenRouter: moonshotai/kimi-k2.6",
+      "temperature": 0.15,
+      "max_iter": 8,
+      "tool_ids": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T_capture_operator_intent",
+      "description": "Read the operator input for {operator_goal}, {project_path}, {current_state}, and {operator_chat_guidance}. Convert it into a short playable-slice brief. Identify unclear requirements, but continue with reasonable assumptions when safe.",
+      "expected_output": "A compact playable-slice brief with objective, assumptions, non-goals, likely files or systems, validation target, and open steering questions.",
+      "async_execution": false,
+      "agent_id": "A_main_quest_project_manager",
+      "context_from_async_tasks_ids": null,
+      "context_from_sync_tasks_ids": null,
+      "created_at": "2026-05-10T00:00:01"
+    },
+    {
+      "id": "T_research_project_state",
+      "description": "Using the brief, inspect the requested project path conceptually and produce a local-context summary. Focus on existing architecture, likely implementation files, tests/build commands, and risks. Keep the result concise enough for the manager to delegate from it.",
+      "expected_output": "A file-and-system context summary, recommended first implementation slice, and a validation checklist.",
+      "async_execution": false,
+      "agent_id": "A_local_game_researcher",
+      "context_from_async_tasks_ids": null,
+      "context_from_sync_tasks_ids": ["T_capture_operator_intent"],
+      "created_at": "2026-05-10T00:00:02"
+    },
+    {
+      "id": "T_plan_and_delegate",
+      "description": "Create a small execution plan for the game slice. Prefer Guardian workers for routine work. Define clear escalation gates: two failed local attempts, risky architecture changes, or hard engine/build blockers.",
+      "expected_output": "A numbered implementation plan with owner role per step, expected artifacts, validation commands, and cloud-escalation triggers.",
+      "async_execution": false,
+      "agent_id": "A_main_quest_project_manager",
+      "context_from_async_tasks_ids": null,
+      "context_from_sync_tasks_ids": ["T_capture_operator_intent", "T_research_project_state"],
+      "created_at": "2026-05-10T00:00:03"
+    },
+    {
+      "id": "T_draft_implementation",
+      "description": "Draft the implementation notes or patch outline for the next smallest game-development step. Do not invent unrelated systems. Include exact files to edit, expected behavior, and fallback if blocked.",
+      "expected_output": "A focused implementation package: files to change, behavior to add/fix, edge cases, and commands to verify the slice.",
+      "async_execution": false,
+      "agent_id": "A_local_game_builder",
+      "context_from_async_tasks_ids": null,
+      "context_from_sync_tasks_ids": ["T_plan_and_delegate"],
+      "created_at": "2026-05-10T00:00:04"
+    },
+    {
+      "id": "T_review_and_acceptance",
+      "description": "Review the implementation package against the operator goal and steering guidance. Flag missing tests, likely gameplay regressions, UX issues, and any case where a stronger model should be used before code is accepted.",
+      "expected_output": "A pass/fail review with severity-ordered findings, required fixes, and the final acceptance checklist for the operator.",
+      "async_execution": false,
+      "agent_id": "A_qa_playtest_reviewer",
+      "context_from_async_tasks_ids": null,
+      "context_from_sync_tasks_ids": ["T_capture_operator_intent", "T_plan_and_delegate", "T_draft_implementation"],
+      "created_at": "2026-05-10T00:00:05"
+    }
+  ],
+  "tools": []
+}

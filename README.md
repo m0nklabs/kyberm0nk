@@ -63,6 +63,20 @@ scripts/superset.sh seed-agents
 scripts/superset.sh import-active
 ```
 
+## CrewAI Main Quest Manager
+
+CrewAI-Studio is the watchable project-manager layer for the game-development main quest. Kyber uses the `m0nklabs/CrewAI-Studio` fork so OpenRouter cloud models and Guardian local models appear as separate providers in the same crew.
+
+```bash
+scripts/crewai_studio_bootstrap.sh
+scripts/crewai_studio_status.sh
+scripts/crewai_studio_seed_main_quest.sh
+```
+
+Open `http://127.0.0.1:8505`, import `.agent-projects/CrewAI-Studio/kyber-imports/main_quest_studio_import.json`, then run the `Kyber Main Quest Game Project Manager` crew.
+
+See [docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md](docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md).
+
 ## Repository Status
 
 This repository starts as a documentation-first planning workspace. Implementation should be added in small, testable steps after the workspace is opened directly.

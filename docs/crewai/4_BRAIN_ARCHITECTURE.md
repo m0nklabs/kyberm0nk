@@ -1,41 +1,44 @@
-# Blueprint: 4-Brained Unreal Engine Dev Crew
+# Blueprint: Hybrid CrewAI Game-Development Crew
 
-## Overkoepelende Strategie
-Dit plan beschrijft de opzet voor een hybrid local/cloud multi-agent systeem in CrewAI-Studio. 
-Het doel is om 90% van het iteratieve en data-zware ("RAG") werk door de lokale GPU (Guardian) te laten doen om OpenRouter credits te besparen, terwijl complexe C++ logica en probleemoplossing 
-aan frontier cloud-modellen wordt overgelaten.
+This blueprint defines the CrewAI-Studio manager crew used by KyberM0nk's main quest: visible game-development orchestration with cheap local Guardian workers and narrow OpenRouter escalation.
 
-## Architectuur (Process: Hierarchical)
-In een "Hierarchical" process flow krijgt de Manager agent de leiding. Hij verdeelt het werk, kijkt het na, en stuurt bij waar nodig. Hier zit ook de **Human-in-the-Loop (HitL)** ingebakken.
+## Strategy
 
-### 1. De Manager / Orchestrator (CEO)
-* **Provider:** OpenRouter
-* **Model:** `deepseek/deepseek-v4-pro` of `openai/gpt-5.5`
-* **Rol:** Ontvangt het hoofddoel, snijdt het op in subtaken, en delegeert.
-* **Instructie:** "Delegeer codeerwerk primair aan de Local Programmer. Bij falen of na 2 mislukte iteraties: escaleer specifieke bestanden naar de Expert Programmer. Beoordeel het eindresultaat. Vraag om *Human Approval* (HitL) voordat taken definitief geaccepteerd worden."
-* **Human Input:** TRUE (Pauzeert voor de gebruiker om goedkeuring te geven of richting te wijzen).
+The crew should spend local GPU time on context gathering, routine coding, and iteration. Cloud models are reserved for management, final review, and blockers where retry cost would exceed model cost.
 
-### 2. De Local Researcher (RAG / Data Scraper) 🕵️‍♂️
-* **Provider:** Guardian (Lokaal)
-* **Model:** `Gemma4-A2B-Uncensored`
-* **Tools:** `RAGTool`, `FileReadTool`
-* **Rol:** Leest door actuele of zware Unreal Engine 5 C++ documentatie of lokale class bestanden zonder rekening te houden met tokenkosten.
-* **Output:** Geeft extreem gecondenseerde samenvattingen en context arrays terug aan de Manager, zodat cloud agenten geen overtollige read/context tokens verbranden.
+## Architecture
 
-### 3. De Local Programmer (Het Werkpaard) 🐴
-* **Provider:** Guardian (Lokaal)
-* **Model:** `Qwen3.6-35B`
-* **Rol:** Doet het dagelijkse "meter werk". Simpele UE classes, boilerplate, iteratieve aanpassingen, headers/includes opzetten.
-* **Kosten:** €0,00 - Hier klopt de GPU de uren.
+Process: `hierarchical`.
 
-### 4. De Expert Programmer (De Sniper) 🎯
-* **Provider:** OpenRouter
-* **Model:** `anthropic/claude-mythos-preview` of `anthropic/claude-opus-4.7`
-* **Rol:** Wordt standaard niet gebruikt. Wordt alleen "wakker gebeld" door de Manager wanneer de Local Programmer vastloopt op complexe Unreal pointer logica, garbage collection (`UObject`), of harde C++ linker/compilatie bugs.
-* **Kosten:** Duur, maar zijn context is minuscuul omdat hij enkel de geëscaleerde, specifieke snippet voorgelegd krijgt door de Manager.
+The manager owns planning, delegation, escalation, and operator-facing summaries. Local Guardian workers do most meter work. OpenRouter reviewers and specialists are used only when their higher task success rate is worth the price.
 
-## Workflow (Uitrol Instructies CrewAI-Studio)
-1. **Agents Maken:** Vul in de Studio op de Agents-tab de 4 bovenstaande rollen in, gekoppeld aan de juiste Provider/Model vanuit de Dropdown menu's.
-2. **HitL Aanzetten:** Zet de "Require Human Approval" of "Human Input" toggles **aan** op de taken die aan de Manager zijn toegewezen.
-3. **Crew Maken:** Zet op de Crew-setup tab de Task Process op **Hierarchical**.
-4. **Tools Koppelen:** Ken de RAG- en Directory/File-tools uitsluitend toe aan de Local Researcher Agent, zodat deze het zware leeswerk lokaal afhandelt.
+## Roles
+
+| Role | Provider | Model | Responsibility |
+|------|----------|-------|----------------|
+| Main Quest Project Manager | OpenRouter | `deepseek/deepseek-v4-pro` | Slice goals, delegate work, track operator guidance, and gate escalation. |
+| Planner | OpenRouter | `deepseek/deepseek-v4-flash` | Cheap planning and progress summaries. |
+| Local Game Researcher | Guardian | `gemma4-26b-agent` | Inspect project context and compress findings. |
+| Local Game Builder | Guardian | `qwen3-35b-reasoning-agent` | Draft routine implementation work and verification steps. |
+| QA Playtest Reviewer | OpenRouter | `google/gemini-3.1-pro-preview-customtools` | Review user-visible quality, tests, and regressions. |
+| Expert Escalation Engineer | OpenRouter | `moonshotai/kimi-k2.6` | Handle narrow complex blockers after local attempts fail. |
+
+## Escalation Rules
+
+- Try Guardian first for scanning, summarizing, boilerplate, and small implementation steps.
+- Escalate after two failed local attempts on the same blocker.
+- Escalate immediately for high-risk architecture changes, destructive operations, hard engine/build failures, or cases where repeated local retries would waste more time than a stronger model costs.
+- Keep escalation prompts narrow and include exact failed attempts.
+
+## Studio Setup
+
+Use the tracked Kyber seed instead of manually recreating the crew:
+
+```bash
+scripts/crewai_studio_bootstrap.sh
+scripts/crewai_studio_seed_main_quest.sh
+```
+
+Then import `.agent-projects/CrewAI-Studio/kyber-imports/main_quest_studio_import.json` through CrewAI-Studio's Import/Export page.
+
+See [MAIN_QUEST_PROJECT_MANAGER.md](MAIN_QUEST_PROJECT_MANAGER.md) for the operational workflow.

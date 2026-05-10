@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-05-10
+
+- **CrewAI-Studio main quest manager:**
+  - Forked `strnad/CrewAI-Studio` to `m0nklabs/CrewAI-Studio` for Kyber-specific provider improvements.
+  - Added dedicated `OpenRouter` and `Guardian` providers in the fork so cloud escalation models and local Guardian models can be selected side by side in a single CrewAI-Studio crew.
+  - Updated the fork's Docker Compose defaults with configurable ports and Linux `host.docker.internal` support for Guardian access from the Streamlit container.
+  - Added `configs/crewai/model_policy.yaml` to encode the MoniFuse value-ranking-based model allocation for CrewAI roles.
+  - Added `configs/crewai/main_quest_studio_import.json` as an importable Studio seed for the game-development project manager crew.
+  - Added `scripts/crewai_studio_bootstrap.sh`, `scripts/crewai_studio_status.sh`, and `scripts/crewai_studio_seed_main_quest.sh` to keep the fork checkout ignored, runtime secrets out of Git, and the UI reproducible on port 8505.
+  - Added `docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md` and rewrote the CrewAI brain architecture note in English around the new fork-backed workflow.
+
 ## 2026-05-09
 
 - **Supervisor loop planning:**

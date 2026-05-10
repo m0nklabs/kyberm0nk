@@ -100,3 +100,14 @@
 - [ ] Add repeated-thought and repeated-command detection to the first supervisor tick.
 - [ ] Fix or replace the Windows NewNexus sync path so validation builds can consume reviewed Linux checkout changes without interactive Git credential prompts.
 - [ ] Add cloud escalation gates for repeated failures, risky diffs, and pre-commit review.
+
+## Phase 10 - CrewAI Main Quest Project Manager
+
+- [x] Fork CrewAI-Studio under `m0nklabs/CrewAI-Studio` for Kyber-specific provider improvements.
+- [x] Add dedicated OpenRouter and Guardian providers to the fork so cloud and local models can coexist in one crew.
+- [x] Add Kyber bootstrap/status scripts for the ignored local CrewAI-Studio checkout.
+- [x] Add a main quest model policy and importable CrewAI-Studio crew seed.
+- [x] Document the watchable CrewAI project-manager workflow.
+- [ ] Add a true live steering panel or tool so operator chat can be injected into an active run instead of only between reruns.
+- [ ] Add a DB/API seeder so the main quest crew can be installed without manual Import/Export UI steps.
+- [ ] Pilot the main quest crew against a disposable game project slice.

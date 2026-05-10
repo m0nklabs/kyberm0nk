@@ -1,0 +1,70 @@
+version: 1
+purpose: KyberM0nk CrewAI-Studio model routing for the main quest project manager.
+
+providers:
+  openrouter:
+    studio_provider: OpenRouter
+    api_base: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    use_for:
+      - orchestration
+      - cloud_escalation
+      - final_review
+  guardian:
+    studio_provider: Guardian
+    api_base: http://host.docker.internal:11434/v1
+    api_key_env: GUARDIAN_API_KEY
+    use_for:
+      - routine_research
+      - routine_code_generation
+      - local_iteration
+
+roles:
+  main_quest_project_manager:
+    provider: openrouter
+    model: deepseek/deepseek-v4-pro
+    ranking_source: MoniFuse value ranking and reasoning/coding balance
+    use_when: Break the game goal into milestones, delegate work, and decide escalation.
+    max_iter: 16
+    temperature: 0.15
+  planner:
+    provider: openrouter
+    model: deepseek/deepseek-v4-flash
+    ranking_source: MoniFuse value ranking
+    use_when: Cheap planning, backlog slicing, and run summaries.
+    max_iter: 10
+    temperature: 0.2
+  local_researcher:
+    provider: guardian
+    model: gemma4-26b-agent
+    ranking_source: local Guardian stability benchmarks
+    use_when: Read local files, summarize state, inspect docs, and avoid cloud read-token burn.
+    max_iter: 12
+    temperature: 0.1
+  local_builder:
+    provider: guardian
+    model: qwen3-35b-reasoning-agent
+    ranking_source: local Guardian coding route
+    use_when: Generate routine code, patches, scripts, and implementation notes.
+    max_iter: 12
+    temperature: 0.2
+  qa_reviewer:
+    provider: openrouter
+    model: google/gemini-3.1-pro-preview-customtools
+    ranking_source: MoniFuse coding/reasoning rank
+    use_when: Review changes, catch regressions, and evaluate whether the output is playable.
+    max_iter: 8
+    temperature: 0.1
+  expert_escalation_engineer:
+    provider: openrouter
+    model: moonshotai/kimi-k2.6
+    ranking_source: MoniFuse coding/value balance
+    use_when: Escalate after two local failures or when the blocker is complex engine/code architecture.
+    max_iter: 8
+    temperature: 0.15
+
+escalation_rules:
+  - Escalate from Guardian to OpenRouter after two failed local attempts on the same blocker.
+  - Escalate immediately for destructive file operations, broad refactors, or engine-level build failures.
+  - Keep cloud prompts narrow: include exact files, error messages, and the failed local attempt summary.
+  - Prefer Guardian for scanning, summarizing, boilerplate, and cheap iteration.
