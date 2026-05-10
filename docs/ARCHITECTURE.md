@@ -97,8 +97,8 @@ KyberM0nk tools should use balanced coding-agent budgets rather than maximum str
 Default policy:
 
 - OpenCode: `65536` context, `4096` max tokens, `0.2` temperature.
-- Agent Zero chat: `65536` context with `ctx_history: 0.55`.
-- Agent Zero utility: `32768` context with `ctx_input: 0.45`.
+- Agent Zero chat: `65536` context with `ctx_history: 0.35`, `1536` output cap, and `240s` timeout.
+- Agent Zero utility: `32768` context with `ctx_input: 0.35`, `1024` output cap, and `180s` timeout.
 - Avoid `32768` output-token caps for normal autonomous coding tasks.
 
 The benchmark suite and trend renderer in `scripts/` provide the evidence trail for changing these values.

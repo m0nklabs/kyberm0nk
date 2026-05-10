@@ -76,7 +76,27 @@
 - [x] Smoke-test Agent Zero with Guardian `gemma4-agent` after Qwen-backed runs stalled.
 - [ ] Add Guardian/AZ cancellation regression tests for orphaned `llama-server` requests.
 - [x] Keep Agent Zero default on `gemma4-26b-agent` after the 31B route proved too slow for routine work.
+- [x] Add loop-safe Agent Zero model budgets and NewNexus anti-repeat recovery rules.
 - [ ] Benchmark/tune `gemma4-31b-uncensored-max-agent` separately before using it as an Agent Zero default.
 - [x] Add dedicated Windows Unreal SSH executor access for Agent Zero without mounting the full host SSH directory.
 - [x] Track and restore the Agent Zero `NewNexus` project metadata after Docker rebuilds.
-- [ ] Evaluate a replacement primary agentic framework for local reasoning-on workflows; prioritize OpenCode/interpreter, Aider, Continue/Roo-style IDE agents, and Goose-style CLI agents over Agent Zero for interactive coding.
+- [x] Perform initial framework scan for supervisor-loop and parallel coding-agent orchestration candidates.
+
+## Phase 9 - Supervisor Loop and Framework Evaluation
+
+- [x] Document the supervisor-loop plan and framework shortlist.
+- [ ] Run a contained Claude Code / Claude Agent SDK smoke test as the premium quality baseline.
+- [x] Check host prerequisites for Claude Squad and Superset evaluation.
+- [x] Evaluate Claude Squad as the fastest tmux/worktree TUI spike for local agents.
+- [x] Evaluate Superset as the richer multi-agent worktree cockpit.
+- [x] Build the Superset Linux CLI from source and verify the command surface starts locally.
+- [x] Prototype a Guardian-backed Superset custom agent preset for OpenCode or Aider.
+- [x] Test Superset CLI host-server flow with a disposable local workspace after a Superset session or API key is available.
+- [x] Run an OpenHands Software Agent SDK smoke test against Guardian-compatible LLM settings.
+- [x] Decide whether OpenHands should complement or replace Agent Zero for future sandbox work.
+- [ ] Prototype a minimal Kyber OpenHands worker wrapper with pinned workspace, Guardian env, iteration limits, and transcript logging.
+- [ ] Add a minimal `supervisor_tick` script after the session/worktree layer is chosen.
+- [ ] Pilot the supervisor loop against the Agent Zero NewNexus context.
+- [ ] Add repeated-thought and repeated-command detection to the first supervisor tick.
+- [ ] Fix or replace the Windows NewNexus sync path so validation builds can consume reviewed Linux checkout changes without interactive Git credential prompts.
+- [ ] Add cloud escalation gates for repeated failures, risky diffs, and pre-commit review.

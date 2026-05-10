@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-project_path="${1:-J:\\Unreal Projects\\NewNexus}"
+printf '%s\n' \
+  "DEPRECATED: windows-unreal-probe is no longer a supported Unreal discovery command." \
+  "" \
+  "Why: this wrapper hid the actual Windows discovery commands and confused local agents." \
+  "Workers must generate direct discovery commands through ssh unreal-windows." \
+  "" \
+  "Use instead:" \
+  "  ssh unreal-windows \"powershell -NoProfile -ExecutionPolicy Bypass -Command \\\"Test-Path 'J:\\UNREAL_ENGINE\\UE_5.7'; Test-Path 'J:\\UNREAL_ENGINE\\UE_5.7\\Engine\\Binaries\\DotNET\\UnrealBuildTool\\UnrealBuildTool.exe'\\\"\"" \
+  "" \
+  "Known NewNexus paths:" \
+  "  Project: J:\\Unreal Projects\\NewNexus" \
+  "  Engine:  J:\\UNREAL_ENGINE\\UE_5.7" \
+  "  UBT:     J:\\UNREAL_ENGINE\\UE_5.7\\Engine\\Binaries\\DotNET\\UnrealBuildTool\\UnrealBuildTool.exe" >&2
 
-script="\$ErrorActionPreference = 'SilentlyContinue'; \$projectPath = '${project_path}'; \$knownUbt = 'J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe'; \$roots = @('J:\UNREAL_ENGINE', 'C:\Program Files\Epic Games', 'C:\Program Files (x86)\Epic Games') | Where-Object { Test-Path -LiteralPath \$_ }; \$ubt = @(); if (Test-Path -LiteralPath \$knownUbt) { \$ubt += \$knownUbt }; foreach (\$root in \$roots) { \$ubt += Get-ChildItem -LiteralPath \$root -Filter 'UnrealBuildTool.exe' -Recurse | Select-Object -First 10 -ExpandProperty FullName }; \$ubt = @(\$ubt | Select-Object -Unique); [pscustomobject]@{ computer = \$env:COMPUTERNAME; user = \$env:USERNAME; project_path = \$projectPath; project_exists = Test-Path -LiteralPath \$projectPath; uproject_exists = Test-Path -LiteralPath (Join-Path \$projectPath 'NewNexus.uproject'); unreal_engine_root = 'J:\UNREAL_ENGINE\UE_5.7'; preferred_unreal_build_tool = \$knownUbt; unreal_build_tools = \$ubt } | ConvertTo-Json -Compress"
-
-exec windows-pwsh "$script"
+exit 2

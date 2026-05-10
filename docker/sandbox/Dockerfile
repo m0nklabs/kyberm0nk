@@ -5,6 +5,9 @@ RUN apt-get update && apt-get install -y \
     git curl wget jq nodejs npm sudo build-essential python3-dev python3-tk \
     && rm -rf /var/lib/apt/lists/*
 
+# Install JavaScript CLIs used by Superset and premium coding-agent evaluation.
+RUN npm install -g bun @anthropic-ai/claude-code
+
 # Upgrade pip and pre-install heavy math/ML dependencies for Agent Zero
 RUN pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir numpy scikit-learn

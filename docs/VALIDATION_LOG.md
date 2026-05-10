@@ -1,5 +1,80 @@
 # Validation Log
 
+## 2026-05-10 - Release Hygiene Validation
+
+Scope:
+
+- Clean scratch experiments and raw probe data before publishing the Superset and Agent Zero work.
+- Reconcile Superset documentation with the current Docker-sandbox wrapper path.
+- Re-run focused syntax and build checks before committing.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| MoniFuse backend syntax | Passed | `/home/linuxbrew/.linuxbrew/bin/python3 -m py_compile backend/llm_analysis.py` |
+| MoniFuse frontend build | Passed | `npm run build` completed; Vite reported only the existing large chunk warning |
+| Kyber shell syntax | Passed | `bash -n` passed for Superset wrappers, Agent Zero unstick, and project provisioning scripts |
+| Kyber Python syntax | Passed | `/bin/python3 -m py_compile scripts/seed_superset_agents.py` |
+| Kyber JSON configs | Passed | `jq empty` passed for changed Agent Zero model/project JSON configs |
+| Whitespace checks | Passed | `git diff --check` passed for MoniFuse and KyberM0nk |
+
+Operational note:
+
+- `scripts/superset.sh` now documents and uses the sandbox Superset path: `/usr/local/superset/bin/superset` with state under `/root/.superset` in `kyberm0nk-sandbox-1`.
+
+## 2026-05-09 - Agent Zero Loop Recovery
+
+Scope:
+
+- Stop Agent Zero from burning tokens in repeated missing-command thought loops.
+- Reduce routine Agent Zero output/history budget and add explicit NewNexus anti-repeat recovery rules.
+- Add a one-command unstick path for restarting the UI with tracked config reapplied.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Live log diagnosis | Passed | The running web log showed repeated thoughts around missing `windows-pwsh` and stale helper guidance |
+| Source config update | Passed | `jq empty`, `bash -n`, `git diff --check`, and editor diagnostics passed after loop-safe config edits |
+| Runtime restart | Passed | `scripts/agent_zero_unstick.sh` stopped the stuck UI process, reprovisioned NewNexus config, and restarted Agent Zero healthy on port `50001` |
+| Effectiveness instruction update | Passed | Added state-delta and valid-but-useless action rules to Markdown and embedded project JSON, then verified the running sandbox contains both |
+| GitHub credential dry-run logging | Passed | `provision_agent_zero_github.sh` now logs that the push check is dry-run only; remote `main` stayed at `d2ed89a54bd42a72d9c224945c523855e88e57f8` before and after provisioning |
+| Stale quote-loop system guidance | Passed | Archived old Agent Zero chats with helper-based quote-loop guidance, force-recreated the sandbox so the file bind mount points at the clean patch inode, and verified active runtime code/chats no longer contain the blocker text |
+
+Operational note:
+
+- The first supervisor tick should detect repeated thoughts or repeated failed commands and emit `nudge` or `stop` before the model spends another full response on the same loop.
+
+## 2026-05-09 - Superset Kyber Integration
+
+Scope:
+
+- Add Superset as the preferred Kyber session/worktree orchestration entry point.
+- Add Guardian-backed OpenCode and Aider terminal-agent wrappers for Superset.
+- Add an idempotent seeder for Kyber agent rows in the local Superset host database.
+
+Validation results:
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Shell syntax | Passed | `bash -n` passed for `scripts/superset.sh`, `scripts/superset-opencode-agent.sh`, and `scripts/superset-aider-agent.sh` |
+| Python syntax | Passed | `py_compile` passed for `scripts/seed_superset_agents.py` |
+| Superset binary resolution | Passed | Wrapper resolves the local evaluation CLI at `tmp/framework-evals/superset/packages/cli/dist/superset-linux-x64/bin/superset` |
+| Link output | Passed | `scripts/superset.sh link` prints Superset website, docs, repository, CLI install link, and local state path |
+| No-prompt guard | Passed | OpenCode and Aider wrappers exit with code `64` instead of blocking on interactive stdin |
+| Seeder isolated DB smoke | Passed | Test host DB received `kyber-opencode` and `kyber-aider` rows |
+| Superset OAuth login | Passed | `scripts/superset.sh login` authenticated the local CLI session for the active organization |
+| Superset host distribution build | Passed | Built the Linux distribution bundle so `bin/superset` can start sibling `bin/superset-host` |
+| Live Superset host status | Passed | `scripts/superset.sh start` launched a healthy local host daemon and `scripts/superset.sh status` reported healthy |
+| Live agent seeding | Passed | `scripts/superset.sh seed-agents` inserted `kyber-opencode`, `kyber-aider`, and optional `kyber-claude-code` rows |
+| Live project import | Passed | `scripts/superset.sh import-active` imported `/home/flip/kyberm0nk` through the local host-service tRPC API |
+| Disposable workspace smoke | Passed | Created `kyber-superset-smoke` on branch `kyber/superset-smoke`; `git worktree list` shows the worktree under `~/.superset/worktrees/` |
+
+Operational note:
+
+- Live Superset host and workspace creation now work after OAuth login. The source-built CLI requires the full Linux distribution bundle, not only the standalone CLI binary, because `superset start` needs the sibling `superset-host` launcher.
+
 
 ## 2026-05-09 - Agent Zero 26B Default Restore
 

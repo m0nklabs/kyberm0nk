@@ -1,25 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mode="${1:-build}"
+printf '%s\n' \
+  "DEPRECATED: newnexus-windows-build is no longer a supported NewNexus validation command." \
+  "" \
+  "Why: this wrapper hid the real Windows/Git/Unreal command flow and confused local agents." \
+  "Workers must generate the direct command needed for the current task." \
+  "" \
+  "Use instead:" \
+  "  1. Work in /a0/usr/projects/newnexus inside the sandbox." \
+  "  2. Commit/push from the sandbox when validation needs the Windows checkout." \
+  "  3. Run direct Windows commands through ssh unreal-windows." \
+  "" \
+  "Examples to adapt, not copy blindly:" \
+  "  ssh unreal-windows \"powershell -NoProfile -ExecutionPolicy Bypass -Command \\\"Set-Location 'J:\\Unreal Projects\\NewNexus'; git pull --ff-only\\\"\"" \
+  "  ssh unreal-windows \"powershell -NoProfile -ExecutionPolicy Bypass -Command \\\"& 'J:\\UNREAL_ENGINE\\UE_5.7\\Engine\\Binaries\\DotNET\\UnrealBuildTool\\UnrealBuildTool.exe' NewNexusEditor Win64 Development -Project='J:\\Unreal Projects\\NewNexus\\NewNexus.uproject'\\\"\"" \
+  "" \
+  "If quoting fails, report the exact command and output instead of retrying random variants." >&2
 
-case "${mode}" in
-  status)
-    script="\$ErrorActionPreference = 'Stop'; Set-Location -LiteralPath 'J:\Unreal Projects\NewNexus'; git status --short --branch; git rev-parse HEAD"
-    ;;
-  pull)
-    script="\$ErrorActionPreference = 'Stop'; Set-Location -LiteralPath 'J:\Unreal Projects\NewNexus'; git pull --ff-only; git status --short --branch; git rev-parse HEAD"
-    ;;
-  query-targets)
-    script="\$ErrorActionPreference = 'Stop'; \$projectPath = 'J:\Unreal Projects\NewNexus'; \$ubt = 'J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe'; Set-Location -LiteralPath \$projectPath; git pull --ff-only; & \$ubt -Mode=QueryTargets -Project=\"\$projectPath\NewNexus.uproject\" -Output=\"\$projectPath\Intermediate\TargetInfo.json\"; exit \$LASTEXITCODE"
-    ;;
-  build)
-    script="\$ErrorActionPreference = 'Stop'; \$projectPath = 'J:\Unreal Projects\NewNexus'; \$ubt = 'J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe'; Set-Location -LiteralPath \$projectPath; git pull --ff-only; & \$ubt NewNexusEditor Win64 Development -Project=\"\$projectPath\NewNexus.uproject\" -WaitMutex -NoHotReloadFromIDE; exit \$LASTEXITCODE"
-    ;;
-  *)
-    printf 'Usage: newnexus-windows-build [status|pull|query-targets|build]\n' >&2
-    exit 2
-    ;;
-esac
-
-exec windows-pwsh "${script}"
+exit 2

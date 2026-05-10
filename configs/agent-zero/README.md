@@ -12,10 +12,24 @@ Planned configuration:
 
 ## Model Budget
 
-Agent Zero uses the balanced local coding profile from `docs/LOCAL_AGENT_MODEL_SETTINGS.md`:
+Agent Zero uses a loop-safe local coding profile for routine sandbox work:
 
-- Guardian alias: `qwen3-35b-uncensored-agent`
-- chat model: `ctx_length: 65536`, `ctx_history: 0.55`, `max_tokens: 4096`, `timeout: 420s`
-- utility model: `ctx_length: 32768`, `ctx_input: 0.45`, `max_tokens: 2048`, `timeout: 240s`
+- Guardian alias: `gemma4-26b-agent`
+- chat model: `ctx_length: 65536`, `ctx_history: 0.35`, `max_tokens: 1536`, `timeout: 240s`
+- utility model: `ctx_length: 32768`, `ctx_input: 0.35`, `max_tokens: 1024`, `timeout: 180s`
 
-The goal is to provide enough context for real coding tasks without defaulting to the slowest possible Guardian request shape. Agent Zero uses Guardian's non-thinking Qwen alias because its own installation guide warns that reasoning/thinking can increase latency, and Qwen's llama.cpp guide requires a custom chat template for the hard non-thinking switch.
+The goal is to provide enough context for real coding tasks while preventing long repetitive thought loops. If Agent Zero starts repeating itself, run `scripts/agent_zero_unstick.sh` to stop the current UI process, reprovision tracked config, and start the UI again.
+
+## Operating Discipline
+
+Agent Zero's project instructions must emphasize effectiveness, not only correctness. A command can be valid and coherent while still failing to move the task forward.
+
+For sandbox workers, prefer instructions that force this cycle:
+
+1. State the expected observable effect of the next action.
+2. Run one focused tool action.
+3. Compare the result against the previous state.
+4. Continue only if the state changed toward the goal.
+5. If two actions produce the same state, stop that route and report the blocker or choose a different route.
+
+This keeps local models useful even when they are weaker than cloud coding agents: they can still execute good small steps, but they need explicit pressure to notice non-progress.

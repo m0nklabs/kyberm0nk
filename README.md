@@ -44,6 +44,25 @@ Start here:
 - [docs/TODO_LIST.md](docs/TODO_LIST.md)
 - [docs/AGENT_HANDOFF_PROMPT.md](docs/AGENT_HANDOFF_PROMPT.md)
 
+## Superset Orchestration
+
+Superset is the current preferred session/worktree cockpit for KyberM0nk.
+
+- Website: https://superset.sh
+- Docs: https://docs.superset.sh
+- Repository: https://github.com/superset-sh/superset
+
+Kyber entry point. Start the sandbox first so the wrapper can run Superset inside `kyberm0nk-sandbox-1` with container-local state at `/root/.superset`:
+
+```bash
+docker compose up -d sandbox
+scripts/superset.sh link
+scripts/superset.sh status
+scripts/superset.sh start
+scripts/superset.sh seed-agents
+scripts/superset.sh import-active
+```
+
 ## Repository Status
 
 This repository starts as a documentation-first planning workspace. Implementation should be added in small, testable steps after the workspace is opened directly.

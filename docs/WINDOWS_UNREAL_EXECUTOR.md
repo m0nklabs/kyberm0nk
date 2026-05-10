@@ -37,29 +37,17 @@ scripts/provision_windows_unreal_ssh.sh
 
 That script copies only the sandbox SSH config and the dedicated private key into the existing container. It preserves the Agent Zero runtime directory and workdir.
 
-## Agent Zero Helpers
+## Direct Windows Commands
 
-The Agent Zero sandbox also has two small helper commands provisioned by `scripts/provision_agent_zero_projects.sh`:
+Agent Zero should generate Windows commands directly and run them through the `unreal-windows` SSH alias. Do not route NewNexus validation through Kyber wrapper commands.
 
-```bash
-windows-pwsh "<PowerShell command>"
-windows-unreal-probe
-```
+Use Windows only for environment discovery, Git sync of the Windows checkout, Unreal project generation, UnrealBuildTool, editor launches, and runtime validation. Source inspection and source edits should happen under `/a0/usr/projects/newnexus`.
 
-Use these helpers for Windows discovery, Unreal builds, editor launches, and validation commands that involve Windows paths. They are intentionally not source-editing tools; Agent Zero should edit NewNexus under `/a0/usr/projects/newnexus` and use Windows only after syncing for build/run validation.
-
-For NewNexus, prefer the dedicated helper instead of hand-built PowerShell command strings:
-
-```bash
-newnexus-windows-build status
-newnexus-windows-build pull
-newnexus-windows-build query-targets
-newnexus-windows-build build
-```
-
-The `windows-pwsh` wrapper blocks `Get-Content`, `Set-Content`, `Add-Content`, redirection, and Git write operations against `J:\Unreal Projects\NewNexus`. This prevents Agent Zero from looping on brittle Windows source edits. Use `/a0/usr/projects/newnexus` for source inspection and edits.
+When Windows-side work is needed, generate the exact command for the task and run it with `ssh unreal-windows "<command>"`. For Windows-specific logic, generate a PowerShell command explicitly rather than relying on a sandbox wrapper. If quoting fails, report the exact command and output instead of retrying random quote variants.
 
 Do not route GitHub commits or pushes through this Windows executor. Agent Zero should commit and push from `/a0/usr/projects/newnexus` in the sandbox, then use Windows only to pull the pushed revision and run Unreal validation.
+
+Deprecated compatibility stubs may exist at the old command names in the sandbox. They intentionally do not run validation; they print a deprecation message and point the worker back to direct `ssh unreal-windows` commands.
 
 Known NewNexus Unreal paths:
 
@@ -94,8 +82,8 @@ Give Agent Zero explicit Windows executor instructions like this:
 Use the Windows Unreal executor over SSH.
 
 Connection:
-- Prefer helper commands in the sandbox: windows-pwsh "<PowerShell command>" or windows-unreal-probe
-- Use raw ssh unreal-windows "<command>" only for simple commands without nested Windows path quoting
+- Generate direct Windows commands yourself and run them through `ssh unreal-windows "<command>"`.
+- Use PowerShell explicitly when Windows path handling or Unreal tooling needs it.
 - The target is Windows host 14700K as user onyou.
 - Do not use teams-host; use unreal-windows only.
 
@@ -112,4 +100,5 @@ For every implementation task:
 - Make code changes in the specified project only.
 - Run the relevant Unreal build or editor command after changes.
 - Report command output summaries and file paths changed.
+- If Windows command quoting fails, stop and report the exact command/output instead of trying random quote variants.
 ```

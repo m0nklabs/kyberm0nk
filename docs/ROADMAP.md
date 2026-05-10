@@ -65,3 +65,18 @@ The KyberM0nk stack maps directly to specific roles to form a cohesive, self-con
 	- Use decision-order benchmarks for fast ballpark tuning before exhaustive matrices.
 	- Keep OpenCode and Agent Zero defaults aligned with the latest stable benchmark evidence.
 	- Avoid defaulting agent tools to maximum context plus maximum output unless an explicit deep benchmark or stress test requires it.
+
+### Phase 10 - Supervisor Loop and Framework Reuse
+- Goal: Reduce expensive cloud-agent usage by letting local agents do routine implementation work under a lightweight critic/supervisor loop.
+- Direction:
+	- Reuse an existing session/worktree orchestrator instead of rebuilding the cockpit from scratch.
+	- Evaluate Claude Code / Claude Agent SDK as the premium coding-agent quality baseline and optional cloud worker.
+	- Evaluate Claude Squad for the fast tmux/worktree TUI path.
+	- Evaluate Superset for richer parallel-agent workspaces, review UI, and agent-agnostic orchestration.
+	- Use OpenHands Software Agent SDK as a likely second worker path for programmable local coding loops; keep Agent Zero for sandbox/operator work until OpenHands remote workspace behavior is proven.
+	- Keep Agent Zero as a sandbox/operator path, not the primary coding-agent default, unless future validation reverses the current evidence.
+	- Use LangGraph supervisor patterns only if the local decision loop outgrows a simple structured script.
+- Deliverables:
+	- Keep `docs/SUPERVISOR_LOOP_PLAN.md` as the active design note.
+	- Add a minimal supervisor tick that reads worker state, git state, validation state, and emits `continue`, `nudge`, `stop`, or `escalate`.
+	- Reserve cloud review for repeated failures, risky diffs, architecture decisions, and pre-commit checkpoints.

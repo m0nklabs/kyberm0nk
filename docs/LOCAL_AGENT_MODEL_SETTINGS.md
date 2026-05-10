@@ -9,8 +9,8 @@ The generic deep alias `qwen3-35b-uncensored` stays available for explicit max-r
 | Tool | Context | History/Input Share | Normal Output | Timeout | Reasoning Policy |
 |------|---------|---------------------|---------------|---------|------------------|
 | OpenCode / interpreter | `65536` | tool-managed | `4096` | wrapper/runtime default | Guardian bounded reasoning alias |
-| Agent Zero chat | `65536` | `ctx_history: 0.55` | `4096` | `420s` | Guardian `gemma4-26b-agent` stable Gemma4 route |
-| Agent Zero utility | `32768` | `ctx_input: 0.45` | `2048` | `240s` | Guardian `gemma4-26b-agent` stable Gemma4 route |
+| Agent Zero chat | `65536` | `ctx_history: 0.35` | `1536` | `240s` | Guardian `gemma4-26b-agent` loop-safe Gemma4 route |
+| Agent Zero utility | `32768` | `ctx_input: 0.35` | `1024` | `180s` | Guardian `gemma4-26b-agent` loop-safe Gemma4 route |
 | Deep manual benchmark mode | `98304` or higher | task-specific | `8192` max | `900s+` | Only for explicit deep-analysis runs |
 
 Do not use `131072` context plus `32768` output as a default agent setting. That shape is useful for stress tests, but too slow and fragile for normal coding work.
@@ -26,6 +26,7 @@ The Qwen3.6 benchmark matrix showed:
 - `8192` output is a reasonable explicit deep-task cap.
 - Reasoning output may appear in `reasoning_content` instead of normal `content`; tool-facing agents should avoid relying on huge hidden reasoning for final actionable output.
 - Agent Zero can appear to hang while local models emit hidden reasoning. Keep reasoning enabled for the user's requested max-reasoning mode, but prevent loops with tool guardrails, anti-repeat sampler settings, and output caps.
+- Agent Zero can also repeat visible JSON thoughts when old tool guidance fails. Keep its default history and output caps lower than OpenCode so stale chat context cannot dominate a full response.
 - Reasoning is still useful for local coding agents, but it needs a budget. Use `qwen3-35b-reasoning-agent` for normal local agent work and reserve `qwen3-35b-uncensored` for explicit deep/manual runs.
 
 ## Operational Pattern
