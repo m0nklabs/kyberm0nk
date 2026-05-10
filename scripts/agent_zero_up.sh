@@ -21,6 +21,23 @@ else
     docker compose up -d --no-build sandbox >/dev/null
 fi
 
+if ! docker compose exec -T sandbox python - <<'PY' >/dev/null 2>&1
+from pathlib import Path
+
+path = Path('/opt/agent-zero/plugins/_code_execution/tools/code_execution_tool.py')
+text = path.read_text(errors='ignore') if path.exists() else ''
+stale = (
+    'Blocked a risky Windows SSH command' in text
+    or 'Use `windows-unreal-probe` for discovery' in text
+    or 'Do not retry raw ssh quote variants' in text
+)
+raise SystemExit(1 if stale else 0)
+PY
+then
+    echo "[agent-zero] stale code_execution_tool.py bind mount detected; recreating sandbox..."
+    docker compose up -d --force-recreate --no-build sandbox >/dev/null
+fi
+
 echo "[agent-zero] ensuring config directories exist..."
 docker compose exec -T sandbox bash -lc '
 set -euo pipefail
@@ -45,6 +62,16 @@ rm -f /opt/agent-zero/usr/plugins/_model_config/config.yaml
 
 echo "  config.json in place:"
 head -8 /opt/agent-zero/usr/plugins/_model_config/config.json
+
+if [[ -d /tmp/.ssh ]]; then
+    echo "  Setting up /root/.ssh..."
+    mkdir -p /root/.ssh
+    cp -r /tmp/.ssh/* /root/.ssh/ || true
+    chown -R root:root /root/.ssh
+    chmod 700 /root/.ssh
+    chmod 600 /root/.ssh/* || true
+    # Remove any potential host-based restriction inside the copied config that might lock out root? (optional, usually ok)
+fi
 '
 
 echo "[agent-zero] restoring tracked project templates..."

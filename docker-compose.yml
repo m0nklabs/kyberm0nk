@@ -49,6 +49,7 @@ services:
       # outside the LAN.
       - "0.0.0.0:50001:50001"
     volumes:
+      - /home/flip/.ssh:/tmp/.ssh:ro
       - ${ACTIVE_PROJECT}:/workspace/project:rw
       - ./cockpit:/workspace/kyberm0nk/cockpit:ro
       - ./configs/aider:/config/aider:ro
