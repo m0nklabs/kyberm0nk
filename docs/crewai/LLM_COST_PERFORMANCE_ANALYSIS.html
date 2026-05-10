@@ -1,0 +1,4823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LLM Prijs & Performance Benchmark</title>
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+<!-- jQuery & DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.css"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<style>
+body { font-family: sans-serif; padding: 20px; background: #121212; color: #e0e0e0; }
+a { color: #6db3f2; }
+table.dataTable tbody tr { background-color: #1e1e1e; }
+table.dataTable tbody tr:hover { background-color: #2c2c2c; }
+table.dataTable thead th, table.dataTable thead td { border-bottom: 2px solid #555; }
+code { background: #333; padding: 2px 5px; border-radius: 3px; }
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate { color: #e0e0e0; }
+</style>
+<script>
+$(document).ready(function() {
+    $('#llmTable').DataTable({
+        "order": [[ 2, "asc" ]],
+        "pageLength": 50
+    });
+});
+</script>
+</head>
+<body>
+<h1>LLM Prijs & Performance Benchmark</h1>
+<table id="llmTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Bedrijf</th>
+            <th>Model</th>
+            <th>Overall Rank</th>
+            <th>Coding Rank</th>
+            <th>Math Rank</th>
+            <th>RAG Rank</th>
+            <th>Prompt ($/1M)</th>
+            <th>Completion ($/1M)</th>
+            <th>Context (tokens)</th>
+            <th>Beschrijving</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.5</code></td>
+            <td data-sort="2">#2 (64.2)</td>
+            <td>#1 (82.1)</td>
+            <td>#2 (79.0)</td>
+            <td>#5</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td>1050000</td>
+            <td>OpenAI: GPT-5.5</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.5-pro</code></td>
+            <td data-sort="2">#2 (64.2)</td>
+            <td>#1 (82.1)</td>
+            <td>#2 (79.0)</td>
+            <td>#5</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td data-sort="180.0">&#36;180.00</td>
+            <td>1050000</td>
+            <td>OpenAI: GPT-5.5 Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-opus-4.7</code></td>
+            <td data-sort="3">#3 (61.3)</td>
+            <td>#2 (81.0)</td>
+            <td>#3</td>
+            <td>#2</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td data-sort="25.0">&#36;25.00</td>
+            <td>1000000</td>
+            <td>Anthropic: Claude Opus 4.7</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.4-nano</code></td>
+            <td data-sort="4">#4 (61.2)</td>
+            <td>#4</td>
+            <td>#4</td>
+            <td>#4</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.4 Nano</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.4-mini</code></td>
+            <td data-sort="4">#4 (61.2)</td>
+            <td>#4</td>
+            <td>#4</td>
+            <td>#4</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td data-sort="4.5">&#36;4.50</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.4 Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.4-image-2</code></td>
+            <td data-sort="4">#4 (61.2)</td>
+            <td>#4</td>
+            <td>#4</td>
+            <td>#4</td>
+            <td data-sort="8.0">&#36;8.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>272000</td>
+            <td>OpenAI: GPT-5.4 Image 2</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.4</code></td>
+            <td data-sort="4">#4 (61.2)</td>
+            <td>#4</td>
+            <td>#4</td>
+            <td>#4</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>1050000</td>
+            <td>OpenAI: GPT-5.4</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.4-pro</code></td>
+            <td data-sort="4">#4 (61.2)</td>
+            <td>#3</td>
+            <td>#4</td>
+            <td>#3</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td data-sort="180.0">&#36;180.00</td>
+            <td>1050000</td>
+            <td>OpenAI: GPT-5.4 Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.2-pro</code></td>
+            <td data-sort="5">#5 (61.2)</td>
+            <td>#6</td>
+            <td>#5</td>
+            <td>#6</td>
+            <td data-sort="21.0">&#36;21.00</td>
+            <td data-sort="168.0">&#36;168.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.2 Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-3.1-flash-lite</code></td>
+            <td data-sort="7">#7 (57.9)</td>
+            <td>#4 (78.5)</td>
+            <td>#7</td>
+            <td>#9</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="1.5">&#36;1.50</td>
+            <td>1048576</td>
+            <td>Google: Gemini 3.1 Flash Lite</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-3.1-flash-lite-preview</code></td>
+            <td data-sort="7">#7 (57.9)</td>
+            <td>#4 (78.5)</td>
+            <td>#7</td>
+            <td>#9</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="1.5">&#36;1.50</td>
+            <td>1048576</td>
+            <td>Google: Gemini 3.1 Flash Lite Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-3.1-flash-image-preview</code></td>
+            <td data-sort="7">#7 (57.9)</td>
+            <td>#4 (78.5)</td>
+            <td>#7</td>
+            <td>#9</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td>65536</td>
+            <td>Google: Nano Banana 2 (Gemini 3.1 Flash Image Preview)</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-3.1-pro-preview-customtools</code></td>
+            <td data-sort="7">#7 (57.9)</td>
+            <td>#4 (78.5)</td>
+            <td>#7</td>
+            <td>#9</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="12.0">&#36;12.00</td>
+            <td>1048576</td>
+            <td>Google: Gemini 3.1 Pro Preview Custom Tools</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-3.1-pro-preview</code></td>
+            <td data-sort="7">#7 (57.9)</td>
+            <td>#4 (78.5)</td>
+            <td>#7</td>
+            <td>#9</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="12.0">&#36;12.00</td>
+            <td>1048576</td>
+            <td>Google: Gemini 3.1 Pro Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-opus-4.6</code></td>
+            <td data-sort="8">#8 (57.6)</td>
+            <td>#8</td>
+            <td>#8</td>
+            <td>#8</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td data-sort="25.0">&#36;25.00</td>
+            <td>1000000</td>
+            <td>Anthropic: Claude Opus 4.6</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-opus-4.6-fast</code></td>
+            <td data-sort="8">#8 (57.6)</td>
+            <td>#8</td>
+            <td>#8</td>
+            <td>#8</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td data-sort="150.0">&#36;150.00</td>
+            <td>1000000</td>
+            <td>Anthropic: Claude Opus 4.6 (Fast)</td>
+        </tr>
+        
+        <tr>
+            <td>Bytedance-seed</td>
+            <td><code>bytedance-seed/seed-2.0-mini</code></td>
+            <td data-sort="9">#9 (56.7)</td>
+            <td>#10</td>
+            <td>#11</td>
+            <td>#15</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>262144</td>
+            <td>ByteDance Seed: Seed-2.0-Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Bytedance-seed</td>
+            <td><code>bytedance-seed/seed-2.0-lite</code></td>
+            <td data-sort="9">#9 (56.7)</td>
+            <td>#10</td>
+            <td>#11</td>
+            <td>#15</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>262144</td>
+            <td>ByteDance Seed: Seed-2.0-Lite</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.2-codex</code></td>
+            <td data-sort="10">#10 (56.2)</td>
+            <td>#15</td>
+            <td>#12</td>
+            <td>#10</td>
+            <td data-sort="1.75">&#36;1.75</td>
+            <td data-sort="14.0">&#36;14.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.2-Codex</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.2-chat</code></td>
+            <td data-sort="10">#10 (56.2)</td>
+            <td>#15</td>
+            <td>#12</td>
+            <td>#10</td>
+            <td data-sort="1.75">&#36;1.75</td>
+            <td data-sort="14.0">&#36;14.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-5.2 Chat</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.2</code></td>
+            <td data-sort="10">#10 (56.2)</td>
+            <td>#15</td>
+            <td>#12</td>
+            <td>#10</td>
+            <td data-sort="1.75">&#36;1.75</td>
+            <td data-sort="14.0">&#36;14.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.2</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-v4-pro</code></td>
+            <td data-sort="18">#18 (51.9)</td>
+            <td>#12</td>
+            <td>#10</td>
+            <td>#25</td>
+            <td data-sort="0.435">&#36;0.43</td>
+            <td data-sort="0.87">&#36;0.87</td>
+            <td>1048576</td>
+            <td>DeepSeek: DeepSeek V4 Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Openrouter</td>
+            <td><code>openrouter/pareto-code</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="-1000000.0">&#36;-1000000.00</td>
+            <td data-sort="-1000000.0">&#36;-1000000.00</td>
+            <td>2000000</td>
+            <td>Pareto Code Router</td>
+        </tr>
+        
+        <tr>
+            <td>Openrouter</td>
+            <td><code>openrouter/bodybuilder</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="-1000000.0">&#36;-1000000.00</td>
+            <td data-sort="-1000000.0">&#36;-1000000.00</td>
+            <td>128000</td>
+            <td>Body Builder (beta)</td>
+        </tr>
+        
+        <tr>
+            <td>Openrouter</td>
+            <td><code>openrouter/auto</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="-1000000.0">&#36;-1000000.00</td>
+            <td data-sort="-1000000.0">&#36;-1000000.00</td>
+            <td>2000000</td>
+            <td>Auto Router</td>
+        </tr>
+        
+        <tr>
+            <td>Inclusionai</td>
+            <td><code>inclusionai/ring-2.6-1t:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>262144</td>
+            <td>inclusionAI: Ring-2.6-1T (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Baidu</td>
+            <td><code>baidu/cobuddy:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>131072</td>
+            <td>Baidu Qianfan: CoBuddy (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Openrouter</td>
+            <td><code>openrouter/owl-alpha</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>1048756</td>
+            <td>Owl Alpha</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>256000</td>
+            <td>NVIDIA: Nemotron 3 Nano Omni (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Poolside</td>
+            <td><code>poolside/laguna-xs.2:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>131072</td>
+            <td>Poolside: Laguna XS.2 (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Poolside</td>
+            <td><code>poolside/laguna-m.1:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>131072</td>
+            <td>Poolside: Laguna M.1 (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Baidu</td>
+            <td><code>baidu/qianfan-ocr-fast:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>65536</td>
+            <td>Baidu: Qianfan-OCR-Fast (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-4-26b-a4b-it:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>262144</td>
+            <td>Google: Gemma 4 26B A4B  (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-4-31b-it:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>262144</td>
+            <td>Google: Gemma 4 31B (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/lyria-3-pro-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>1048576</td>
+            <td>Google: Lyria 3 Pro Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/lyria-3-clip-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>1048576</td>
+            <td>Google: Lyria 3 Clip Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/nemotron-3-super-120b-a12b:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>262144</td>
+            <td>NVIDIA: Nemotron 3 Super (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Minimax</td>
+            <td><code>minimax/minimax-m2.5:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>196608</td>
+            <td>MiniMax: MiniMax M2.5 (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Openrouter</td>
+            <td><code>openrouter/free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>200000</td>
+            <td>Free Models Router</td>
+        </tr>
+        
+        <tr>
+            <td>Liquid</td>
+            <td><code>liquid/lfm-2.5-1.2b-thinking:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>32768</td>
+            <td>LiquidAI: LFM2.5-1.2B-Thinking (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Liquid</td>
+            <td><code>liquid/lfm-2.5-1.2b-instruct:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>32768</td>
+            <td>LiquidAI: LFM2.5-1.2B-Instruct (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/nemotron-3-nano-30b-a3b:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>256000</td>
+            <td>NVIDIA: Nemotron 3 Nano 30B A3B (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/nemotron-nano-12b-v2-vl:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>128000</td>
+            <td>NVIDIA: Nemotron Nano 12B 2 VL (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-next-80b-a3b-instruct:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 Next 80B A3B Instruct (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/nemotron-nano-9b-v2:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>128000</td>
+            <td>NVIDIA: Nemotron Nano 9B V2 (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-oss-120b:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>131072</td>
+            <td>OpenAI: gpt-oss-120b (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-oss-20b:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>131072</td>
+            <td>OpenAI: gpt-oss-20b (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4.5-air:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>131072</td>
+            <td>Z.ai: GLM 4.5 Air (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-coder:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>262000</td>
+            <td>Qwen: Qwen3 Coder 480B A35B (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Cognitivecomputations</td>
+            <td><code>cognitivecomputations/dolphin-mistral-24b-venice-edition:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>32768</td>
+            <td>Venice: Uncensored (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3.3-70b-instruct:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>65536</td>
+            <td>Meta: Llama 3.3 70B Instruct (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3.2-3b-instruct:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>131072</td>
+            <td>Meta: Llama 3.2 3B Instruct (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Nousresearch</td>
+            <td><code>nousresearch/hermes-3-llama-3.1-405b:free</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td data-sort="0.0">&#36;0.00</td>
+            <td>131072</td>
+            <td>Nous: Hermes 3 405B Instruct (free)</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-guard-3-8b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.48">&#36;0.48</td>
+            <td data-sort="0.03">&#36;0.03</td>
+            <td>131072</td>
+            <td>Llama Guard 3 8B</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-nemo</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.02">&#36;0.02</td>
+            <td data-sort="0.03">&#36;0.03</td>
+            <td>131072</td>
+            <td>Mistral: Mistral Nemo</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3-8b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.04">&#36;0.04</td>
+            <td data-sort="0.04">&#36;0.04</td>
+            <td>8192</td>
+            <td>Meta: Llama 3 8B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Sao10k</td>
+            <td><code>sao10k/l3-lunaris-8b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.04">&#36;0.04</td>
+            <td data-sort="0.049999999999999996">&#36;0.05</td>
+            <td>8192</td>
+            <td>Sao10K: Llama 3 8B Lunaris</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3.1-8b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.02">&#36;0.02</td>
+            <td data-sort="0.049999999999999996">&#36;0.05</td>
+            <td>16384</td>
+            <td>Meta: Llama 3.1 8B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Gryphe</td>
+            <td><code>gryphe/mythomax-l2-13b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.06">&#36;0.06</td>
+            <td data-sort="0.06">&#36;0.06</td>
+            <td>4096</td>
+            <td>MythoMax 13B</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-3-4b-it</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.04">&#36;0.04</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td>131072</td>
+            <td>Google: Gemma 3 4B</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-small-24b-instruct-2501</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.049999999999999996">&#36;0.05</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td>32768</td>
+            <td>Mistral: Mistral Small 3</td>
+        </tr>
+        
+        <tr>
+            <td>Ibm-granite</td>
+            <td><code>ibm-granite/granite-4.1-8b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.049999999999999996">&#36;0.05</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td>131072</td>
+            <td>IBM: Granite 4.1 8B</td>
+        </tr>
+        
+        <tr>
+            <td>Rekaai</td>
+            <td><code>rekaai/reka-edge</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td>16384</td>
+            <td>Reka Edge</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/ministral-3b-2512</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td>131072</td>
+            <td>Mistral: Ministral 3 3B 2512</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4-32b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td>128000</td>
+            <td>Z.ai: GLM 4 32B </td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-235b-a22b-2507</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.071">&#36;0.07</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 235B A22B Instruct 2507</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-2.5-7b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.04">&#36;0.04</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td>32768</td>
+            <td>Qwen: Qwen2.5 7B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Ibm-granite</td>
+            <td><code>ibm-granite/granite-4.0-h-micro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.017">&#36;0.02</td>
+            <td data-sort="0.11">&#36;0.11</td>
+            <td>131000</td>
+            <td>IBM: Granite 4.0 Micro</td>
+        </tr>
+        
+        <tr>
+            <td>Liquid</td>
+            <td><code>liquid/lfm-2-24b-a2b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.03">&#36;0.03</td>
+            <td data-sort="0.12">&#36;0.12</td>
+            <td>32768</td>
+            <td>LiquidAI: LFM2-24B-A2B</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-3n-e4b-it</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.06">&#36;0.06</td>
+            <td data-sort="0.12">&#36;0.12</td>
+            <td>32768</td>
+            <td>Google: Gemma 3n 4B</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-3-12b-it</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.04">&#36;0.04</td>
+            <td data-sort="0.13">&#36;0.13</td>
+            <td>131072</td>
+            <td>Google: Gemma 3 12B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-turbo</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0325">&#36;0.03</td>
+            <td data-sort="0.13">&#36;0.13</td>
+            <td>131072</td>
+            <td>Qwen: Qwen-Turbo</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-oss-20b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.03">&#36;0.03</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td>131072</td>
+            <td>OpenAI: gpt-oss-20b</td>
+        </tr>
+        
+        <tr>
+            <td>Microsoft</td>
+            <td><code>microsoft/phi-4</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.065">&#36;0.07</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td>16384</td>
+            <td>Microsoft: Phi 4</td>
+        </tr>
+        
+        <tr>
+            <td>Amazon</td>
+            <td><code>amazon/nova-micro-v1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.035">&#36;0.04</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td>128000</td>
+            <td>Amazon: Nova Micro 1.0</td>
+        </tr>
+        
+        <tr>
+            <td>Nousresearch</td>
+            <td><code>nousresearch/hermes-2-pro-llama-3-8b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td>8192</td>
+            <td>NousResearch: Hermes 2 Pro - Llama-3 8B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.5-9b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.04">&#36;0.04</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3.5-9B</td>
+        </tr>
+        
+        <tr>
+            <td>Essentialai</td>
+            <td><code>essentialai/rnj-1-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td>32768</td>
+            <td>EssentialAI: Rnj 1 Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/ministral-8b-2512</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td>262144</td>
+            <td>Mistral: Ministral 3 8B 2512</td>
+        </tr>
+        
+        <tr>
+            <td>Arcee-ai</td>
+            <td><code>arcee-ai/trinity-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.045">&#36;0.04</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td>131072</td>
+            <td>Arcee AI: Trinity Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Cohere</td>
+            <td><code>cohere/command-r7b-12-2024</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0375">&#36;0.04</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td>128000</td>
+            <td>Cohere: Command R7B (12-2024)</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/nemotron-nano-9b-v2</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.04">&#36;0.04</td>
+            <td data-sort="0.16">&#36;0.16</td>
+            <td>131072</td>
+            <td>NVIDIA: Nemotron Nano 9B V2</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-3-27b-it</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td data-sort="0.16">&#36;0.16</td>
+            <td>131072</td>
+            <td>Google: Gemma 3 27B</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-oss-120b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.039">&#36;0.04</td>
+            <td data-sort="0.18">&#36;0.18</td>
+            <td>131072</td>
+            <td>OpenAI: gpt-oss-120b</td>
+        </tr>
+        
+        <tr>
+            <td>Arcee-ai</td>
+            <td><code>arcee-ai/spotlight</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.18">&#36;0.18</td>
+            <td data-sort="0.18">&#36;0.18</td>
+            <td>131072</td>
+            <td>Arcee AI: Spotlight</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-guard-4-12b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.18">&#36;0.18</td>
+            <td data-sort="0.18">&#36;0.18</td>
+            <td>163840</td>
+            <td>Meta: Llama Guard 4 12B</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-7b-instruct-v0.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.11">&#36;0.11</td>
+            <td data-sort="0.19">&#36;0.19</td>
+            <td>2824</td>
+            <td>Mistral: Mistral 7B Instruct v0.1</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/nemotron-3-nano-30b-a3b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.049999999999999996">&#36;0.05</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td>262144</td>
+            <td>NVIDIA: Nemotron 3 Nano 30B A3B</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/ministral-14b-2512</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td>262144</td>
+            <td>Mistral: Ministral 3 14B 2512</td>
+        </tr>
+        
+        <tr>
+            <td>Bytedance</td>
+            <td><code>bytedance/ui-tars-1.5-7b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td>128000</td>
+            <td>ByteDance: UI-TARS 7B </td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-small-3.2-24b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.075">&#36;0.07</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td>128000</td>
+            <td>Mistral: Mistral Small 3.2 24B</td>
+        </tr>
+        
+        <tr>
+            <td>Rekaai</td>
+            <td><code>rekaai/reka-flash-3</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td>65536</td>
+            <td>Reka Flash 3</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3.2-1b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.027">&#36;0.03</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td>60000</td>
+            <td>Meta: Llama 3.2 1B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Inclusionai</td>
+            <td><code>inclusionai/ling-2.6-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td data-sort="0.24">&#36;0.24</td>
+            <td>262144</td>
+            <td>inclusionAI: Ling-2.6-flash</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-14b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.06">&#36;0.06</td>
+            <td data-sort="0.24">&#36;0.24</td>
+            <td>40960</td>
+            <td>Qwen: Qwen3 14B</td>
+        </tr>
+        
+        <tr>
+            <td>Amazon</td>
+            <td><code>amazon/nova-lite-v1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.06">&#36;0.06</td>
+            <td data-sort="0.24">&#36;0.24</td>
+            <td>300000</td>
+            <td>Amazon: Nova Lite 1.0</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3.2-11b-vision-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.245">&#36;0.24</td>
+            <td data-sort="0.245">&#36;0.24</td>
+            <td>131072</td>
+            <td>Meta: Llama 3.2 11B Vision Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Tencent</td>
+            <td><code>tencent/hy3-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.06599999999999999">&#36;0.07</td>
+            <td data-sort="0.26">&#36;0.26</td>
+            <td>262144</td>
+            <td>Tencent: Hy3 preview</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.5-flash-02-23</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.065">&#36;0.07</td>
+            <td data-sort="0.26">&#36;0.26</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen3.5-Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-coder-30b-a3b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.07">&#36;0.07</td>
+            <td data-sort="0.27">&#36;0.27</td>
+            <td>160000</td>
+            <td>Qwen: Qwen3 Coder 30B A3B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-v4-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td data-sort="0.28">&#36;0.28</td>
+            <td>1048576</td>
+            <td>DeepSeek: DeepSeek V4 Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Baidu</td>
+            <td><code>baidu/ernie-4.5-21b-a3b-thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.07">&#36;0.07</td>
+            <td data-sort="0.28">&#36;0.28</td>
+            <td>131072</td>
+            <td>Baidu: ERNIE 4.5 21B A3B Thinking</td>
+        </tr>
+        
+        <tr>
+            <td>Baidu</td>
+            <td><code>baidu/ernie-4.5-21b-a3b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.07">&#36;0.07</td>
+            <td data-sort="0.28">&#36;0.28</td>
+            <td>120000</td>
+            <td>Baidu: ERNIE 4.5 21B A3B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-32b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td data-sort="0.28">&#36;0.28</td>
+            <td>40960</td>
+            <td>Qwen: Qwen3 32B</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-r1-distill-qwen-32b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.29">&#36;0.29</td>
+            <td data-sort="0.29">&#36;0.29</td>
+            <td>32768</td>
+            <td>DeepSeek: R1 Distill Qwen 32B</td>
+        </tr>
+        
+        <tr>
+            <td>Stepfun</td>
+            <td><code>stepfun/step-3.5-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>262144</td>
+            <td>StepFun: Step 3.5 Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Bytedance-seed</td>
+            <td><code>bytedance-seed/seed-1.6-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.075">&#36;0.07</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>262144</td>
+            <td>ByteDance Seed: Seed 1.6 Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Xiaomi</td>
+            <td><code>xiaomi/mimo-v2-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>262144</td>
+            <td>Xiaomi: MiMo-V2-Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/voxtral-small-24b-2507</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>32000</td>
+            <td>Mistral: Voxtral Small 24B 2507</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-oss-safeguard-20b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.075">&#36;0.07</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>131072</td>
+            <td>OpenAI: gpt-oss-safeguard-20b</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-30b-a3b-instruct-2507</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09">&#36;0.09</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 30B A3B Instruct 2507</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/devstral-small</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>131072</td>
+            <td>Mistral: Devstral Small 1.1</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-4-scout</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>327680</td>
+            <td>Meta: Llama 4 Scout</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.0-flash-lite-001</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.075">&#36;0.07</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>1048576</td>
+            <td>Google: Gemini 2.0 Flash Lite</td>
+        </tr>
+        
+        <tr>
+            <td>Nousresearch</td>
+            <td><code>nousresearch/hermes-3-llama-3.1-70b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td>131072</td>
+            <td>Nous: Hermes 3 70B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3.3-70b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.32">&#36;0.32</td>
+            <td>131072</td>
+            <td>Meta: Llama 3.3 70B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-4-26b-a4b-it</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.06">&#36;0.06</td>
+            <td data-sort="0.33">&#36;0.33</td>
+            <td>262144</td>
+            <td>Google: Gemma 4 26B A4B </td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3.2-3b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.051">&#36;0.05</td>
+            <td data-sort="0.33999999999999997">&#36;0.34</td>
+            <td>80000</td>
+            <td>Meta: Llama 3.2 3B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Microsoft</td>
+            <td><code>microsoft/phi-4-mini-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td data-sort="0.35">&#36;0.35</td>
+            <td>128000</td>
+            <td>Microsoft: Phi 4 Mini Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-v3.2</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.252">&#36;0.25</td>
+            <td data-sort="0.378">&#36;0.38</td>
+            <td>131072</td>
+            <td>DeepSeek: DeepSeek V3.2</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-4-31b-it</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.13">&#36;0.13</td>
+            <td data-sort="0.38">&#36;0.38</td>
+            <td>262144</td>
+            <td>Google: Gemma 4 31B</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4.7-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.06">&#36;0.06</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>202752</td>
+            <td>Z.ai: GLM 4.7 Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/llama-3.3-nemotron-super-49b-v1.5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>131072</td>
+            <td>NVIDIA: Llama 3.3 Nemotron Super 49B V1.5</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.5-flash-lite-preview-09-2025</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>1048576</td>
+            <td>Google: Gemini 2.5 Flash Lite Preview 09-2025</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-30b-a3b-thinking-2507</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 30B A3B Thinking 2507</td>
+        </tr>
+        
+        <tr>
+            <td>Nousresearch</td>
+            <td><code>nousresearch/hermes-4-70b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.13">&#36;0.13</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>131072</td>
+            <td>Nous: Hermes 4 70B</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5-nano</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.049999999999999996">&#36;0.05</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5 Nano</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.5-flash-lite</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>1048576</td>
+            <td>Google: Gemini 2.5 Flash Lite</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-8b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.049999999999999996">&#36;0.05</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>40960</td>
+            <td>Qwen: Qwen3 8B</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4.1-nano</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>1047576</td>
+            <td>OpenAI: GPT-4.1 Nano</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.0-flash-001</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09999999999999999">&#36;0.10</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>1000000</td>
+            <td>Google: Gemini 2.0 Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Thedrummer</td>
+            <td><code>thedrummer/unslopnemo-12b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>32768</td>
+            <td>TheDrummer: UnslopNemo 12B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-2.5-72b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.36">&#36;0.36</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>32768</td>
+            <td>Qwen2.5 72B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3.1-70b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td>131072</td>
+            <td>Meta: Llama 3.1 70B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-vl-plus</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.1365">&#36;0.14</td>
+            <td data-sort="0.40950000000000003">&#36;0.41</td>
+            <td>131072</td>
+            <td>Qwen: Qwen VL Plus</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-v3.2-exp</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.27">&#36;0.27</td>
+            <td data-sort="0.41">&#36;0.41</td>
+            <td>163840</td>
+            <td>DeepSeek: DeepSeek V3.2 Exp</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-vl-32b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.10400000000000001">&#36;0.10</td>
+            <td data-sort="0.41600000000000004">&#36;0.42</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 VL 32B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Thedrummer</td>
+            <td><code>thedrummer/rocinante-12b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.16999999999999998">&#36;0.17</td>
+            <td data-sort="0.43">&#36;0.43</td>
+            <td>32768</td>
+            <td>TheDrummer: Rocinante 12B</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-v3.2-speciale</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.28700000000000003">&#36;0.29</td>
+            <td data-sort="0.431">&#36;0.43</td>
+            <td>163840</td>
+            <td>DeepSeek: DeepSeek V3.2 Speciale</td>
+        </tr>
+        
+        <tr>
+            <td>Nvidia</td>
+            <td><code>nvidia/nemotron-3-super-120b-a12b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09">&#36;0.09</td>
+            <td data-sort="0.44999999999999996">&#36;0.45</td>
+            <td>262144</td>
+            <td>NVIDIA: Nemotron 3 Super</td>
+        </tr>
+        
+        <tr>
+            <td>Arcee-ai</td>
+            <td><code>arcee-ai/trinity-large-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.44999999999999996">&#36;0.45</td>
+            <td>131000</td>
+            <td>Arcee AI: Trinity Large Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Alibaba</td>
+            <td><code>alibaba/tongyi-deepresearch-30b-a3b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09">&#36;0.09</td>
+            <td data-sort="0.44999999999999996">&#36;0.45</td>
+            <td>131072</td>
+            <td>Tongyi DeepResearch 30B A3B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-30b-a3b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09">&#36;0.09</td>
+            <td data-sort="0.44999999999999996">&#36;0.45</td>
+            <td>40960</td>
+            <td>Qwen: Qwen3 30B A3B</td>
+        </tr>
+        
+        <tr>
+            <td>Nex-agi</td>
+            <td><code>nex-agi/deepseek-v3.1-nex-n1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.135">&#36;0.14</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td>131072</td>
+            <td>Nex AGI: DeepSeek V3.1 Nex N1</td>
+        </tr>
+        
+        <tr>
+            <td>Allenai</td>
+            <td><code>allenai/olmo-3-32b-think</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td>65536</td>
+            <td>AllenAI: Olmo 3 32B Think</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-4.1-fast</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td>2000000</td>
+            <td>xAI: Grok 4.1 Fast</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-vl-8b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.08">&#36;0.08</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 VL 8B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Thedrummer</td>
+            <td><code>thedrummer/cydonia-24b-v4.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td>131072</td>
+            <td>TheDrummer: Cydonia 24B V4.1</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-4-fast</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td>2000000</td>
+            <td>xAI: Grok 4 Fast</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-3-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td>131072</td>
+            <td>xAI: Grok 3 Mini</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-3-mini-beta</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td>131072</td>
+            <td>xAI: Grok 3 Mini Beta</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-vl-30b-a3b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.13">&#36;0.13</td>
+            <td data-sort="0.52">&#36;0.52</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 VL 30B A3B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Baidu</td>
+            <td><code>baidu/ernie-4.5-vl-28b-a3b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td data-sort="0.56">&#36;0.56</td>
+            <td>30000</td>
+            <td>Baidu: ERNIE 4.5 VL 28B A3B</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-small-3.1-24b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.35">&#36;0.35</td>
+            <td data-sort="0.56">&#36;0.56</td>
+            <td>128000</td>
+            <td>Mistral: Mistral Small 3.1 24B</td>
+        </tr>
+        
+        <tr>
+            <td>Tencent</td>
+            <td><code>tencent/hunyuan-a13b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td data-sort="0.5700000000000001">&#36;0.57</td>
+            <td>131072</td>
+            <td>Tencent: Hunyuan A13B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-small-2603</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td>262144</td>
+            <td>Mistral: Mistral Small 4</td>
+        </tr>
+        
+        <tr>
+            <td>Upstage</td>
+            <td><code>upstage/solar-pro-3</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td>128000</td>
+            <td>Upstage: Solar Pro 3</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-4-maverick</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td>1048576</td>
+            <td>Meta: Llama 4 Maverick</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o-mini-search-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o-mini Search Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-saba</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td>32768</td>
+            <td>Mistral: Saba</td>
+        </tr>
+        
+        <tr>
+            <td>Cohere</td>
+            <td><code>cohere/command-r-08-2024</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td>128000</td>
+            <td>Cohere: Command R (08-2024)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o-mini-2024-07-18</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o-mini (2024-07-18)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o-mini</td>
+        </tr>
+        
+        <tr>
+            <td>Microsoft</td>
+            <td><code>microsoft/wizardlm-2-8x22b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.62">&#36;0.62</td>
+            <td data-sort="0.62">&#36;0.62</td>
+            <td>65535</td>
+            <td>WizardLM-2 8x22B</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemma-2-27b-it</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.65">&#36;0.65</td>
+            <td data-sort="0.65">&#36;0.65</td>
+            <td>8192</td>
+            <td>Google: Gemma 2 27B</td>
+        </tr>
+        
+        <tr>
+            <td>Undi95</td>
+            <td><code>undi95/remm-slerp-l2-13b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.44999999999999996">&#36;0.45</td>
+            <td data-sort="0.65">&#36;0.65</td>
+            <td>6144</td>
+            <td>ReMM SLERP 13B</td>
+        </tr>
+        
+        <tr>
+            <td>Meta-llama</td>
+            <td><code>meta-llama/llama-3-70b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.51">&#36;0.51</td>
+            <td data-sort="0.74">&#36;0.74</td>
+            <td>8192</td>
+            <td>Meta: Llama 3 70B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Inception</td>
+            <td><code>inception/mercury-2</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td>128000</td>
+            <td>Inception: Mercury 2</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-chat-v3.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td>32768</td>
+            <td>DeepSeek: DeepSeek V3.1</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen2.5-vl-72b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td>32000</td>
+            <td>Qwen: Qwen2.5 VL 72B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Sao10k</td>
+            <td><code>sao10k/l3.3-euryale-70b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.65">&#36;0.65</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td>131072</td>
+            <td>Sao10K: Llama 3.3 Euryale 70B</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-chat-v3-0324</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="0.77">&#36;0.77</td>
+            <td>163840</td>
+            <td>DeepSeek: DeepSeek V3 0324</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-next-80b-a3b-thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.0975">&#36;0.10</td>
+            <td data-sort="0.78">&#36;0.78</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 Next 80B A3B Thinking</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-plus-2025-07-28:thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.26">&#36;0.26</td>
+            <td data-sort="0.78">&#36;0.78</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen Plus 0728 (thinking)</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-plus-2025-07-28</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.26">&#36;0.26</td>
+            <td data-sort="0.78">&#36;0.78</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen Plus 0728</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-plus</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.26">&#36;0.26</td>
+            <td data-sort="0.78">&#36;0.78</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen-Plus</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-coder-next</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.11">&#36;0.11</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 Coder Next</td>
+        </tr>
+        
+        <tr>
+            <td>Arcee-ai</td>
+            <td><code>arcee-ai/coder-large</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td>32768</td>
+            <td>Arcee AI: Coder Large</td>
+        </tr>
+        
+        <tr>
+            <td>Thedrummer</td>
+            <td><code>thedrummer/skyfall-36b-v2</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.55">&#36;0.55</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td>32768</td>
+            <td>TheDrummer: Skyfall 36B V2</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-r1-distill-llama-70b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7">&#36;0.70</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td>131072</td>
+            <td>DeepSeek: R1 Distill Llama 70B</td>
+        </tr>
+        
+        <tr>
+            <td>Arcee-ai</td>
+            <td><code>arcee-ai/trinity-large-thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.22">&#36;0.22</td>
+            <td data-sort="0.85">&#36;0.85</td>
+            <td>262144</td>
+            <td>Arcee AI: Trinity Large Thinking</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4.5-air</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.13">&#36;0.13</td>
+            <td data-sort="0.85">&#36;0.85</td>
+            <td>131072</td>
+            <td>Z.ai: GLM 4.5 Air</td>
+        </tr>
+        
+        <tr>
+            <td>Sao10k</td>
+            <td><code>sao10k/l3.1-euryale-70b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.85">&#36;0.85</td>
+            <td data-sort="0.85">&#36;0.85</td>
+            <td>131072</td>
+            <td>Sao10K: Llama 3.1 Euryale 70B v2.2</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-vl-235b-a22b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="0.88">&#36;0.88</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 VL 235B A22B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-chat</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.32">&#36;0.32</td>
+            <td data-sort="0.8899999999999999">&#36;0.89</td>
+            <td>163840</td>
+            <td>DeepSeek: DeepSeek V3</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4.6v</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="0.8999999999999999">&#36;0.90</td>
+            <td>131072</td>
+            <td>Z.ai: GLM 4.6V</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/codestral-2508</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="0.8999999999999999">&#36;0.90</td>
+            <td>256000</td>
+            <td>Mistral: Codestral 2508</td>
+        </tr>
+        
+        <tr>
+            <td>Minimax</td>
+            <td><code>minimax/minimax-m2.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.29">&#36;0.29</td>
+            <td data-sort="0.95">&#36;0.95</td>
+            <td>196608</td>
+            <td>MiniMax: MiniMax M2.1</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-v3.1-terminus</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.27">&#36;0.27</td>
+            <td data-sort="0.95">&#36;0.95</td>
+            <td>163840</td>
+            <td>DeepSeek: DeepSeek V3.1 Terminus</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-coder-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.195">&#36;0.20</td>
+            <td data-sort="0.975">&#36;0.97</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen3 Coder Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.6-35b-a3b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3.6 35B A3B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.5-35b-a3b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.14">&#36;0.14</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3.5-35B-A3B</td>
+        </tr>
+        
+        <tr>
+            <td>Minimax</td>
+            <td><code>minimax/minimax-m2</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.255">&#36;0.26</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td>196608</td>
+            <td>MiniMax: MiniMax M2</td>
+        </tr>
+        
+        <tr>
+            <td>Perplexity</td>
+            <td><code>perplexity/sonar</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td>127072</td>
+            <td>Perplexity: Sonar</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-2.5-coder-32b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.66">&#36;0.66</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td>32768</td>
+            <td>Qwen2.5 Coder 32B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Nousresearch</td>
+            <td><code>nousresearch/hermes-3-llama-3.1-405b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td>131072</td>
+            <td>Nous: Hermes 3 405B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Mancer</td>
+            <td><code>mancer/weaver</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td>8000</td>
+            <td>Mancer: Weaver (alpha)</td>
+        </tr>
+        
+        <tr>
+            <td>Prime-intellect</td>
+            <td><code>prime-intellect/intellect-3</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="1.1">&#36;1.10</td>
+            <td>131072</td>
+            <td>Prime Intellect: INTELLECT-3</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-next-80b-a3b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.09">&#36;0.09</td>
+            <td data-sort="1.1">&#36;1.10</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 Next 80B A3B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Baidu</td>
+            <td><code>baidu/ernie-4.5-300b-a47b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.28">&#36;0.28</td>
+            <td data-sort="1.1">&#36;1.10</td>
+            <td>123000</td>
+            <td>Baidu: ERNIE 4.5 300B A47B </td>
+        </tr>
+        
+        <tr>
+            <td>Minimax</td>
+            <td><code>minimax/minimax-01</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="1.1">&#36;1.10</td>
+            <td>1000192</td>
+            <td>MiniMax: MiniMax-01</td>
+        </tr>
+        
+        <tr>
+            <td>Minimax</td>
+            <td><code>minimax/minimax-m2.5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.15">&#36;0.15</td>
+            <td data-sort="1.15">&#36;1.15</td>
+            <td>196608</td>
+            <td>MiniMax: MiniMax M2.5</td>
+        </tr>
+        
+        <tr>
+            <td>Kwaipilot</td>
+            <td><code>kwaipilot/kat-coder-pro-v2</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="1.2">&#36;1.20</td>
+            <td>256000</td>
+            <td>Kwaipilot: KAT-Coder-Pro V2</td>
+        </tr>
+        
+        <tr>
+            <td>Minimax</td>
+            <td><code>minimax/minimax-m2.7</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.29900000000000004">&#36;0.30</td>
+            <td data-sort="1.2">&#36;1.20</td>
+            <td>196608</td>
+            <td>MiniMax: MiniMax M2.7</td>
+        </tr>
+        
+        <tr>
+            <td>Minimax</td>
+            <td><code>minimax/minimax-m2-her</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="1.2">&#36;1.20</td>
+            <td>65536</td>
+            <td>MiniMax: MiniMax M2-her</td>
+        </tr>
+        
+        <tr>
+            <td>Morph</td>
+            <td><code>morph/morph-v3-fast</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td data-sort="1.2">&#36;1.20</td>
+            <td>81920</td>
+            <td>Morph: Morph V3 Fast</td>
+        </tr>
+        
+        <tr>
+            <td>Arcee-ai</td>
+            <td><code>arcee-ai/virtuoso-large</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td data-sort="1.2">&#36;1.20</td>
+            <td>131072</td>
+            <td>Arcee AI: Virtuoso Large</td>
+        </tr>
+        
+        <tr>
+            <td>Alfredpros</td>
+            <td><code>alfredpros/codellama-7b-instruct-solidity</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td data-sort="1.2">&#36;1.20</td>
+            <td>4096</td>
+            <td>AlfredPros: CodeLLaMa 7B Instruct Solidity</td>
+        </tr>
+        
+        <tr>
+            <td>Deepcogito</td>
+            <td><code>deepcogito/cogito-v2.1-671b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td>128000</td>
+            <td>Deep Cogito: Cogito v2.1 671B</td>
+        </tr>
+        
+        <tr>
+            <td>Relace</td>
+            <td><code>relace/relace-apply-3</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.85">&#36;0.85</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td>256000</td>
+            <td>Relace: Relace Apply 3</td>
+        </tr>
+        
+        <tr>
+            <td>Baidu</td>
+            <td><code>baidu/ernie-4.5-vl-424b-a47b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.42">&#36;0.42</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td>123000</td>
+            <td>Baidu: ERNIE 4.5 VL 424B A47B </td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-3-haiku</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td>200000</td>
+            <td>Anthropic: Claude 3 Haiku</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-vl-8b-thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.117">&#36;0.12</td>
+            <td data-sort="1.365">&#36;1.36</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 VL 8B Thinking</td>
+        </tr>
+        
+        <tr>
+            <td>Aion-labs</td>
+            <td><code>aion-labs/aion-1.0-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7">&#36;0.70</td>
+            <td data-sort="1.4">&#36;1.40</td>
+            <td>131072</td>
+            <td>AionLabs: Aion-1.0-Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Sao10k</td>
+            <td><code>sao10k/l3-euryale-70b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.48">&#36;1.48</td>
+            <td data-sort="1.48">&#36;1.48</td>
+            <td>8192</td>
+            <td>Sao10k: Llama 3 Euryale 70B v2.1</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-235b-a22b-thinking-2507</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.14950000000000002">&#36;0.15</td>
+            <td data-sort="1.495">&#36;1.50</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 235B A22B Thinking 2507</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.6-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="1.5">&#36;1.50</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen3.6 Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-large-2512</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td data-sort="1.5">&#36;1.50</td>
+            <td>262144</td>
+            <td>Mistral: Mistral Large 3 2512</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-code-fast-1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.19999999999999998">&#36;0.20</td>
+            <td data-sort="1.5">&#36;1.50</td>
+            <td>256000</td>
+            <td>xAI: Grok Code Fast 1</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-3.5-turbo</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td data-sort="1.5">&#36;1.50</td>
+            <td>16385</td>
+            <td>OpenAI: GPT-3.5 Turbo</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.5-27b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.195">&#36;0.20</td>
+            <td data-sort="1.56">&#36;1.56</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3.5-27B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.5-plus-02-15</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.26">&#36;0.26</td>
+            <td data-sort="1.56">&#36;1.56</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen3.5 Plus 2026-02-15</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-vl-30b-a3b-thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.13">&#36;0.13</td>
+            <td data-sort="1.56">&#36;1.56</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 VL 30B A3B Thinking</td>
+        </tr>
+        
+        <tr>
+            <td>Aion-labs</td>
+            <td><code>aion-labs/aion-2.0</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td data-sort="1.5999999999999999">&#36;1.60</td>
+            <td>131072</td>
+            <td>AionLabs: Aion-2.0</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4.1-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="1.5999999999999999">&#36;1.60</td>
+            <td>1047576</td>
+            <td>OpenAI: GPT-4.1 Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Aion-labs</td>
+            <td><code>aion-labs/aion-rp-llama-3.1-8b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td data-sort="1.5999999999999999">&#36;1.60</td>
+            <td>32768</td>
+            <td>AionLabs: Aion-RP 1.0 (8B)</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4.7</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="1.75">&#36;1.75</td>
+            <td>202752</td>
+            <td>Z.ai: GLM 4.7</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4.5v</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td data-sort="1.7999999999999998">&#36;1.80</td>
+            <td>65536</td>
+            <td>Z.ai: GLM 4.5V</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-coder</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.22">&#36;0.22</td>
+            <td data-sort="1.7999999999999998">&#36;1.80</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 Coder 480B A35B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-235b-a22b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.45499999999999996">&#36;0.45</td>
+            <td data-sort="1.8199999999999998">&#36;1.82</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 235B A22B</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4.6</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39">&#36;0.39</td>
+            <td data-sort="1.9">&#36;1.90</td>
+            <td>204800</td>
+            <td>Z.ai: GLM 4.6</td>
+        </tr>
+        
+        <tr>
+            <td>Morph</td>
+            <td><code>morph/morph-v3-large</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.8999999999999999">&#36;0.90</td>
+            <td data-sort="1.9">&#36;1.90</td>
+            <td>262144</td>
+            <td>Morph: Morph V3 Large</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td data-sort="1.92">&#36;1.92</td>
+            <td>202752</td>
+            <td>Z.ai: GLM 5</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.6-plus</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.325">&#36;0.33</td>
+            <td data-sort="1.95">&#36;1.95</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen3.6 Plus</td>
+        </tr>
+        
+        <tr>
+            <td>Xiaomi</td>
+            <td><code>xiaomi/mimo-v2.5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>1048576</td>
+            <td>Xiaomi: MiMo-V2.5</td>
+        </tr>
+        
+        <tr>
+            <td>Xiaomi</td>
+            <td><code>xiaomi/mimo-v2-omni</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>262144</td>
+            <td>Xiaomi: MiMo-V2-Omni</td>
+        </tr>
+        
+        <tr>
+            <td>Moonshotai</td>
+            <td><code>moonshotai/kimi-k2.5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.44">&#36;0.44</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>262144</td>
+            <td>MoonshotAI: Kimi K2.5</td>
+        </tr>
+        
+        <tr>
+            <td>Bytedance-seed</td>
+            <td><code>bytedance-seed/seed-1.6</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>262144</td>
+            <td>ByteDance Seed: Seed 1.6</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/devstral-2512</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>262144</td>
+            <td>Mistral: Devstral 2 2512</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.1-codex-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.1-Codex-Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5-image-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5 Image Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Moonshotai</td>
+            <td><code>moonshotai/kimi-k2-0905</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>262144</td>
+            <td>MoonshotAI: Kimi K2 0905</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-medium-3.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>131072</td>
+            <td>Mistral: Mistral Medium 3.1</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.25">&#36;0.25</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5 Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/devstral-medium</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>131072</td>
+            <td>Mistral: Devstral Medium</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-medium-3</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>131072</td>
+            <td>Mistral: Mistral Medium 3</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-3.5-turbo-0613</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>4095</td>
+            <td>OpenAI: GPT-3.5 Turbo (older v0613)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-3.5-turbo-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.5">&#36;1.50</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td>4095</td>
+            <td>OpenAI: GPT-3.5 Turbo Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.5-122b-a10b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.26">&#36;0.26</td>
+            <td data-sort="2.08">&#36;2.08</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3.5-122B-A10B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-vl-max</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.52">&#36;0.52</td>
+            <td data-sort="2.08">&#36;2.08</td>
+            <td>131072</td>
+            <td>Qwen: Qwen VL Max</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-r1-0528</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td data-sort="2.1500000000000004">&#36;2.15</td>
+            <td>163840</td>
+            <td>DeepSeek: R1 0528</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-4.5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td data-sort="2.2">&#36;2.20</td>
+            <td>131072</td>
+            <td>Z.ai: GLM 4.5</td>
+        </tr>
+        
+        <tr>
+            <td>Minimax</td>
+            <td><code>minimax/minimax-m1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.2">&#36;2.20</td>
+            <td>1000000</td>
+            <td>MiniMax: MiniMax M1</td>
+        </tr>
+        
+        <tr>
+            <td>Moonshotai</td>
+            <td><code>moonshotai/kimi-k2</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.5700000000000001">&#36;0.57</td>
+            <td data-sort="2.3">&#36;2.30</td>
+            <td>131072</td>
+            <td>MoonshotAI: Kimi K2 0711</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.5-397b-a17b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39">&#36;0.39</td>
+            <td data-sort="2.34">&#36;2.34</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3.5 397B A17B</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.5-plus-20260420</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.39999999999999997">&#36;0.40</td>
+            <td data-sort="2.4">&#36;2.40</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen3.5 Plus 2026-04-20</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-audio-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td data-sort="2.4">&#36;2.40</td>
+            <td>128000</td>
+            <td>OpenAI: GPT Audio Mini</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-4.3</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td>1000000</td>
+            <td>xAI: Grok 4.3</td>
+        </tr>
+        
+        <tr>
+            <td>Inclusionai</td>
+            <td><code>inclusionai/ling-2.6-1t</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td>262144</td>
+            <td>inclusionAI: Ling-2.6-1T</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-4.20</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td>2000000</td>
+            <td>xAI: Grok 4.20</td>
+        </tr>
+        
+        <tr>
+            <td>Amazon</td>
+            <td><code>amazon/nova-2-lite-v1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td>1000000</td>
+            <td>Amazon: Nova 2 Lite</td>
+        </tr>
+        
+        <tr>
+            <td>Moonshotai</td>
+            <td><code>moonshotai/kimi-k2-thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td>262144</td>
+            <td>MoonshotAI: Kimi K2 Thinking</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.5-flash-image</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td>32768</td>
+            <td>Google: Nano Banana (Gemini 2.5 Flash Image)</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.5-flash</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.3">&#36;0.30</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td>1048576</td>
+            <td>Google: Gemini 2.5 Flash</td>
+        </tr>
+        
+        <tr>
+            <td>Deepseek</td>
+            <td><code>deepseek/deepseek-r1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7">&#36;0.70</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td>64000</td>
+            <td>DeepSeek: R1</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-vl-235b-a22b-thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.26">&#36;0.26</td>
+            <td data-sort="2.6">&#36;2.60</td>
+            <td>131072</td>
+            <td>Qwen: Qwen3 VL 235B A22B Thinking</td>
+        </tr>
+        
+        <tr>
+            <td>~google</td>
+            <td><code>~google/gemini-flash-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td>1048576</td>
+            <td>Google Gemini Flash Latest</td>
+        </tr>
+        
+        <tr>
+            <td>Xiaomi</td>
+            <td><code>xiaomi/mimo-v2.5-pro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td>1048576</td>
+            <td>Xiaomi: MiMo-V2.5-Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Xiaomi</td>
+            <td><code>xiaomi/mimo-v2-pro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td>1048576</td>
+            <td>Xiaomi: MiMo-V2-Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-3-flash-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.5">&#36;0.50</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td>1048576</td>
+            <td>Google: Gemini 3 Flash Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Relace</td>
+            <td><code>relace/relace-search</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td>256000</td>
+            <td>Relace: Relace Search</td>
+        </tr>
+        
+        <tr>
+            <td>Nousresearch</td>
+            <td><code>nousresearch/hermes-4-405b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td>131072</td>
+            <td>Nous: Hermes 4 405B</td>
+        </tr>
+        
+        <tr>
+            <td>Sao10k</td>
+            <td><code>sao10k/l3.1-70b-hanami-x1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td>16000</td>
+            <td>Sao10K: Llama 3.1 70B Hanami x1</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.6-27b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.32">&#36;0.32</td>
+            <td data-sort="3.1999999999999997">&#36;3.20</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3.6 27B</td>
+        </tr>
+        
+        <tr>
+            <td>Amazon</td>
+            <td><code>amazon/nova-pro-v1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td data-sort="3.1999999999999997">&#36;3.20</td>
+            <td>300000</td>
+            <td>Amazon: Nova Pro 1.0</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-coder-plus</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.65">&#36;0.65</td>
+            <td data-sort="3.25">&#36;3.25</td>
+            <td>1000000</td>
+            <td>Qwen: Qwen3 Coder Plus</td>
+        </tr>
+        
+        <tr>
+            <td>Arcee-ai</td>
+            <td><code>arcee-ai/maestro-reasoning</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.8999999999999999">&#36;0.90</td>
+            <td data-sort="3.3000000000000003">&#36;3.30</td>
+            <td>131072</td>
+            <td>Arcee AI: Maestro Reasoning</td>
+        </tr>
+        
+        <tr>
+            <td>Switchpoint</td>
+            <td><code>switchpoint/router</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.85">&#36;0.85</td>
+            <td data-sort="3.4">&#36;3.40</td>
+            <td>131072</td>
+            <td>Switchpoint Router</td>
+        </tr>
+        
+        <tr>
+            <td>~moonshotai</td>
+            <td><code>~moonshotai/kimi-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td data-sort="3.5">&#36;3.50</td>
+            <td>262144</td>
+            <td>MoonshotAI Kimi Latest</td>
+        </tr>
+        
+        <tr>
+            <td>Moonshotai</td>
+            <td><code>moonshotai/kimi-k2.6</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td data-sort="3.5">&#36;3.50</td>
+            <td>262144</td>
+            <td>MoonshotAI: Kimi K2.6</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-5.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0499999999999998">&#36;1.05</td>
+            <td data-sort="3.5">&#36;3.50</td>
+            <td>202752</td>
+            <td>Z.ai: GLM 5.1</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-max-thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.78">&#36;0.78</td>
+            <td data-sort="3.9">&#36;3.90</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 Max Thinking</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3-max</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.78">&#36;0.78</td>
+            <td data-sort="3.9">&#36;3.90</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3 Max</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-5v-turbo</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.2">&#36;1.20</td>
+            <td data-sort="4.0">&#36;4.00</td>
+            <td>202752</td>
+            <td>Z.ai: GLM 5V Turbo</td>
+        </tr>
+        
+        <tr>
+            <td>Z-ai</td>
+            <td><code>z-ai/glm-5-turbo</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.2">&#36;1.20</td>
+            <td data-sort="4.0">&#36;4.00</td>
+            <td>202752</td>
+            <td>Z.ai: GLM 5 Turbo</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-3.5-haiku</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.7999999999999999">&#36;0.80</td>
+            <td data-sort="4.0">&#36;4.00</td>
+            <td>200000</td>
+            <td>Anthropic: Claude 3.5 Haiku</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-3.5-turbo-16k</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="4.0">&#36;4.00</td>
+            <td>16385</td>
+            <td>OpenAI: GPT-3.5 Turbo 16k</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen-max</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.04">&#36;1.04</td>
+            <td data-sort="4.16">&#36;4.16</td>
+            <td>32768</td>
+            <td>Qwen: Qwen-Max </td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o4-mini-high</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.1">&#36;1.10</td>
+            <td data-sort="4.4">&#36;4.40</td>
+            <td>200000</td>
+            <td>OpenAI: o4 Mini High</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o4-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.1">&#36;1.10</td>
+            <td data-sort="4.4">&#36;4.40</td>
+            <td>200000</td>
+            <td>OpenAI: o4 Mini</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o3-mini-high</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.1">&#36;1.10</td>
+            <td data-sort="4.4">&#36;4.40</td>
+            <td>200000</td>
+            <td>OpenAI: o3 Mini High</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o3-mini</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.1">&#36;1.10</td>
+            <td data-sort="4.4">&#36;4.40</td>
+            <td>200000</td>
+            <td>OpenAI: o3 Mini</td>
+        </tr>
+        
+        <tr>
+            <td>~openai</td>
+            <td><code>~openai/gpt-mini-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.75">&#36;0.75</td>
+            <td data-sort="4.5">&#36;4.50</td>
+            <td>400000</td>
+            <td>OpenAI GPT Mini Latest</td>
+        </tr>
+        
+        <tr>
+            <td>~anthropic</td>
+            <td><code>~anthropic/claude-haiku-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td>200000</td>
+            <td>Anthropic Claude Haiku Latest</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-haiku-4.5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.0">&#36;1.00</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td>200000</td>
+            <td>Anthropic: Claude Haiku 4.5</td>
+        </tr>
+        
+        <tr>
+            <td>Anthracite-org</td>
+            <td><code>anthracite-org/magnum-v4-72b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td>16384</td>
+            <td>Magnum v4 72B</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-4.20-multi-agent</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="6.0">&#36;6.00</td>
+            <td>2000000</td>
+            <td>xAI: Grok 4.20 Multi-Agent</td>
+        </tr>
+        
+        <tr>
+            <td>Writer</td>
+            <td><code>writer/palmyra-x5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="0.6">&#36;0.60</td>
+            <td data-sort="6.0">&#36;6.00</td>
+            <td>1040000</td>
+            <td>Writer: Palmyra X5</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-large-2411</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="6.0">&#36;6.00</td>
+            <td>131072</td>
+            <td>Mistral Large 2411</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-large-2407</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="6.0">&#36;6.00</td>
+            <td>131072</td>
+            <td>Mistral Large 2407</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/pixtral-large-2411</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="6.0">&#36;6.00</td>
+            <td>131072</td>
+            <td>Mistral: Pixtral Large 2411</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mixtral-8x22b-instruct</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="6.0">&#36;6.00</td>
+            <td>65536</td>
+            <td>Mistral: Mixtral 8x22B Instruct</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-large</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="6.0">&#36;6.00</td>
+            <td>128000</td>
+            <td>Mistral Large</td>
+        </tr>
+        
+        <tr>
+            <td>Qwen</td>
+            <td><code>qwen/qwen3.6-max-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.04">&#36;1.04</td>
+            <td data-sort="6.24">&#36;6.24</td>
+            <td>262144</td>
+            <td>Qwen: Qwen3.6 Max Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Mistralai</td>
+            <td><code>mistralai/mistral-medium-3-5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.5">&#36;1.50</td>
+            <td data-sort="7.5">&#36;7.50</td>
+            <td>262144</td>
+            <td>Mistral: Mistral Medium 3.5</td>
+        </tr>
+        
+        <tr>
+            <td>Alpindale</td>
+            <td><code>alpindale/goliath-120b</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.75">&#36;3.75</td>
+            <td data-sort="7.5">&#36;7.50</td>
+            <td>6144</td>
+            <td>Goliath 120B</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o4-mini-deep-research</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="8.0">&#36;8.00</td>
+            <td>200000</td>
+            <td>OpenAI: o4 Mini Deep Research</td>
+        </tr>
+        
+        <tr>
+            <td>Ai21</td>
+            <td><code>ai21/jamba-large-1.7</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="8.0">&#36;8.00</td>
+            <td>256000</td>
+            <td>AI21: Jamba Large 1.7</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o3</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="8.0">&#36;8.00</td>
+            <td>200000</td>
+            <td>OpenAI: o3</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="8.0">&#36;8.00</td>
+            <td>1047576</td>
+            <td>OpenAI: GPT-4.1</td>
+        </tr>
+        
+        <tr>
+            <td>Perplexity</td>
+            <td><code>perplexity/sonar-reasoning-pro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="8.0">&#36;8.00</td>
+            <td>128000</td>
+            <td>Perplexity: Sonar Reasoning Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Perplexity</td>
+            <td><code>perplexity/sonar-deep-research</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="8.0">&#36;8.00</td>
+            <td>128000</td>
+            <td>Perplexity: Sonar Deep Research</td>
+        </tr>
+        
+        <tr>
+            <td>Aion-labs</td>
+            <td><code>aion-labs/aion-1.0</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="4.0">&#36;4.00</td>
+            <td data-sort="8.0">&#36;8.00</td>
+            <td>131072</td>
+            <td>AionLabs: Aion-1.0</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-audio</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT Audio</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.1-codex-max</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.1-Codex-Max</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.1</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.1-chat</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-5.1 Chat</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.1-codex</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.1-Codex</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5-image</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5 Image</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5-codex</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5 Codex</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o-audio-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o Audio</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5-chat</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-5 Chat</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.5-pro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>1048576</td>
+            <td>Google: Gemini 2.5 Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.5-pro-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>1048576</td>
+            <td>Google: Gemini 2.5 Pro Preview 06-05</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-2.5-pro-preview-05-06</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.25">&#36;1.25</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>1048576</td>
+            <td>Google: Gemini 2.5 Pro Preview 05-06</td>
+        </tr>
+        
+        <tr>
+            <td>Cohere</td>
+            <td><code>cohere/command-a</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>256000</td>
+            <td>Cohere: Command A</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o-search-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o Search Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o-2024-11-20</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o (2024-11-20)</td>
+        </tr>
+        
+        <tr>
+            <td>Inflection</td>
+            <td><code>inflection/inflection-3-productivity</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>8000</td>
+            <td>Inflection: Inflection 3 Productivity</td>
+        </tr>
+        
+        <tr>
+            <td>Inflection</td>
+            <td><code>inflection/inflection-3-pi</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>8000</td>
+            <td>Inflection: Inflection 3 Pi</td>
+        </tr>
+        
+        <tr>
+            <td>Cohere</td>
+            <td><code>cohere/command-r-plus-08-2024</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>Cohere: Command R+ (08-2024)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o-2024-08-06</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o (2024-08-06)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o</td>
+        </tr>
+        
+        <tr>
+            <td>~google</td>
+            <td><code>~google/gemini-pro-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="12.0">&#36;12.00</td>
+            <td>1048576</td>
+            <td>Google Gemini Pro Latest</td>
+        </tr>
+        
+        <tr>
+            <td>Google</td>
+            <td><code>google/gemini-3-pro-image-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.0">&#36;2.00</td>
+            <td data-sort="12.0">&#36;12.00</td>
+            <td>65536</td>
+            <td>Google: Nano Banana Pro (Gemini 3 Pro Image Preview)</td>
+        </tr>
+        
+        <tr>
+            <td>Amazon</td>
+            <td><code>amazon/nova-premier-v1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="2.5">&#36;2.50</td>
+            <td data-sort="12.5">&#36;12.50</td>
+            <td>1000000</td>
+            <td>Amazon: Nova Premier 1.0</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.3-chat</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.75">&#36;1.75</td>
+            <td data-sort="14.0">&#36;14.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-5.3 Chat</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5.3-codex</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="1.75">&#36;1.75</td>
+            <td data-sort="14.0">&#36;14.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5.3-Codex</td>
+        </tr>
+        
+        <tr>
+            <td>~anthropic</td>
+            <td><code>~anthropic/claude-sonnet-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>1000000</td>
+            <td>Anthropic Claude Sonnet Latest</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-sonnet-4.6</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>1000000</td>
+            <td>Anthropic: Claude Sonnet 4.6</td>
+        </tr>
+        
+        <tr>
+            <td>Perplexity</td>
+            <td><code>perplexity/sonar-pro-search</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>200000</td>
+            <td>Perplexity: Sonar Pro Search</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-sonnet-4.5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>1000000</td>
+            <td>Anthropic: Claude Sonnet 4.5</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-4</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>256000</td>
+            <td>xAI: Grok 4</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-3</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>131072</td>
+            <td>xAI: Grok 3</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-sonnet-4</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>1000000</td>
+            <td>Anthropic: Claude Sonnet 4</td>
+        </tr>
+        
+        <tr>
+            <td>X-ai</td>
+            <td><code>x-ai/grok-3-beta</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>131072</td>
+            <td>xAI: Grok 3 Beta</td>
+        </tr>
+        
+        <tr>
+            <td>Perplexity</td>
+            <td><code>perplexity/sonar-pro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>200000</td>
+            <td>Perplexity: Sonar Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-3.7-sonnet</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>200000</td>
+            <td>Anthropic: Claude 3.7 Sonnet</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-3.7-sonnet:thinking</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="3.0">&#36;3.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>200000</td>
+            <td>Anthropic: Claude 3.7 Sonnet (thinking)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4o-2024-05-13</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4o (2024-05-13)</td>
+        </tr>
+        
+        <tr>
+            <td>~anthropic</td>
+            <td><code>~anthropic/claude-opus-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td data-sort="25.0">&#36;25.00</td>
+            <td>1000000</td>
+            <td>Anthropic: Claude Opus Latest</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-opus-4.5</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td data-sort="25.0">&#36;25.00</td>
+            <td>200000</td>
+            <td>Anthropic: Claude Opus 4.5</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-chat-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT Chat Latest</td>
+        </tr>
+        
+        <tr>
+            <td>~openai</td>
+            <td><code>~openai/gpt-latest</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="5.0">&#36;5.00</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td>1050000</td>
+            <td>OpenAI GPT Latest</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4-turbo</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4 Turbo</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4-turbo-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4 Turbo Preview</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4-1106-preview</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td>128000</td>
+            <td>OpenAI: GPT-4 Turbo (older v1106)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o3-deep-research</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="10.0">&#36;10.00</td>
+            <td data-sort="40.0">&#36;40.00</td>
+            <td>200000</td>
+            <td>OpenAI: o3 Deep Research</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td data-sort="60.0">&#36;60.00</td>
+            <td>200000</td>
+            <td>OpenAI: o1</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4-0314</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td data-sort="60.0">&#36;60.00</td>
+            <td>8191</td>
+            <td>OpenAI: GPT-4 (older v0314)</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-4</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="30.0">&#36;30.00</td>
+            <td data-sort="60.0">&#36;60.00</td>
+            <td>8191</td>
+            <td>OpenAI: GPT-4</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-opus-4.1</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td data-sort="75.0">&#36;75.00</td>
+            <td>200000</td>
+            <td>Anthropic: Claude Opus 4.1</td>
+        </tr>
+        
+        <tr>
+            <td>Anthropic</td>
+            <td><code>anthropic/claude-opus-4</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td data-sort="75.0">&#36;75.00</td>
+            <td>200000</td>
+            <td>Anthropic: Claude Opus 4</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o3-pro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="20.0">&#36;20.00</td>
+            <td data-sort="80.0">&#36;80.00</td>
+            <td>200000</td>
+            <td>OpenAI: o3 Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/gpt-5-pro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="15.0">&#36;15.00</td>
+            <td data-sort="120.0">&#36;120.00</td>
+            <td>400000</td>
+            <td>OpenAI: GPT-5 Pro</td>
+        </tr>
+        
+        <tr>
+            <td>Openai</td>
+            <td><code>openai/o1-pro</code></td>
+            <td data-sort="999">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td data-sort="150.0">&#36;150.00</td>
+            <td data-sort="600.0">&#36;600.00</td>
+            <td>200000</td>
+            <td>OpenAI: o1-pro</td>
+        </tr>
+        
+    </tbody>
+</table>
+</body>
+</html>
