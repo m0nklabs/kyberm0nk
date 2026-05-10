@@ -3,7 +3,7 @@
   "name": "Kyber Main Quest Game Project Manager",
   "process": "hierarchical",
   "verbose": true,
-  "memory": true,
+  "memory": false,
   "cache": true,
   "planning": true,
   "planning_llm": "OpenRouter: deepseek/deepseek-v4-flash",

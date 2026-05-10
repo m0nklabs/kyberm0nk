@@ -1,0 +1,68 @@
+tasks:
+  capture_operator_intent:
+    agent: main_quest_project_manager
+    async_execution: false
+    context: []
+    description: >
+      Read the operator input for {operator_goal}, {project_path}, {current_state},
+      and {operator_chat_guidance}. Convert it into a short playable-slice brief.
+      Identify unclear requirements, but continue with reasonable assumptions when safe.
+    expected_output: >
+      A compact playable-slice brief with objective, assumptions, non-goals,
+      likely files or systems, validation target, and open steering questions.
+
+  research_project_state:
+    agent: local_game_researcher
+    async_execution: false
+    context:
+      - capture_operator_intent
+    description: >
+      Using the brief, inspect the requested project path conceptually and produce
+      a local-context summary. Focus on existing architecture, likely implementation
+      files, tests/build commands, and risks. Keep the result concise enough for
+      the manager to delegate from it.
+    expected_output: >
+      A file-and-system context summary, recommended first implementation slice,
+      and a validation checklist.
+
+  plan_and_delegate:
+    agent: main_quest_project_manager
+    async_execution: false
+    context:
+      - capture_operator_intent
+      - research_project_state
+    description: >
+      Create a small execution plan for the game slice. Prefer Guardian workers
+      for routine work. Define clear escalation gates: two failed local attempts,
+      risky architecture changes, or hard engine/build blockers.
+    expected_output: >
+      A numbered implementation plan with owner role per step, expected artifacts,
+      validation commands, and cloud-escalation triggers.
+
+  draft_implementation:
+    agent: local_game_builder
+    async_execution: false
+    context:
+      - plan_and_delegate
+    description: >
+      Draft the implementation notes or patch outline for the next smallest
+      game-development step. Do not invent unrelated systems. Include exact files
+      to edit, expected behavior, and fallback if blocked.
+    expected_output: >
+      A focused implementation package: files to change, behavior to add/fix,
+      edge cases, and commands to verify the slice.
+
+  review_and_acceptance:
+    agent: qa_playtest_reviewer
+    async_execution: false
+    context:
+      - capture_operator_intent
+      - plan_and_delegate
+      - draft_implementation
+    description: >
+      Review the implementation package against the operator goal and steering
+      guidance. Flag missing tests, likely gameplay regressions, UX issues, and
+      any case where a stronger model should be used before code is accepted.
+    expected_output: >
+      A pass/fail review with severity-ordered findings, required fixes, and the
+      final acceptance checklist for the operator.

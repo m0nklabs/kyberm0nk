@@ -10,6 +10,7 @@ This is the KyberM0nk path for the user's main quest: a visible CrewAI-Studio pr
 - Cloud models: OpenRouter through the fork's dedicated `OpenRouter` provider.
 - Local models: Guardian through the fork's dedicated `Guardian` provider.
 - Crew seed: `configs/crewai/main_quest_studio_import.json`.
+- Direct CrewAI project config: `configs/crewai/main_quest_project/`.
 - Model policy: `configs/crewai/model_policy.yaml`.
 
 ## Why The Fork Exists
@@ -45,11 +46,23 @@ The bootstrap script keeps secrets in the ignored fork checkout `.env`. It can r
 scripts/crewai_studio_seed_main_quest.sh
 ```
 
-Then open CrewAI-Studio, go to Import/Export, and import:
+The seed script copies the JSON into the ignored checkout and installs it directly into the running CrewAI-Studio database when the web container is up.
+
+Manual fallback: open CrewAI-Studio, go to Import/Export, and import:
 
 ```text
 .agent-projects/CrewAI-Studio/kyber-imports/main_quest_studio_import.json
 ```
+
+## Direct CrewAI Dry Run
+
+The same crew also exists as plain CrewAI config files under `configs/crewai/main_quest_project/`.
+
+```bash
+scripts/crewai_main_quest_dry_run.sh
+```
+
+This copies the config into the Studio container and builds the CrewAI `Crew` object without calling a model. It verifies that the YAML config, provider policy, and CrewAI object construction all work before spending tokens.
 
 ## Crew Shape
 

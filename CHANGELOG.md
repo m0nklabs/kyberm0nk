@@ -13,6 +13,9 @@
   - Isolated CrewAI-Studio Docker Compose under its own project name so it no longer inherits Kyber's main compose project when launched from the root `.env`.
   - Fixed OpenRouter key discovery for the existing `$HOME/.secrets/keys/openrouter.key` secret location.
   - Stabilized CrewAI-Studio port selection so refreshes keep the port already owned by the Studio container instead of incrementing on every restart.
+  - Added direct CrewAI project config files under `configs/crewai/main_quest_project/` so the main quest crew can be built outside the Studio UI.
+  - Upgraded the CrewAI-Studio seed script to install the main quest crew directly into the running Studio database.
+  - Added `scripts/crewai_main_quest_dry_run.sh` to validate CrewAI object construction inside the Studio container without spending model tokens.
   - Added `docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md` and rewrote the CrewAI brain architecture note in English around the new fork-backed workflow.
 
 ## 2026-05-09

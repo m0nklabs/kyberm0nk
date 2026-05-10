@@ -1,0 +1,27 @@
+crew:
+  name: Kyber Main Quest Game Project Manager
+  process: hierarchical
+  verbose: true
+  memory: false
+  cache: true
+  planning: true
+  max_rpm: 30
+  manager_llm:
+    provider: openrouter
+    model: deepseek/deepseek-v4-pro
+    temperature: 0.15
+  planning_llm:
+    provider: openrouter
+    model: deepseek/deepseek-v4-flash
+    temperature: 0.2
+
+providers:
+  openrouter:
+    api_key_env: OPENROUTER_API_KEY
+    api_base_env: OPENROUTER_API_BASE
+    default_api_base: https://openrouter.ai/api/v1
+  guardian:
+    api_key_env: GUARDIAN_API_KEY
+    api_base_env: GUARDIAN_API_BASE
+    default_api_key: sk-guardian-local
+    default_api_base: http://host.docker.internal:11434/v1

@@ -108,6 +108,7 @@
 - [x] Add Kyber bootstrap/status scripts for the ignored local CrewAI-Studio checkout.
 - [x] Add a main quest model policy and importable CrewAI-Studio crew seed.
 - [x] Document the watchable CrewAI project-manager workflow.
+- [x] Add direct CrewAI project config files and a no-token dry-run validator.
+- [x] Add a DB seeder so the main quest crew can be installed without manual Import/Export UI steps.
 - [ ] Add a true live steering panel or tool so operator chat can be injected into an active run instead of only between reruns.
-- [ ] Add a DB/API seeder so the main quest crew can be installed without manual Import/Export UI steps.
 - [ ] Pilot the main quest crew against a disposable game project slice.

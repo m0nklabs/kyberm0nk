@@ -16,6 +16,7 @@ if [[ -f "${REPO_ROOT}/.env" ]]; then
 fi
 
 CREWAI_STUDIO_DIR="${CREWAI_STUDIO_DIR:-${REPO_ROOT}/.agent-projects/CrewAI-Studio}"
+CREWAI_STUDIO_WEB_CONTAINER="${CREWAI_STUDIO_WEB_CONTAINER:-crewai_studio_kyber}"
 IMPORT_SOURCE="${REPO_ROOT}/configs/crewai/main_quest_studio_import.json"
 IMPORT_DIR="${CREWAI_STUDIO_DIR}/kyber-imports"
 IMPORT_TARGET="${IMPORT_DIR}/main_quest_studio_import.json"
@@ -29,4 +30,18 @@ mkdir -p "${IMPORT_DIR}"
 install -m 0644 "${IMPORT_SOURCE}" "${IMPORT_TARGET}"
 
 log "Seed crew JSON copied to ${IMPORT_TARGET}."
-log "Open CrewAI-Studio, go to Import/Export, and import that JSON to create the Kyber main quest crew."
+
+if [[ -f "${CREWAI_STUDIO_DIR}/.env" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "${CREWAI_STUDIO_DIR}/.env"
+  set +a
+fi
+
+if docker inspect "${CREWAI_STUDIO_WEB_CONTAINER}" >/dev/null 2>&1; then
+  docker cp "${IMPORT_TARGET}" "${CREWAI_STUDIO_WEB_CONTAINER}:/tmp/main_quest_studio_import.json"
+  docker exec "${CREWAI_STUDIO_WEB_CONTAINER}" python /CrewAI-Studio/scripts/import_crew_json.py /tmp/main_quest_studio_import.json
+  log "Main quest crew installed directly into CrewAI-Studio database."
+else
+  log "CrewAI-Studio container is not running. Start it, then rerun this script to install directly into the database."
+fi
