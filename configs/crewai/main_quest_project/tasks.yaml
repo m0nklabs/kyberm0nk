@@ -5,11 +5,15 @@ tasks:
     context: []
     description: >
       Read the operator input for {operator_goal}, {project_path}, {current_state},
-      and {operator_chat_guidance}. Convert it into a short playable-slice brief.
-      Identify unclear requirements, but continue with reasonable assumptions when safe.
+      and {operator_chat_guidance}. Convert it into a short NewNexus Unreal
+      playable-slice brief. If project_path is empty, assume the GitHub repo
+      m0nklabs/NewNexus and the local workspace .agent-projects/NewNexus / Agent
+      Zero path /a0/usr/projects/newnexus. Identify unclear requirements, but
+      continue with reasonable Unreal-specific assumptions when safe.
     expected_output: >
-      A compact playable-slice brief with objective, assumptions, non-goals,
-      likely files or systems, validation target, and open steering questions.
+      A compact Unreal/NewNexus playable-slice brief with objective, assumptions,
+      non-goals, likely repository files or systems, validation target, and open
+      steering questions. Explicitly name NewNexus and Unreal Engine.
 
   research_project_state:
     agent: local_game_researcher
@@ -18,12 +22,14 @@ tasks:
       - capture_operator_intent
     description: >
       Using the brief, inspect the requested project path conceptually and produce
-      a local-context summary. Focus on existing architecture, likely implementation
-      files, tests/build commands, and risks. Keep the result concise enough for
-      the manager to delegate from it.
+      a local-context summary for NewNexus. Focus on Unreal architecture, likely
+      implementation files under Source/, Config/, Content/, Build.cs, .uproject
+      metadata, tests/build commands, and risks. Never replace this with Unity,
+      generic 2D, or another engine unless the operator explicitly asks.
     expected_output: >
-      A file-and-system context summary, recommended first implementation slice,
-      and a validation checklist.
+      A NewNexus file-and-system context summary, recommended first Unreal
+      implementation slice, and a validation checklist using UnrealBuildTool or
+      editor smoke tests where appropriate.
 
   plan_and_delegate:
     agent: main_quest_project_manager
@@ -32,12 +38,12 @@ tasks:
       - capture_operator_intent
       - research_project_state
     description: >
-      Create a small execution plan for the game slice. Prefer Guardian workers
-      for routine work. Define clear escalation gates: two failed local attempts,
-      risky architecture changes, or hard engine/build blockers.
+      Create a small execution plan for the NewNexus Unreal slice. Prefer Guardian
+      workers for routine work. Define clear escalation gates: two failed local
+      attempts, risky Unreal architecture changes, or hard engine/build blockers.
     expected_output: >
       A numbered implementation plan with owner role per step, expected artifacts,
-      validation commands, and cloud-escalation triggers.
+      Unreal/NewNexus validation commands, and cloud-escalation triggers.
 
   draft_implementation:
     agent: local_game_builder
@@ -46,11 +52,12 @@ tasks:
       - plan_and_delegate
     description: >
       Draft the implementation notes or patch outline for the next smallest
-      game-development step. Do not invent unrelated systems. Include exact files
-      to edit, expected behavior, and fallback if blocked.
+      NewNexus Unreal step. Do not invent unrelated systems or switch engines.
+      Include exact files to edit, expected behavior, Unreal-specific edge cases,
+      and fallback if blocked.
     expected_output: >
       A focused implementation package: files to change, behavior to add/fix,
-      edge cases, and commands to verify the slice.
+      Unreal edge cases, and commands to verify the slice.
 
   review_and_acceptance:
     agent: qa_playtest_reviewer
@@ -61,8 +68,9 @@ tasks:
       - draft_implementation
     description: >
       Review the implementation package against the operator goal and steering
-      guidance. Flag missing tests, likely gameplay regressions, UX issues, and
-      any case where a stronger model should be used before code is accepted.
+      guidance. Flag missing Unreal validation, likely gameplay regressions,
+      compile/reflection/config issues, UX issues, and any case where a stronger
+      model should be used before code is accepted.
     expected_output: >
       A pass/fail review with severity-ordered findings, required fixes, and the
-      final acceptance checklist for the operator.
+      final NewNexus acceptance checklist for the operator.

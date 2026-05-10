@@ -1,0 +1,11 @@
+tools:
+  newnexus_github_search:
+    type: github_search
+    github_repo: m0nklabs/NewNexus
+    content_types:
+      - code
+      - repo
+      - pr
+      - issue
+    token_env: GITHUB_TOKEN
+    fallback_token_env: GH_TOKEN

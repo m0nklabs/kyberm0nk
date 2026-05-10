@@ -16,6 +16,8 @@
   - Added direct CrewAI project config files under `configs/crewai/main_quest_project/` so the main quest crew can be built outside the Studio UI.
   - Upgraded the CrewAI-Studio seed script to install the main quest crew directly into the running Studio database.
   - Added `scripts/crewai_main_quest_dry_run.sh` to validate CrewAI object construction inside the Studio container without spending model tokens.
+  - Anchored the main quest crew prompts to the NewNexus Unreal Engine project so runs do not drift into generic 2D or Unity assumptions.
+  - Added a NewNexus-scoped GitHub REST search tool to the main quest crew, with `GITHUB_TOKEN` loaded from the ignored local Studio environment.
   - Added `docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md` and rewrote the CrewAI brain architecture note in English around the new fork-backed workflow.
 
 ## 2026-05-09

@@ -2,6 +2,8 @@
 
 This is the KyberM0nk path for the user's main quest: a visible CrewAI-Studio project manager that can drive game-development work while the operator watches and steers the run.
 
+Default target: NewNexus, the Unreal Engine game project in `m0nklabs/NewNexus`.
+
 ## What Exists Now
 
 - Fork: `m0nklabs/CrewAI-Studio`, based on `strnad/CrewAI-Studio`.
@@ -12,6 +14,8 @@ This is the KyberM0nk path for the user's main quest: a visible CrewAI-Studio pr
 - Crew seed: `configs/crewai/main_quest_studio_import.json`.
 - Direct CrewAI project config: `configs/crewai/main_quest_project/`.
 - Model policy: `configs/crewai/model_policy.yaml`.
+- NewNexus source checkout: `.agent-projects/NewNexus` on the host and `/a0/usr/projects/newnexus` in Agent Zero.
+- Repository tool: `GithubSearchTool` in the Studio UI, backed by Kyber's lightweight GitHub REST implementation scoped to `m0nklabs/NewNexus`, with the token read from `GITHUB_TOKEN` or `GH_TOKEN` in the ignored Studio `.env`.
 
 ## Why The Fork Exists
 
@@ -38,7 +42,7 @@ Default URLs:
 
 If `8505` is already in use, the bootstrap script automatically selects the next free port and writes that port into the ignored Studio `.env` when regeneration is enabled.
 
-The bootstrap script keeps secrets in the ignored fork checkout `.env`. It can read `OPENROUTER_API_KEY` from Kyber's `.env` or from `OPENROUTER_API_KEY_FILE`, defaulting to `$HOME/.secrets/openrouter.key` and then `$HOME/.secrets/keys/openrouter.key` when present.
+The bootstrap script keeps secrets in the ignored fork checkout `.env`. It can read `OPENROUTER_API_KEY` from Kyber's `.env` or from `OPENROUTER_API_KEY_FILE`, defaulting to `$HOME/.secrets/openrouter.key` and then `$HOME/.secrets/keys/openrouter.key` when present. The NewNexus GitHub tool reads `GITHUB_TOKEN` from the environment or `GITHUB_TOKEN_FILE`, defaulting to `$HOME/.secrets/kyberm0nk_github_token`.
 
 ## Seed The Main Quest Crew
 
@@ -86,9 +90,9 @@ Current limitation: upstream CrewAI-Studio does not provide true mid-run chat in
 Use these placeholders in the kickoff screen:
 
 - `operator_goal`: the game feature or playable slice to build.
-- `project_path`: the active project path, for example `/workspace/project`.
+- `project_path`: the active NewNexus project path, for example `/workspace/project/.agent-projects/NewNexus` or `/a0/usr/projects/newnexus`.
 - `current_state`: a short summary of what already exists.
-- `operator_chat_guidance`: live direction from the operator, including what to avoid.
+- `operator_chat_guidance`: live direction from the operator, including what to avoid. Mention `Stay on Unreal/NewNexus` when the run must not drift into Unity, generic 2D, or another engine.
 
 ## Safety Rules
 
