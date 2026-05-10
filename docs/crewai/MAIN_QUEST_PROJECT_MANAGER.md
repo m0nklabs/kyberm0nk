@@ -35,6 +35,8 @@ Default URLs:
 - Host: `http://127.0.0.1:8505`
 - LAN: `http://192.168.1.35:8505`
 
+If `8505` is already in use, the bootstrap script automatically selects the next free port and writes that port into the ignored Studio `.env` when regeneration is enabled.
+
 The bootstrap script keeps secrets in the ignored fork checkout `.env`. It can read `OPENROUTER_API_KEY` from Kyber's `.env` or from `OPENROUTER_API_KEY_FILE`, defaulting to `$HOME/.secrets/openrouter.key` when present.
 
 ## Seed The Main Quest Crew

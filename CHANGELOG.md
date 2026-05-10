@@ -9,6 +9,7 @@
   - Added `configs/crewai/model_policy.yaml` to encode the MoniFuse value-ranking-based model allocation for CrewAI roles.
   - Added `configs/crewai/main_quest_studio_import.json` as an importable Studio seed for the game-development project manager crew.
   - Added `scripts/crewai_studio_bootstrap.sh`, `scripts/crewai_studio_status.sh`, and `scripts/crewai_studio_seed_main_quest.sh` to keep the fork checkout ignored, runtime secrets out of Git, and the UI reproducible on port 8505.
+  - Hardened the CrewAI-Studio bootstrap script to auto-select the next free port when 8505 is already allocated.
   - Added `docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md` and rewrote the CrewAI brain architecture note in English around the new fork-backed workflow.
 
 ## 2026-05-09

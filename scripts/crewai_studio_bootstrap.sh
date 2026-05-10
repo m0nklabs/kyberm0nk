@@ -15,6 +15,19 @@ require_command() {
   fi
 }
 
+port_is_busy() {
+  local port="$1"
+  (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1
+}
+
+choose_available_port() {
+  local port="$1"
+  while port_is_busy "${port}"; do
+    port=$((port + 1))
+  done
+  printf '%s\n' "${port}"
+}
+
 if [[ -f "${REPO_ROOT}/.env" ]]; then
   set -a
   # shellcheck disable=SC1091
@@ -28,6 +41,13 @@ require_command docker
 CREWAI_STUDIO_REPO="${CREWAI_STUDIO_REPO:-https://github.com/m0nklabs/CrewAI-Studio.git}"
 CREWAI_STUDIO_DIR="${CREWAI_STUDIO_DIR:-${REPO_ROOT}/.agent-projects/CrewAI-Studio}"
 CREWAI_STUDIO_PORT="${CREWAI_STUDIO_PORT:-8505}"
+CREWAI_STUDIO_REQUESTED_PORT="${CREWAI_STUDIO_PORT}"
+if [[ "${CREWAI_STUDIO_AUTO_PORT:-1}" == "1" ]]; then
+  CREWAI_STUDIO_PORT="$(choose_available_port "${CREWAI_STUDIO_PORT}")"
+  if [[ "${CREWAI_STUDIO_PORT}" != "${CREWAI_STUDIO_REQUESTED_PORT}" ]]; then
+    log "Port ${CREWAI_STUDIO_REQUESTED_PORT} is busy; using ${CREWAI_STUDIO_PORT} instead."
+  fi
+fi
 CREWAI_STUDIO_DB_PORT="${CREWAI_STUDIO_DB_PORT:-55432}"
 CREWAI_STUDIO_WEB_CONTAINER="${CREWAI_STUDIO_WEB_CONTAINER:-crewai_studio_kyber}"
 CREWAI_STUDIO_DB_CONTAINER="${CREWAI_STUDIO_DB_CONTAINER:-crewai_db_kyber}"
