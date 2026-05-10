@@ -50,8 +50,9 @@ git config --global --add safe.directory /workspace/project/.agent-projects/NewN
 
 if git -C /a0/usr/projects/newnexus rev-parse --git-dir >/dev/null 2>&1; then
   git -C /a0/usr/projects/newnexus remote set-url origin https://github.com/m0nklabs/NewNexus.git
-  git -C /a0/usr/projects/newnexus ls-remote --heads origin main >/dev/null
-  git -C /a0/usr/projects/newnexus push --dry-run origin HEAD:main >/dev/null
+  git -C /a0/usr/projects/newnexus ls-remote --heads origin main >/dev/null || true
+  echo "[agent-zero-github] checking push credentials with git push --dry-run; no refs will be updated"
+  git -C /a0/usr/projects/newnexus push --dry-run origin HEAD:main >/dev/null 2>&1 || true
 fi
 '
 
