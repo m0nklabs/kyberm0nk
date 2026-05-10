@@ -54,11 +54,11 @@ services:
       - ./cockpit:/workspace/kyberm0nk/cockpit:ro
       - ./configs/aider:/config/aider:ro
       - ./configs/opencode:/config/opencode:ro
-      - ./configs/agent-zero:/config/agent-zero:ro
+      - ./configs/agent-zero:/config/agent-zero:rw
       # AZ patches mounted directly into the source
-      - ./configs/agent-zero/patches/modules.py:/opt/agent-zero/helpers/modules.py:ro
-      - ./configs/agent-zero/patches/code_execution_tool.py:/opt/agent-zero/plugins/_code_execution/tools/code_execution_tool.py:ro
-      - ./configs/agent-zero/patches/searxng.py:/opt/agent-zero/helpers/searxng.py:ro
+      - ./configs/agent-zero/patches/modules.py:/opt/agent-zero/helpers/modules.py:rw
+      - ./configs/agent-zero/patches/code_execution_tool.py:/opt/agent-zero/plugins/_code_execution/tools/code_execution_tool.py:rw
+      - ./configs/agent-zero/patches/searxng.py:/opt/agent-zero/helpers/searxng.py:rw
       - ./logs:/logs:rw
     security_opt:
       - no-new-privileges:true
