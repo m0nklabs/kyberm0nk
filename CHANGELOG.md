@@ -11,6 +11,8 @@
   - Added `scripts/crewai_studio_bootstrap.sh`, `scripts/crewai_studio_status.sh`, and `scripts/crewai_studio_seed_main_quest.sh` to keep the fork checkout ignored, runtime secrets out of Git, and the UI reproducible on port 8505.
   - Hardened the CrewAI-Studio bootstrap script to auto-select the next free port when 8505 is already allocated.
   - Isolated CrewAI-Studio Docker Compose under its own project name so it no longer inherits Kyber's main compose project when launched from the root `.env`.
+  - Fixed OpenRouter key discovery for the existing `$HOME/.secrets/keys/openrouter.key` secret location.
+  - Stabilized CrewAI-Studio port selection so refreshes keep the port already owned by the Studio container instead of incrementing on every restart.
   - Added `docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md` and rewrote the CrewAI brain architecture note in English around the new fork-backed workflow.
 
 ## 2026-05-09

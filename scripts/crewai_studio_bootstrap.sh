@@ -20,9 +20,21 @@ port_is_busy() {
   (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1
 }
 
+port_is_owned_by_studio() {
+  local port="$1"
+  local mapping=""
+
+  if [[ -z "${CREWAI_STUDIO_WEB_CONTAINER:-}" ]]; then
+    return 1
+  fi
+
+  mapping="$(docker port "${CREWAI_STUDIO_WEB_CONTAINER}" 8501/tcp 2>/dev/null || true)"
+  [[ "${mapping}" == *":${port}"* ]]
+}
+
 choose_available_port() {
   local port="$1"
-  while port_is_busy "${port}"; do
+  while port_is_busy "${port}" && ! port_is_owned_by_studio "${port}"; do
     port=$((port + 1))
   done
   printf '%s\n' "${port}"
@@ -41,6 +53,8 @@ require_command docker
 CREWAI_STUDIO_REPO="${CREWAI_STUDIO_REPO:-https://github.com/m0nklabs/CrewAI-Studio.git}"
 CREWAI_STUDIO_DIR="${CREWAI_STUDIO_DIR:-${REPO_ROOT}/.agent-projects/CrewAI-Studio}"
 CREWAI_STUDIO_COMPOSE_PROJECT_NAME="${CREWAI_STUDIO_COMPOSE_PROJECT_NAME:-crewai-studio-kyber}"
+CREWAI_STUDIO_WEB_CONTAINER="${CREWAI_STUDIO_WEB_CONTAINER:-crewai_studio_kyber}"
+CREWAI_STUDIO_DB_CONTAINER="${CREWAI_STUDIO_DB_CONTAINER:-crewai_db_kyber}"
 CREWAI_STUDIO_PORT="${CREWAI_STUDIO_PORT:-8505}"
 CREWAI_STUDIO_REQUESTED_PORT="${CREWAI_STUDIO_PORT}"
 if [[ "${CREWAI_STUDIO_AUTO_PORT:-1}" == "1" ]]; then
@@ -50,8 +64,6 @@ if [[ "${CREWAI_STUDIO_AUTO_PORT:-1}" == "1" ]]; then
   fi
 fi
 CREWAI_STUDIO_DB_PORT="${CREWAI_STUDIO_DB_PORT:-55432}"
-CREWAI_STUDIO_WEB_CONTAINER="${CREWAI_STUDIO_WEB_CONTAINER:-crewai_studio_kyber}"
-CREWAI_STUDIO_DB_CONTAINER="${CREWAI_STUDIO_DB_CONTAINER:-crewai_db_kyber}"
 CREWAI_STUDIO_REFRESH_ENV="${CREWAI_STUDIO_REFRESH_ENV:-0}"
 
 OPENROUTER_API_KEY_FILE="${OPENROUTER_API_KEY_FILE:-${HOME}/.secrets/openrouter.key}"
@@ -60,6 +72,9 @@ if [[ -z "${OPENROUTER_API_KEY:-}" && "${OPENAI_API_KEY:-}" == sk-or-* ]]; then
 fi
 if [[ -z "${OPENROUTER_API_KEY:-}" && -f "${OPENROUTER_API_KEY_FILE}" ]]; then
   OPENROUTER_API_KEY="$(tr -d '\r\n' < "${OPENROUTER_API_KEY_FILE}")"
+fi
+if [[ -z "${OPENROUTER_API_KEY:-}" && -f "${HOME}/.secrets/keys/openrouter.key" ]]; then
+  OPENROUTER_API_KEY="$(tr -d '\r\n' < "${HOME}/.secrets/keys/openrouter.key")"
 fi
 
 if [[ "${GUARDIAN_API_KEY:-}" == "replace-me" ]]; then

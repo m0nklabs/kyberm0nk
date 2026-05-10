@@ -37,7 +37,7 @@ Default URLs:
 
 If `8505` is already in use, the bootstrap script automatically selects the next free port and writes that port into the ignored Studio `.env` when regeneration is enabled.
 
-The bootstrap script keeps secrets in the ignored fork checkout `.env`. It can read `OPENROUTER_API_KEY` from Kyber's `.env` or from `OPENROUTER_API_KEY_FILE`, defaulting to `$HOME/.secrets/openrouter.key` when present.
+The bootstrap script keeps secrets in the ignored fork checkout `.env`. It can read `OPENROUTER_API_KEY` from Kyber's `.env` or from `OPENROUTER_API_KEY_FILE`, defaulting to `$HOME/.secrets/openrouter.key` and then `$HOME/.secrets/keys/openrouter.key` when present.
 
 ## Seed The Main Quest Crew
 
