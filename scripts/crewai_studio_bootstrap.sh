@@ -40,6 +40,7 @@ require_command docker
 
 CREWAI_STUDIO_REPO="${CREWAI_STUDIO_REPO:-https://github.com/m0nklabs/CrewAI-Studio.git}"
 CREWAI_STUDIO_DIR="${CREWAI_STUDIO_DIR:-${REPO_ROOT}/.agent-projects/CrewAI-Studio}"
+CREWAI_STUDIO_COMPOSE_PROJECT_NAME="${CREWAI_STUDIO_COMPOSE_PROJECT_NAME:-crewai-studio-kyber}"
 CREWAI_STUDIO_PORT="${CREWAI_STUDIO_PORT:-8505}"
 CREWAI_STUDIO_REQUESTED_PORT="${CREWAI_STUDIO_PORT}"
 if [[ "${CREWAI_STUDIO_AUTO_PORT:-1}" == "1" ]]; then
@@ -54,6 +55,9 @@ CREWAI_STUDIO_DB_CONTAINER="${CREWAI_STUDIO_DB_CONTAINER:-crewai_db_kyber}"
 CREWAI_STUDIO_REFRESH_ENV="${CREWAI_STUDIO_REFRESH_ENV:-0}"
 
 OPENROUTER_API_KEY_FILE="${OPENROUTER_API_KEY_FILE:-${HOME}/.secrets/openrouter.key}"
+if [[ -z "${OPENROUTER_API_KEY:-}" && "${OPENAI_API_KEY:-}" == sk-or-* ]]; then
+  OPENROUTER_API_KEY="${OPENAI_API_KEY}"
+fi
 if [[ -z "${OPENROUTER_API_KEY:-}" && -f "${OPENROUTER_API_KEY_FILE}" ]]; then
   OPENROUTER_API_KEY="$(tr -d '\r\n' < "${OPENROUTER_API_KEY_FILE}")"
 fi
@@ -88,6 +92,7 @@ if [[ ! -f "${APP_ENV}" || "${CREWAI_STUDIO_REFRESH_ENV}" == "1" ]]; then
   fi
   umask 077
   cat > "${APP_ENV}" <<ENV
+COMPOSE_PROJECT_NAME=${CREWAI_STUDIO_COMPOSE_PROJECT_NAME}
 POSTGRES_USER=crewai_user
 POSTGRES_PASSWORD=crewai_secret
 POSTGRES_DB=crewai
@@ -117,5 +122,5 @@ fi
 
 log "Starting CrewAI-Studio on http://127.0.0.1:${CREWAI_STUDIO_PORT}."
 cd "${CREWAI_STUDIO_DIR}"
-docker compose --env-file .env -f docker-compose.yaml up -d --build
+COMPOSE_PROJECT_NAME="${CREWAI_STUDIO_COMPOSE_PROJECT_NAME}" docker compose --env-file .env -f docker-compose.yaml up -d --build
 log "CrewAI-Studio should be reachable at http://127.0.0.1:${CREWAI_STUDIO_PORT} and http://192.168.1.35:${CREWAI_STUDIO_PORT}."

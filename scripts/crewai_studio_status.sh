@@ -17,6 +17,7 @@ fi
 
 CREWAI_STUDIO_DIR="${CREWAI_STUDIO_DIR:-${REPO_ROOT}/.agent-projects/CrewAI-Studio}"
 CREWAI_STUDIO_PORT="${CREWAI_STUDIO_PORT:-8505}"
+CREWAI_STUDIO_COMPOSE_PROJECT_NAME="${CREWAI_STUDIO_COMPOSE_PROJECT_NAME:-crewai-studio-kyber}"
 
 if [[ ! -d "${CREWAI_STUDIO_DIR}" ]]; then
   log "CrewAI-Studio checkout not found. Run scripts/crewai_studio_bootstrap.sh first."
@@ -31,7 +32,7 @@ if [[ -f "${CREWAI_STUDIO_DIR}/.env" ]]; then
 fi
 
 cd "${CREWAI_STUDIO_DIR}"
-docker compose --env-file .env -f docker-compose.yaml ps
+COMPOSE_PROJECT_NAME="${CREWAI_STUDIO_COMPOSE_PROJECT_NAME}" docker compose --env-file .env -f docker-compose.yaml ps
 
 if command -v curl >/dev/null 2>&1; then
   if curl -fsS -m 5 "http://127.0.0.1:${CREWAI_STUDIO_PORT}/_stcore/health" >/dev/null; then
