@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import urllib.request
 import json
-import collections
 import os
 
 DOC_PATH = os.path.join(os.path.dirname(__file__), '../docs/crewai/LLM_COST_PERFORMANCE_ANALYSIS.md')
 
-# Bekende LLM-Stats ranks
+# Bekende LLM-Stats ranks (simulatie van wat we hebben)
 known_ranks = {
     'gpt-5.5': '#2 (64.2)',
     'gpt-5.4-pro': '#4 (61.2)',
@@ -36,7 +35,7 @@ def fetch_openrouter():
 
 def generate_markdown():
     models = fetch_openrouter()
-    providers = collections.defaultdict(list)
+    all_models = []
     
     for m in models:
         name = m.get('id', '')
@@ -53,7 +52,8 @@ def generate_markdown():
                 rank = v
                 break
                 
-        providers[provider].append({
+        all_models.append({
+            'provider': provider.capitalize(),
             'id': name,
             'cost_in': price_p,
             'cost_out': price_c,
@@ -62,27 +62,34 @@ def generate_markdown():
             'rank': rank
         })
 
-    # Top 20 providers gebaseerd op hoeveelheid modellen
-    top_providers = sorted(providers.keys(), key=lambda k: len(providers[k]), reverse=True)
-    selected_providers = top_providers[:20]
+    # Sorteer op rank (indien aanwezig) dan prijs
+    def sort_key(x):
+        r = x['rank']
+        r_val = 999
+        if r != '-':
+            try:
+                r_val = int(r.split('(')[0].replace('#', '').strip())
+            except:
+                pass
+        return (r_val, x['cost_out'])
+
+    all_models.sort(key=sort_key)
 
     md_lines = [
-        "# Uitgebreide LLM Prijs/Kwaliteit Analyse (20 Bedrijven)", 
+        "# Uitgebreide LLM Prijs/Kwaliteit Analyse", 
         "",
         "> **Let op:** Dit document kan automatisch ge-update worden met live data via `scripts/generate_llm_cost_analysis.py`.",
-        ""
+        "",
+        "## Alle Modellen (Gesorteerd op Rank, dan Prijs)",
+        "| Bedrijf | Model | LLM-Stats Rank & Score | Prijs Prompt (1M) | Prijs Completion (1M) | Context | Beschrijving |",
+        "|---|---|---|---|---|---|---|",
     ]
 
-    for p in selected_providers:
-        md_lines.append(f"## {p.capitalize()}")
-        md_lines.append("| Rank/Score | Model | Live Prijs (1M In / Out) | Context | Beschrijving |")
-        md_lines.append("|---|---|---|---|---|")
-        
-        variants = sorted(providers[p], key=lambda x: x['cost_out'], reverse=True)
-        # Max 10 laten zien, of meer als gewenst
-        for v in variants[:10]:
-            md_lines.append(f"| {v['rank']} | `{v['id']}` | ${v['cost_in']:.2f} / ${v['cost_out']:.2f} | {v['context']} | {v['desc']} |")
-        md_lines.append("")
+    # Om te zorgen dat we echt een boel verschillende bedrijven hebben (en varianten), 
+    # printen we hier alles (of een stevige selectie).
+    for v in all_models:
+        # Filter evt op een limiet als het er te veel zijn (>300), of gewoon allemaal:
+        md_lines.append(f"| {v['provider']} | `{v['id']}` | {v['rank']} | ${v['cost_in']:.2f} | ${v['cost_out']:.2f} | {v['context']} | {v['desc']} |")
 
     return '\n'.join(md_lines)
 
@@ -90,9 +97,7 @@ if __name__ == '__main__':
     print("Generating comprehensive LLM analysis...")
     md_content = generate_markdown()
     
-    # Save the file
     with open(DOC_PATH, 'w') as f:
         f.write(md_content)
         
     print(f"Document updated successfully at: {os.path.abspath(DOC_PATH)}")
-
