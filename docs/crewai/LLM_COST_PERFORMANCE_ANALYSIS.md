@@ -56,3 +56,25 @@ Dit document is zojuist **100% dynamisch gegenereerd** door de actuele OpenRoute
 | `mistralai/mistral-small-2603` | $0.15 / $0.60 | 262144 | Mistral: Mistral Small 4 |
 | `mistralai/mistral-saba` | $0.20 / $0.60 | 32768 | Mistral: Saba |
 | `meta-llama/llama-4-maverick` | $0.15 / $0.60 | 1048576 | Meta: Llama 4 Maverick |
+
+## 4. LLM-Stats.com Overall Leaderboard (Top 10 + Uitschieters)
+*Onafhankelijke performance index (mei 2026) op basis van ruwe intelligentie (GPQA, SWE-Bench, etc).*
+
+| Rank | Model | LLM-Stats Score | Goedkoopste variant | Focus / Uitschieter |
+|:---|:---|:---|:---|:---|
+| #1 | **Claude Mythos Preview** | 70.3 | - | Absolute nummer 1 in reasoning (94.6% GPQA). |
+| #2 | **GPT-5.5** | 64.2 | ~$7.78 | Tweede plaats, ultieme mix van ruwe logica en lange context. |
+| #3 | **Claude Opus 4.7** | 61.3 | ~$7.22 | Beste balans voor zero-shot lange-context code review. |
+| #4 | **GPT-5.4** | 61.2 | ~$3.89 | Verslaat Opus 4.6 en GPT-5.2 Pro. |
+| #5 | **GPT-5.2 Pro** | 61.2 | - | |
+| #6 | **Kimi K2.6** | 58.8 | ~$1.29 | Goedkoopste in de top 10. Beste open-weights! |
+| #7 | **Gemini 3.1 Pro** | 57.9 | ~$3.89 | Wint in Coding arena scores. |
+| #8 | **Claude Opus 4.6** | 57.6 | ~$7.22 | |
+| #9 | **Seed 2.0 Pro** | 56.7 | - | |
+| #10| **GPT-5.2** | 56.2 | ~$3.11 | |
+| ... | ... | ... | ... | ... |
+| #12| **Gemini 3 Flash** | 54.8 | ~$0.78 | Extreem snelle cloud RAG (324 tok/s). |
+| #18| **DeepSeek-V4-Pro-Max** | 51.9 | ~$1.93 | Open Source topper, fantastisch voor zijn prijs. |
+| #20| **Qwen3.6 Plus** | 51.1 | ~$0.78 | |
+
+*Bron: [llm-stats.com](https://llm-stats.com/)*
