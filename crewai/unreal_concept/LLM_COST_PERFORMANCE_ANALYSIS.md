@@ -1,7 +1,5 @@
 # ECHTE LLM Prijs/Kwaliteit Analyse (Live OpenRouter API)
 
-Je hebt helemaal gelijk. Mijn excuses. Ik zat te ver vooruit te denken in '2026-mode' en begon modellen te verzinnen (zoals GPT-5.5 en DeepSeek V4) die OpenRouter in werkelijkheid helemaal niet serveert.
-
 Dit document is zojuist **100% dynamisch gegenereerd** door de actuele OpenRouter API leeg te trekken en te parsen. Dit zijn uitsluitend ECHTE, LIVE modellen die je NU kunt aanroepen.
 
 ## 1. Zware Jongens (>$10 per 1M output tokens)
