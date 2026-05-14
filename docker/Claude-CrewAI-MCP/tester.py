@@ -13,8 +13,14 @@ from mcp.client.stdio import stdio_client
 
 TOOL_TEST_ARGS = {
     "run_kyber_crewai_dry_run": {"timeout_seconds": 1},
-    "start_kyber_crewai_live_run": {"kickoff_mode": "dry_run"},
     "get_kyber_crewai_live_log_preview": {"line_count": 5},
+}
+
+SKIP_TOOL_CALLS = {
+    "start_kyber_crewai_live_run",
+    "restart_kyber_crewai_live_run",
+    "stop_kyber_crewai_live_run",
+    "update_kyber_crewai_operator_inputs",
 }
 
 
@@ -54,6 +60,9 @@ async def test_crewai_mcp_server():
                     print("\n🔧 Testing tools...")
                     for tool in tools_response.tools:
                         print(f"\n📞 Calling tool: {tool.name}")
+                        if tool.name in SKIP_TOOL_CALLS:
+                            print(f"⏭️ Skipping disruptive tool in smoke test: {tool.name}")
+                            continue
                         try:
                             # Call the tool with empty arguments
                             result = await session.call_tool(tool.name, TOOL_TEST_ARGS.get(tool.name, {}))

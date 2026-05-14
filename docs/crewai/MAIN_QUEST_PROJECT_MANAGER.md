@@ -77,10 +77,13 @@ The user-scoped Claude `crewai` MCP is no longer only a rulebook. The Kyber-vend
 - `run_kyber_crewai_dry_run`
 - `get_kyber_crewai_run_status`
 - `start_kyber_crewai_live_run`
+- `restart_kyber_crewai_live_run`
+- `get_kyber_crewai_operator_inputs`
+- `update_kyber_crewai_operator_inputs`
 - `stop_kyber_crewai_live_run`
 - `get_kyber_crewai_live_log_preview`
 
-This is the current safe operational slice: Claude can inspect the tracked CrewAI project, validate wiring through the existing dry-run script, start or stop the tracked background run, and review current run/log state without going through the Studio UI manually. True mid-run steering remains separate follow-up work.
+This is the current safe operational slice: Claude can inspect the tracked CrewAI project, validate wiring through the existing dry-run script, start or stop the tracked background run, update the persisted operator guidance used for the next restart, and review current run/log state without going through the Studio UI manually. True mid-run steering remains separate follow-up work.
 
 ## Run Control
 
@@ -92,6 +95,12 @@ The tracked shell entry point [scripts/crewai_main_quest_run.sh](/home/flip/kybe
 - `stop` for controlled termination
 
 The MCP uses the same control script, so terminal usage and Claude usage share one control path instead of drifting into separate wrappers.
+
+The same control path now also exposes:
+
+- `get-inputs` for current persisted operator inputs
+- `set-inputs` for steering updates between runs
+- `restart` for applying updated guidance to a fresh background run
 
 ## Crew Shape
 
@@ -108,7 +117,7 @@ The MCP uses the same control script, so terminal usage and Claude usage share o
 
 The seeded crew includes an `operator_chat_guidance` placeholder. Use it as the steering channel for the current run: paste corrections, priorities, constraints, and course changes there before kickoff.
 
-Current limitation: upstream CrewAI-Studio does not provide true mid-run chat injection into an active CrewAI execution. The usable first version is watchable and steerable between runs: stop a wrong run, update `operator_chat_guidance`, and restart from the latest result. A dedicated live steering panel/tool is the next fork improvement.
+Current limitation: upstream CrewAI-Studio does not provide true mid-run chat injection into an active CrewAI execution. The usable current version is watchable and steerable between runs through the shared control path and MCP tools: update the persisted operator inputs, then restart the run. A dedicated live steering panel/tool is the next fork improvement.
 
 ## First Game Run Inputs
 

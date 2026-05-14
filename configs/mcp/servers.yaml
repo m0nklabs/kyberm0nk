@@ -40,6 +40,9 @@ servers:
       - crewai_live_run_status
       - crewai_live_log_preview
       - crewai_live_run_control
+      - crewai_operator_input_inspection
+      - crewai_operator_input_update
+      - crewai_rerun_control
     ask_for_when:
       - "The task is about CrewAI agent, task, crew, or environment setup."
       - "The model needs CrewAI-specific rules before generating code."
@@ -49,7 +52,7 @@ servers:
       write_risk: medium
       notes:
         - "This server now supports live run start/stop in addition to guidance, project inspection, dry-run execution, status checks, and log previews."
-        - "Mid-run steering is still separate follow-up work."
+        - "It can now persist and update operator inputs for future starts or restarts, but true mid-run steering is still separate follow-up work."
 
   - id: github
     status: active

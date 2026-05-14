@@ -26,6 +26,7 @@ DEFAULT_PROJECT_PATH = "/workspace/project/.agent-projects/NewNexus"
 DEFAULT_OPERATOR_GOAL = "Create the first playable NewNexus Unreal slice."
 DEFAULT_CURRENT_STATE = "NewNexus is the Unreal Engine project in m0nklabs/NewNexus."
 DEFAULT_OPERATOR_CHAT_GUIDANCE = "Stay on Unreal Engine and NewNexus. Do not switch to Unity or generic 2D assumptions."
+INPUT_FIELDS = ("project_path", "operator_goal", "current_state", "operator_chat_guidance")
 STOP_WAIT_SECONDS = 8.0
 
 
@@ -70,6 +71,16 @@ def project_target(project_id: str) -> str:
 def state_path(project_id: str) -> Path:
     """Return the persisted controller state path for a project."""
     return STATE_DIR / f"{project_id}.json"
+
+
+def default_operator_inputs() -> dict[str, str]:
+    """Return the default operator inputs for the tracked main quest."""
+    return {
+        "project_path": DEFAULT_PROJECT_PATH,
+        "operator_goal": DEFAULT_OPERATOR_GOAL,
+        "current_state": DEFAULT_CURRENT_STATE,
+        "operator_chat_guidance": DEFAULT_OPERATOR_CHAT_GUIDANCE,
+    }
 
 
 def load_runtime_settings() -> dict[str, str]:
@@ -159,6 +170,51 @@ def load_state(project_id: str) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def extract_operator_inputs(state: dict[str, Any]) -> dict[str, str]:
+    """Extract operator input fields from persisted state."""
+    return {
+        field: str(state.get(field, "") or "")
+        for field in INPUT_FIELDS
+    }
+
+
+def kickoff_overrides_from_args(args: argparse.Namespace) -> dict[str, str]:
+    """Extract non-empty operator input overrides from parsed args."""
+    return {
+        field: str(getattr(args, field, "") or "")
+        for field in INPUT_FIELDS
+    }
+
+
+def resolve_operator_inputs(project_id: str, overrides: dict[str, str] | None = None) -> dict[str, str]:
+    """Resolve operator inputs from defaults, persisted state, and explicit overrides."""
+    resolved = default_operator_inputs()
+    saved_state = load_state(project_id)
+    saved_inputs = extract_operator_inputs(saved_state)
+    resolved.update({key: value for key, value in saved_inputs.items() if value})
+    resolved.update({key: value for key, value in (overrides or {}).items() if value})
+    return resolved
+
+
+def update_operator_inputs(project_id: str, overrides: dict[str, str]) -> dict[str, Any]:
+    """Persist operator input overrides for a project and return the merged payload."""
+    state = load_state(project_id)
+    state.setdefault("project_id", project_id)
+    state.setdefault("status", state.get("status", "idle") or "idle")
+    merged_inputs = resolve_operator_inputs(project_id, overrides)
+    state.update(merged_inputs)
+    state["operator_inputs_updated_at"] = datetime.now(timezone.utc).isoformat()
+    save_state(project_id, state)
+    return {
+        "success": True,
+        "project_id": project_id,
+        "status": state.get("status", "idle"),
+        "active": build_status_payload(project_id).get("active", False),
+        "operator_inputs": merged_inputs,
+        "message": "Operator inputs updated.",
+    }
+
+
 def save_state(project_id: str, payload: dict[str, Any]) -> None:
     """Persist the controller state as JSON."""
     STATE_DIR.mkdir(parents=True, exist_ok=True)
@@ -195,6 +251,7 @@ def build_status_payload(project_id: str) -> dict[str, Any]:
             "project_id": project_id,
             "active": False,
             "status": "idle",
+            "operator_inputs": default_operator_inputs(),
             "state_path": str(state_path(project_id)),
         }
 
@@ -211,6 +268,7 @@ def build_status_payload(project_id: str) -> dict[str, Any]:
         "project_id": project_id,
         "active": active,
         "status": state.get("status", "unknown"),
+        "operator_inputs": resolve_operator_inputs(project_id),
         "state_path": str(state_path(project_id)),
         **state,
     }
@@ -295,14 +353,26 @@ def parse_args() -> argparse.Namespace:
     kickoff.add_argument("--project-id", default=DEFAULT_PROJECT_ID)
     kickoff.add_argument("--output", choices=("text", "json"), default="text")
     kickoff.add_argument("--kickoff-mode", choices=("live", "dry_run"), default="live")
-    kickoff.add_argument("--project-path", default=DEFAULT_PROJECT_PATH)
-    kickoff.add_argument("--operator-goal", default=DEFAULT_OPERATOR_GOAL)
-    kickoff.add_argument("--current-state", default=DEFAULT_CURRENT_STATE)
-    kickoff.add_argument("--operator-chat-guidance", default=DEFAULT_OPERATOR_CHAT_GUIDANCE)
+    kickoff.add_argument("--project-path", default="")
+    kickoff.add_argument("--operator-goal", default="")
+    kickoff.add_argument("--current-state", default="")
+    kickoff.add_argument("--operator-chat-guidance", default="")
+
+    inputs = argparse.ArgumentParser(add_help=False)
+    inputs.add_argument("--project-id", default=DEFAULT_PROJECT_ID)
+    inputs.add_argument("--output", choices=("text", "json"), default="text")
+    inputs.add_argument("--project-path", default="")
+    inputs.add_argument("--operator-goal", default="")
+    inputs.add_argument("--current-state", default="")
+    inputs.add_argument("--operator-chat-guidance", default="")
 
     subparsers.add_parser("run", parents=[kickoff], help="Run the CrewAI project in the foreground.")
     subparsers.add_parser("start", parents=[kickoff], help="Start the CrewAI project in the background.")
+    restart_parser = subparsers.add_parser("restart", parents=[kickoff], help="Restart the CrewAI project in the background.")
+    restart_parser.add_argument("--force", action="store_true")
     subparsers.add_parser("status", parents=[common], help="Show background-run status.")
+    subparsers.add_parser("get-inputs", parents=[common], help="Show persisted operator inputs.")
+    subparsers.add_parser("set-inputs", parents=[inputs], help="Update persisted operator inputs.")
     stop_parser = subparsers.add_parser("stop", parents=[common], help="Stop the active background run.")
     stop_parser.add_argument("--force", action="store_true")
 
@@ -326,13 +396,14 @@ def run_foreground(args: argparse.Namespace) -> int:
     container_name = runtime["crewai_studio_web_container"]
     ensure_container_running(container_name)
     target = stage_project_copy(container_name, args.project_id)
+    operator_inputs = resolve_operator_inputs(args.project_id, kickoff_overrides_from_args(args))
     command = build_crew_command(
         container_name=container_name,
         container_project_target=target,
-        project_path=args.project_path,
-        operator_goal=args.operator_goal,
-        current_state=args.current_state,
-        operator_chat_guidance=args.operator_chat_guidance,
+        project_path=operator_inputs["project_path"],
+        operator_goal=operator_inputs["operator_goal"],
+        current_state=operator_inputs["current_state"],
+        operator_chat_guidance=operator_inputs["operator_chat_guidance"],
         kickoff_mode=args.kickoff_mode,
     )
 
@@ -356,13 +427,14 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
     container_name = runtime["crewai_studio_web_container"]
     ensure_container_running(container_name)
     target = stage_project_copy(container_name, args.project_id)
+    operator_inputs = resolve_operator_inputs(args.project_id, kickoff_overrides_from_args(args))
     command = build_crew_command(
         container_name=container_name,
         container_project_target=target,
-        project_path=args.project_path,
-        operator_goal=args.operator_goal,
-        current_state=args.current_state,
-        operator_chat_guidance=args.operator_chat_guidance,
+        project_path=operator_inputs["project_path"],
+        operator_goal=operator_inputs["operator_goal"],
+        current_state=operator_inputs["current_state"],
+        operator_chat_guidance=operator_inputs["operator_chat_guidance"],
         kickoff_mode=args.kickoff_mode,
     )
 
@@ -387,10 +459,7 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
         "pid": process.pid,
         "started_at": datetime.now(timezone.utc).isoformat(),
         "kickoff_mode": args.kickoff_mode,
-        "project_path": args.project_path,
-        "operator_goal": args.operator_goal,
-        "current_state": args.current_state,
-        "operator_chat_guidance": args.operator_chat_guidance,
+        **operator_inputs,
         "container_name": container_name,
         "container_project_target": target,
         "command_signature": target,
@@ -404,6 +473,15 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def restart_background(args: argparse.Namespace) -> dict[str, Any]:
+    """Restart the CrewAI project in the background using merged operator inputs."""
+    previous = stop_active_run(args.project_id, force=args.force)
+    started = start_background(args)
+    started["previous_status"] = previous.get("status", "idle")
+    started["message"] = "Background run restarted."
+    return started
+
+
 def main() -> int:
     """CLI entry point for run control."""
     args = parse_args()
@@ -414,8 +492,19 @@ def main() -> int:
             return run_foreground(args)
         if args.command == "start":
             return emit(start_background(args), args.output)
+        if args.command == "restart":
+            return emit(restart_background(args), args.output)
         if args.command == "status":
             return emit(build_status_payload(args.project_id), args.output)
+        if args.command == "get-inputs":
+            return emit({
+                "success": True,
+                "project_id": args.project_id,
+                "operator_inputs": resolve_operator_inputs(args.project_id),
+                "active": build_status_payload(args.project_id).get("active", False),
+            }, args.output)
+        if args.command == "set-inputs":
+            return emit(update_operator_inputs(args.project_id, kickoff_overrides_from_args(args)), args.output)
         if args.command == "stop":
             return emit(stop_active_run(args.project_id, force=args.force), args.output)
     except Exception as exc:

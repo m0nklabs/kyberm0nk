@@ -536,6 +536,70 @@ def start_kyber_crewai_live_run(
     return json_response(payload)
 
 
+@mcp.tool(name="restart_kyber_crewai_live_run",
+          description="Restart a Kyber CrewAI background run through the tracked control script, optionally with updated operator inputs.")
+def restart_kyber_crewai_live_run(
+    project_id: str = DEFAULT_PROJECT_ID,
+    kickoff_mode: str = "live",
+    operator_goal: str = "",
+    project_path: str = "",
+    current_state: str = "",
+    operator_chat_guidance: str = "",
+    force: bool = False,
+) -> str:
+    """Restart a Kyber CrewAI background run."""
+    payload = run_control_command(
+        project_id=project_id,
+        action="restart",
+        timeout_seconds=120,
+        extra_args={
+            "kickoff_mode": kickoff_mode,
+            "operator_goal": operator_goal,
+            "project_path": project_path,
+            "current_state": current_state,
+            "operator_chat_guidance": operator_chat_guidance,
+            "force": force,
+        },
+    )
+    return json_response(payload)
+
+
+@mcp.tool(name="get_kyber_crewai_operator_inputs",
+          description="Read the persisted operator inputs that the Kyber CrewAI control path will use for the next run.")
+def get_kyber_crewai_operator_inputs(project_id: str = DEFAULT_PROJECT_ID) -> str:
+    """Return the persisted operator inputs for a tracked Kyber CrewAI project."""
+    payload = run_control_command(
+        project_id=project_id,
+        action="get-inputs",
+        timeout_seconds=60,
+    )
+    return json_response(payload)
+
+
+@mcp.tool(name="update_kyber_crewai_operator_inputs",
+          description="Update the persisted operator inputs used by the Kyber CrewAI control path for future runs or restarts.")
+def update_kyber_crewai_operator_inputs(
+    project_id: str = DEFAULT_PROJECT_ID,
+    operator_goal: str = "",
+    project_path: str = "",
+    current_state: str = "",
+    operator_chat_guidance: str = "",
+) -> str:
+    """Update persisted operator inputs for a tracked Kyber CrewAI project."""
+    payload = run_control_command(
+        project_id=project_id,
+        action="set-inputs",
+        timeout_seconds=60,
+        extra_args={
+            "operator_goal": operator_goal,
+            "project_path": project_path,
+            "current_state": current_state,
+            "operator_chat_guidance": operator_chat_guidance,
+        },
+    )
+    return json_response(payload)
+
+
 @mcp.tool(name="stop_kyber_crewai_live_run",
           description="Stop an active Kyber CrewAI background run through the tracked control script.")
 def stop_kyber_crewai_live_run(project_id: str = DEFAULT_PROJECT_ID, force: bool = False) -> str:
@@ -622,6 +686,21 @@ def list_server_tools() -> str:
             "name": "start_kyber_crewai_live_run",
             "description": "Start a Kyber CrewAI background run through the tracked control script.",
             "purpose": "Starts a project-aware background run with optional operator inputs and returns the persisted controller state."
+        },
+        {
+            "name": "restart_kyber_crewai_live_run",
+            "description": "Restart a Kyber CrewAI background run.",
+            "purpose": "Stops the tracked background run if needed and starts it again with persisted or overridden operator inputs."
+        },
+        {
+            "name": "get_kyber_crewai_operator_inputs",
+            "description": "Read the persisted operator inputs for the tracked Kyber CrewAI run.",
+            "purpose": "Returns the current operator goal, project path, current state, and operator guidance that the control path will reuse."
+        },
+        {
+            "name": "update_kyber_crewai_operator_inputs",
+            "description": "Update the persisted operator inputs for the tracked Kyber CrewAI run.",
+            "purpose": "Stores updated operator guidance for future starts or restarts without editing files manually."
         },
         {
             "name": "stop_kyber_crewai_live_run",

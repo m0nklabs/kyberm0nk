@@ -7,10 +7,12 @@ In upstream form this server is mostly a CrewAI rulebook. In the KyberM0nk vendo
 - inspecting the current project config
 - running the existing dry-run wrapper
 - starting and stopping the tracked background run
+- reading and updating persisted operator inputs
+- restarting the tracked run with updated guidance
 - checking CrewAI-Studio/container status
 - previewing the live CrewAI log
 
-This keeps the first useful version safe enough while still being operational: Claude can inspect, validate, start, stop, and review the tracked CrewAI project wiring without needing full mid-run mutation tools yet.
+This keeps the first useful version safe enough while still being operational: Claude can inspect, validate, start, stop, steer between runs, and review the tracked CrewAI project wiring without needing full mid-run mutation tools yet.
 
 ## Installation
 ```
