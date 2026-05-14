@@ -35,13 +35,19 @@ servers:
       - crewai_agent_rules
       - crewai_task_rules
       - crewai_server_tool_listing
+      - crewai_project_config_inspection
+      - crewai_project_dry_run
+      - crewai_live_run_status
+      - crewai_live_log_preview
     ask_for_when:
       - "The task is about CrewAI agent, task, crew, or environment setup."
       - "The model needs CrewAI-specific rules before generating code."
+      - "The model needs to inspect, dry-run, or review the current Kyber CrewAI project state without touching the Studio UI manually."
     safety:
       write_risk: low
       notes:
-        - "This server is guidance-oriented, not the main coding orchestrator."
+        - "This server is read-mostly: guidance plus project inspection, dry-run execution, status checks, and log previews."
+        - "Live run control and mid-run steering are still separate follow-up work."
 
   - id: github
     status: active

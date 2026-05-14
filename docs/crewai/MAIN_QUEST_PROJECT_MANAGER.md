@@ -68,6 +68,18 @@ scripts/crewai_main_quest_dry_run.sh
 
 This copies the config into the Studio container and builds the CrewAI `Crew` object without calling a model. It verifies that the YAML config, provider policy, and CrewAI object construction all work before spending tokens.
 
+## Claude MCP Surface
+
+The user-scoped Claude `crewai` MCP is no longer only a rulebook. The Kyber-vendored server now exposes a read-mostly project surface for the tracked CrewAI setup:
+
+- `list_kyber_crewai_projects`
+- `inspect_kyber_crewai_project`
+- `run_kyber_crewai_dry_run`
+- `get_kyber_crewai_run_status`
+- `get_kyber_crewai_live_log_preview`
+
+This is the intended first step: Claude can inspect the tracked CrewAI project, validate wiring through the existing dry-run script, and review current run/log state without going through the Studio UI manually. Live run control and true mid-run steering remain separate follow-up work.
+
 ## Crew Shape
 
 | Role | Provider | Model | Purpose |

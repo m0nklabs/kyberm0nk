@@ -113,5 +113,6 @@
 - [x] Document the watchable CrewAI project-manager workflow.
 - [x] Add direct CrewAI project config files and a no-token dry-run validator.
 - [x] Add a DB seeder so the main quest crew can be installed without manual Import/Export UI steps.
+- [ ] Extend the CrewAI MCP from read-mostly project inspection into live run control and steering hooks.
 - [ ] Add a true live steering panel or tool so operator chat can be injected into an active run instead of only between reruns.
 - [ ] Pilot the main quest crew against a disposable game project slice.

@@ -2,6 +2,12 @@
 
 ## 2026-05-14
 
+- **CrewAI MCP read-mostly v1:**
+  - Extended `docker/Claude-CrewAI-MCP/crewai_mcp_server.py` from a guidance-only rulebook into a Kyber project-aware MCP surface.
+  - Added project inspection, dry-run execution, CrewAI-Studio container status, and live-log preview tools so Claude can interrogate `configs/crewai/main_quest_project/` and the existing run scripts directly.
+  - Updated the MCP registry and CrewAI main quest documentation to reflect that the `crewai` server is now read-mostly operational tooling, not only static rules.
+  - Hardened the vendored FastMCP tester to use the MCP virtualenv interpreter and small tool-specific smoke arguments, and fixed dry-run timeout handling so the MCP returns structured timeout responses instead of crashing on partial subprocess output.
+
 - **MCP sync check + supervisor tick MVP:**
   - Added `scripts/check_mcp_registry_sync.py` to compare live Claude MCP registrations against `configs/mcp/servers.yaml`, normalize descriptive transport labels such as `stdio_bridge_to_http`, and optionally fail CI-style on drift.
   - Validated the sync checker against the current live Claude MCP set; it reports `crewai`, `github`, `playwright`, and `vibeue` in sync with no missing registrations or command/arg mismatches.

@@ -6,8 +6,15 @@ This script uses the official FastMCP client to communicate with the server.
 
 import asyncio
 import json
+import sys
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+
+TOOL_TEST_ARGS = {
+    "run_kyber_crewai_dry_run": {"timeout_seconds": 1},
+    "get_kyber_crewai_live_log_preview": {"line_count": 5},
+}
 
 
 async def test_crewai_mcp_server():
@@ -17,7 +24,7 @@ async def test_crewai_mcp_server():
 
     # Server parameters (same as Claude Desktop would use)
     server_params = StdioServerParameters(
-        command="python3",
+        command=sys.executable,
         args=["crewai_mcp_server.py"],
     )
 
@@ -48,7 +55,7 @@ async def test_crewai_mcp_server():
                         print(f"\n📞 Calling tool: {tool.name}")
                         try:
                             # Call the tool with empty arguments
-                            result = await session.call_tool(tool.name, {})
+                            result = await session.call_tool(tool.name, TOOL_TEST_ARGS.get(tool.name, {}))
 
                             print(f"✅ Tool '{tool.name}' executed successfully")
 

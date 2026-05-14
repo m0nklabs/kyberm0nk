@@ -1,5 +1,15 @@
 # Claude-CrewAI-MCP
-Model Context Protocol (MCP) server for the Claude Desktop that instructs it how to properly code Python projects using CrewAI. Uses [FastMCP](https://gofastmcp.com/getting-started/welcome).
+Model Context Protocol (MCP) server for Claude Desktop / Claude Code using [FastMCP](https://gofastmcp.com/getting-started/welcome).
+
+In upstream form this server is mostly a CrewAI rulebook. In the KyberM0nk vendored variant it also exposes read-mostly project tools for the tracked local CrewAI setup, including:
+
+- listing tracked Kyber CrewAI projects
+- inspecting the current project config
+- running the existing dry-run wrapper
+- checking CrewAI-Studio/container status
+- previewing the live CrewAI log
+
+This keeps the first version safe and useful: Claude can inspect and validate the CrewAI project wiring without needing full live-run mutation tools yet.
 
 ## Installation
 ```
