@@ -34,8 +34,8 @@ class GitHubRepoSearchInputSchema(BaseModel):
 class GitHubRepoSearchTool(BaseTool):
     """Small GitHub REST search tool that avoids embedding-provider dependencies."""
 
-    name: str = "GitHub repository search"
-    description: str = "Search a GitHub repository for code, issues, pull requests, and repository metadata using the GitHub REST API."
+    name: str = "newnexus_github_search"
+    description: str = "Search a GitHub repository for code, issues, pull requests, and repository metadata. ACTION INPUT MUST BE A VALID JSON DICTIONARY with keys: 'query' (string), 'content_type' (string: 'code', 'issue', 'pr', 'repo', or 'all'), and 'limit' (integer)."
     args_schema: Type[BaseModel] = GitHubRepoSearchInputSchema
     github_repo: str
     gh_token: str = Field(exclude=True)
@@ -151,6 +151,99 @@ class GitHubRepoSearchTool(BaseTool):
         return json.dumps(results, indent=2)
 
 
+
+
+import subprocess
+
+class WindowsSSHCommandInputSchema(BaseModel):
+    """Input schema for Windows SSH Command tool."""
+    command: str = Field(..., description="The command to execute on the Windows PC via SSH. Will be executed in the UnrealProjects workspace.")
+
+class WindowsSSHCommandTool(BaseTool):
+    """Tool to execute commands on the Windows PC equipped with Unreal Engine via SSH."""
+    name: str = "newnexus_windows_ssh"
+    description: str = "Executes arbitrary commands on the Windows 11 PC (unreal-windows) over SSH. ACTION INPUT MUST BE A VALID JSON DICTIONARY with key 'command' (string)."
+    args_schema: Type[BaseModel] = WindowsSSHCommandInputSchema
+
+    def _run(self, command: str) -> str:
+        # SECURITY GUARDRAILS
+        if "C:" in command.upper() or "C\\" in command.upper():
+            return "CRITICAL ERROR: Command rejected by Security Guardrail. Access to the C: drive is strictly prohibited."
+        if "Remove-Item" in command and "*" in command:
+            return "CRITICAL ERROR: Command rejected by Security Guardrail. Wildcard deletes are prohibited."
+
+        # Force execution in the designated workspace to prevent default C:\Users\onyou disasters
+        safe_workspace = "J:\\UnrealProjects" # Update to L:\\UnrealProjects if needed
+        wrapped_command = f"powershell -NoProfile -Command \"Set-Location -Path '{safe_workspace}' -ErrorAction Stop; {command}\""
+
+        try:
+            # We use the unreal-windows SSH alias already configured in the container
+            result = subprocess.run(
+                ["ssh", "unreal-windows", wrapped_command],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            output = result.stdout + "\n" + result.stderr
+            if result.returncode == 0:
+                return f"Success (Exit 0):\n{output}"
+            else:
+                return f"Failed (Exit {result.returncode}):\n{output}"
+        except Exception as e:
+            return f"Error executing SSH command: {str(e)}"
+
+# Marker replacement
+class GitHubRepoPushInputSchema(BaseModel):
+    """Input schema for GitHub repository push file."""
+    file_path: str = Field(..., description="The path to the file in the repository (e.g. 'src/main.py').")
+    content: str = Field(..., description="The text content to commit.")
+    commit_message: str = Field(..., description="The commit message.")
+    branch: str = Field("main", description="The branch to commit to. Defaults to main.")
+
+class GitHubRepoPushTool(BaseTool):
+    """Small GitHub REST tool to create or update a file in a repository without a local git clone."""
+
+    name: str = "newnexus_github_push"
+    description: str = "Commit and push a single file's content to a GitHub repository. ACTION INPUT MUST BE A VALID JSON DICTIONARY with keys: 'file_path' (string), 'content' (string), 'commit_message' (string), and 'branch' (string)."
+    args_schema: Type[BaseModel] = GitHubRepoPushInputSchema
+    github_repo: str
+    gh_token: str = Field(exclude=True)
+    api_base: str = "https://api.github.com"
+
+    def __init__(self, github_repo: str, gh_token: str, **kwargs: Any) -> None:
+        super().__init__(github_repo=github_repo, gh_token=gh_token, **kwargs)
+        self._generate_description()
+
+    def _headers(self) -> dict[str, str]:
+        return {
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {self.gh_token}",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+    def _run(self, file_path: str, content: str, commit_message: str, branch: str = "main") -> str:
+        file_url = f"{self.api_base}/repos/{self.github_repo}/contents/{file_path}"
+        get_response = requests.get(f"{file_url}?ref={branch}", headers=self._headers(), timeout=REQUEST_TIMEOUT_SECONDS)
+        
+        sha = None
+        if get_response.status_code == 200:
+            sha = get_response.json().get("sha")
+            
+        data = {
+            "message": commit_message,
+            "content": base64.b64encode(content.encode("utf-8")).decode("utf-8"),
+            "branch": branch
+        }
+        if sha:
+            data["sha"] = sha
+            
+        put_response = requests.put(file_url, headers=self._headers(), json=data, timeout=REQUEST_TIMEOUT_SECONDS)
+        
+        if put_response.status_code in [200, 201]:
+            return f"Success! File '{file_path}' committed and pushed to {branch}."
+        else:
+            return f"Failed to commit file. Code: {put_response.status_code}, Resp: {put_response.text}"
+
 def load_yaml(path: Path) -> dict[str, Any]:
     """Load a YAML file as a dictionary."""
     with path.open("r", encoding="utf-8") as handle:
@@ -182,18 +275,26 @@ def create_llm(provider_name: str, model: str, temperature: float, providers: di
 def create_tool(tool_name: str, tools_config: dict[str, Any]) -> Any:
     """Create a CrewAI tool from YAML config."""
     config = tools_config["tools"][tool_name]
-    if config["type"] != "github_search":
-        raise ValueError(f"Unsupported tool type: {config['type']}")
-
+    
     gh_token = os.getenv(config.get("token_env", "GITHUB_TOKEN")) or os.getenv(config.get("fallback_token_env", "GH_TOKEN"))
     if not gh_token:
         raise ValueError("Missing GitHub token env var: GITHUB_TOKEN or GH_TOKEN")
 
-    return GitHubRepoSearchTool(
-        github_repo=config["github_repo"],
-        gh_token=gh_token,
-        content_types=config.get("content_types") or ["code", "repo", "pr", "issue"],
-    )
+    if config["type"] == "github_search":
+        return GitHubRepoSearchTool(
+            github_repo=config["github_repo"],
+            gh_token=gh_token,
+            content_types=config.get("content_types") or ["code", "repo", "pr", "issue"],
+        )
+    elif config["type"] == "github_push":
+        return GitHubRepoPushTool(
+            github_repo=config["github_repo"],
+            gh_token=gh_token,
+        )
+    elif config["type"] == "windows_ssh_command":
+        return WindowsSSHCommandTool()
+    else:
+        raise ValueError(f"Unsupported tool type: {config['type']}")
 
 
 def build_agents(agents_config: dict[str, Any], providers: dict[str, Any], tools_config: dict[str, Any]) -> dict[str, Agent]:
@@ -202,7 +303,7 @@ def build_agents(agents_config: dict[str, Any], providers: dict[str, Any], tools
     for agent_name, config in agents_config["agents"].items():
         tools = [create_tool(tool_name, tools_config) for tool_name in config.get("tools", [])]
         agents[agent_name] = Agent(
-            role=config["role"],
+            role=f"{config['role']} [LLM: {config['provider']} - {config['model']}]",
             goal=config["goal"],
             backstory=config["backstory"],
             allow_delegation=config.get("allow_delegation", False),
@@ -260,13 +361,34 @@ def build_crew(config_dir: Path = CONFIG_DIR) -> Crew:
         "cache": crew_settings.get("cache", True),
         "planning": crew_settings.get("planning", False),
         "max_rpm": crew_settings.get("max_rpm", 30),
-        "manager_llm": create_llm(
+    }
+
+    if manager:
+        manager_llm_obj = create_llm(
             provider_name=manager["provider"],
             model=manager["model"],
             temperature=manager.get("temperature", 0.15),
             providers=providers,
-        ),
-    }
+        )
+        try:
+            from crewai.utilities.i18n import I18N
+            i18n = I18N()
+            role = f"{i18n.retrieve('hierarchical_manager_agent', 'role')} [LLM: {manager['provider']} - {manager['model']}]"
+            goal = i18n.retrieve("hierarchical_manager_agent", "goal")
+            backstory = i18n.retrieve("hierarchical_manager_agent", "backstory")
+        except Exception:
+            role = f"Crew Manager [LLM: {manager['provider']} - {manager['model']}]"
+            goal = "Manage the crew to complete the task in the best way possible."
+            backstory = "You are a seasoned manager with a knack for getting the best out of your team. You allow them to do the work. Even if you don't perform the tasks by yourself, you properly evaluate the work of your team members."
+            
+        crew_args["manager_agent"] = Agent(
+            role=role,
+            goal=goal,
+            backstory=backstory,
+            allow_delegation=True,
+            verbose=crew_settings.get("verbose", True),
+            llm=manager_llm_obj,
+        )
 
     if planning:
         crew_args["planning_llm"] = create_llm(

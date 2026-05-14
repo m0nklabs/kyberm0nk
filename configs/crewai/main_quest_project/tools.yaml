@@ -9,3 +9,12 @@ tools:
       - issue
     token_env: GITHUB_TOKEN
     fallback_token_env: GH_TOKEN
+
+  newnexus_github_push:
+    type: github_push
+    github_repo: m0nklabs/NewNexus
+    token_env: GITHUB_TOKEN
+    fallback_token_env: GH_TOKEN
+
+  newnexus_windows_ssh:
+    type: windows_ssh_command

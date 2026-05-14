@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-05-14
+
+- **Always-on local coding stack + MCP registry:**
+  - Added `docs/CODING_MONSTER_STACK.md` to capture the current recommendation for a multi-project, local-first coding stack: Superset as orchestration layer, OpenCode/Aider as default local workers, OpenHands as programmable worker substrate, Claude Code as premium escalation, CrewAI as planning layer, and LangGraph only if the supervisor loop outgrows a small custom tick.
+  - Added `configs/mcp/servers.yaml` as the canonical machine-readable MCP server registry for KyberM0nk, covering active Claude MCP servers (`crewai`, `github`, `playwright`, `vibeue`), the Superset orchestration candidate, and planned MCP gaps such as local search.
+  - Updated `configs/README.md` and `docs/TODO_LIST.md` so the MCP registry becomes part of the repo structure and future worker prompts/sync checks are tracked explicitly.
+  - Clarified in the stack documentation that Superset is the multi-project coding control plane candidate, while CrewAI remains the planning/project-manager layer rather than the main coding orchestrator.
+
+- **CrewAI + Unreal helper tooling:**
+  - Extended `configs/crewai/main_quest_project/` with direct GitHub search/push tools and a guarded Windows SSH execution tool so the main quest crew can inspect `m0nklabs/NewNexus`, push reviewed source changes, and trigger Windows-side Unreal validation.
+  - Added local helper scripts for CrewAI live runs, web log watching, Windows SSH provisioning, local smoke testing, Claude MCP wrappers, and tracked Unreal/Python utility scripts that were previously only living in the working tree.
+  - Added `docs/UNREAL_HEADLESS_PIPELINE.md` for the current Windows Unreal recovery/build checklist used by local agents.
+
+- **Claude Code MCP + instruction layering:**
+  - Added `scripts/claude_mcp_github.sh` so Claude Code can start the GitHub MCP server without storing the PAT directly in Claude config; the wrapper reads the token from the existing ignored secret file and falls back to `gh auth token` if needed.
+  - Validated user-scoped Claude Code MCP connectivity for `crewai`, `github`, and `playwright`.
+  - Updated `scripts/claude_mcp_vibeue.sh` to target the current VibeUE MCP server port (`62351`) and recycle stale local SSH tunnels when the MCP health check fails, so Claude Code can reconnect to the live Unreal session without manual cleanup.
+  - Updated the local `claude-local` wrapper to inject GitHub token environment variables and add `github-copilot-config` as an extra Claude-accessible directory so sibling private instruction files can be imported by project `CLAUDE.md` files.
+
+## 2026-05-13
+
+- **NewNexus Unreal 5.7 recovery docs:**
+  - Documented the VS2022 `v143` / `Win64` false-positive fix caused by Unreal using `Win64` while VS MSBuild only exposed `x64` platform targets.
+  - Documented the `VisualStudioTools` plugin trap that caused Unreal's `Missing NewNexus Modules` popup and UBT `ModuleRules` failure.
+  - Captured the correct NewNexus engine/project paths, SSH user vs desktop user split, and project discovery config locations for Epic Launcher and Unreal Project Browser.
+  - Added manual build and validation commands for `NewNexusEditor` so future agents can verify the fix without relying on Unreal's popup rebuild path.
+
 ## 2026-05-10
 
 - **CrewAI-Studio main quest manager:**

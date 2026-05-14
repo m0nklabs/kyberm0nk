@@ -85,6 +85,7 @@
 ## Phase 9 - Supervisor Loop and Framework Evaluation
 
 - [x] Document the supervisor-loop plan and framework shortlist.
+- [x] Add a canonical MCP server registry under `configs/mcp/servers.yaml` for capability-based tool selection.
 - [ ] Run a contained Claude Code / Claude Agent SDK smoke test as the premium quality baseline.
 - [x] Check host prerequisites for Claude Squad and Superset evaluation.
 - [x] Evaluate Claude Squad as the fastest tmux/worktree TUI spike for local agents.
@@ -98,6 +99,8 @@
 - [ ] Add a minimal `supervisor_tick` script after the session/worktree layer is chosen.
 - [ ] Pilot the supervisor loop against the Agent Zero NewNexus context.
 - [ ] Add repeated-thought and repeated-command detection to the first supervisor tick.
+- [ ] Teach worker wrappers and prompts to consult the MCP registry before asking for tools.
+- [ ] Add a registry sync check that compares live Claude MCP registrations against `configs/mcp/servers.yaml`.
 - [ ] Fix or replace the Windows NewNexus sync path so validation builds can consume reviewed Linux checkout changes without interactive Git credential prompts.
 - [ ] Add cloud escalation gates for repeated failures, risky diffs, and pre-commit review.
 

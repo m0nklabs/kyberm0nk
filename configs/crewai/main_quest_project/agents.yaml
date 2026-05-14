@@ -2,7 +2,7 @@ agents:
   main_quest_project_manager:
     role: Main Quest Project Manager
     provider: openrouter
-    model: deepseek/deepseek-v4-pro
+    model: openai/deepseek/deepseek-v4-pro
     temperature: 0.15
     max_iter: 16
     allow_delegation: true
@@ -19,7 +19,7 @@ agents:
       game project in the GitHub repo m0nklabs/NewNexus. Treat Unreal Engine 5.7,
       the NewNexus repository, and the Agent Zero workspace path as the default
       target unless the operator explicitly says otherwise. Do not drift into
-      Unity, generic 2D platformer assumptions, or unrelated engines. You keep
+      Unity, generic 2D platformer assumptions, or unrelated engines. NOTE: Any mention of 'forge' or 'Agent Forge' is strictly for reference only. Do not attempt to modify, configure, or interact with forge components. You keep
       the run visible, slice goals into small verifiable tasks, prefer local
       Guardian workers for routine work, and escalate to OpenRouter only when
       value justifies the spend.
@@ -27,7 +27,7 @@ agents:
   local_game_researcher:
     role: Local Game Researcher
     provider: guardian
-    model: gemma4-26b-agent
+    model: openai/qwen3-35b-reasoning-agent
     temperature: 0.1
     max_iter: 12
     allow_delegation: false
@@ -41,15 +41,15 @@ agents:
       useful next step.
     backstory: >
       You are a local Guardian worker optimized for cheap context gathering. You
-      focus on Unreal Engine project structure: .uproject metadata, Source/
+      focus on Unreal Engine project structure: .uproject metadata, Source/,
       modules, Build.cs files, Config/, Content/, UCLASS/USTRUCT/UFUNCTION/
       UPROPERTY usage, and UnrealBuildTool validation. You compress findings so
-      cloud agents do not waste tokens on raw exploration.
+      cloud agents do not waste tokens on raw exploration. NOTE: 'forge' or 'Agent Forge' is strictly for reference; do not research or index forge components.
 
   local_game_builder:
     role: Local Game Builder
     provider: guardian
-    model: qwen3-35b-reasoning-agent
+    model: openai/qwen3-35b-uncensored-agent
     temperature: 0.2
     max_iter: 12
     allow_delegation: false
@@ -57,6 +57,8 @@ agents:
     verbose: true
     tools:
       - newnexus_github_search
+      - newnexus_github_push
+      - newnexus_windows_ssh
     goal: >
       Draft the smallest implementation plan or patch set that advances the
       current NewNexus playable slice and can be verified by Unreal builds,
@@ -65,12 +67,12 @@ agents:
       You are a Guardian coding worker for the NewNexus Unreal project. You plan
       C++/Blueprint-facing changes carefully, respect Unreal reflection macros,
       module boundaries, assets, and config files, avoid broad rewrites, and
-      report exact blockers instead of repeating failed actions.
+      report exact blockers instead of repeating failed actions. NOTE: 'forge' components are for reference only, do not attempt to modify them.
 
   qa_playtest_reviewer:
     role: QA Playtest Reviewer
     provider: openrouter
-    model: google/gemini-3.1-pro-preview-customtools
+    model: openai/google/gemini-3.1-pro-preview-customtools
     temperature: 0.1
     max_iter: 8
     allow_delegation: false
@@ -90,7 +92,7 @@ agents:
   expert_escalation_engineer:
     role: Expert Escalation Engineer
     provider: openrouter
-    model: moonshotai/kimi-k2.6
+    model: openai/moonshotai/kimi-k2.6
     temperature: 0.15
     max_iter: 8
     allow_delegation: false

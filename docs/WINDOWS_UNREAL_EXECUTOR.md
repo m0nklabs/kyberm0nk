@@ -9,7 +9,8 @@ KyberM0nk can hand Unreal build and runtime work to the Windows workstation over
 | Host alias from Linux host | `unreal-windows` |
 | Host alias inside sandbox | `unreal-windows` |
 | Hostname | `192.168.1.245` |
-| User | `onyou` |
+| SSH user | `mark1` |
+| Desktop / Epic Launcher user | `onyou` |
 | Verified host response | `14700K` |
 
 ## Key Handling
@@ -52,11 +53,20 @@ Deprecated compatibility stubs may exist at the old command names in the sandbox
 Known NewNexus Unreal paths:
 
 ```text
-Project: J:\Unreal Projects\NewNexus
-Engine root: J:\UNREAL_ENGINE\UE_5.7
-UnrealBuildTool: J:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe
+Project: J:\UnrealProjects\NewNexus
+Engine root: C:\UNREAL_ENGINE\UE_5.7
+UnrealBuildTool: C:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe
 .NET runtime: Microsoft.NETCore.App 8.0.26 installed in C:\Program Files\dotnet
 ```
+
+The SSH user and GUI user are not the same. SSH commands run under `mark1`, while Epic Launcher and Unreal Editor GUI state live under `onyou`. When fixing project discovery or startup browser settings, patch the `onyou` profile:
+
+```text
+C:\Users\onyou\AppData\Local\UnrealEngine\5.7\Saved\Config\WindowsEditor\EditorSettings.ini
+C:\Users\onyou\AppData\Local\EpicGamesLauncher\Saved\Config\WindowsEditor\GameUserSettings.ini
+```
+
+For NewNexus, `VisualStudioTools` is optional and must stay out of `NewNexus.uproject` unless the matching plugin is installed into the source-built engine. If startup reports missing modules, check `C:\Users\onyou\AppData\Local\UnrealBuildTool\Log.txt` before editing source. A `VisualStudioTools` ModuleRules error means the plugin reference is invalid, not that NewNexus code failed to compile.
 
 UnrealBuildTool requires the .NET 8 runtime family. If Windows only has .NET 9, UBT fails before any Unreal build work starts with a missing `Microsoft.NETCore.App 8.0.0` error.
 

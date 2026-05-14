@@ -51,12 +51,12 @@ tasks:
     context:
       - plan_and_delegate
     description: >
-      Draft the implementation notes or patch outline for the next smallest
-      NewNexus Unreal step. Do not invent unrelated systems or switch engines.
+      Implement the next smallest NewNexus Unreal step. Do not invent unrelated systems or switch engines.
+      You MUST use the newnexus_github_push tool to actually commit and push the code changes to the repository!
       Include exact files to edit, expected behavior, Unreal-specific edge cases,
       and fallback if blocked.
     expected_output: >
-      A focused implementation package: files to change, behavior to add/fix,
+      Confirmation that the file(s) were successfully pushed, behavior added/fixed,
       Unreal edge cases, and commands to verify the slice.
 
   review_and_acceptance:

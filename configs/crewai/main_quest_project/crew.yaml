@@ -4,7 +4,7 @@ crew:
   verbose: true
   memory: false
   cache: true
-  planning: true
+  planning: false
   max_rpm: 30
   manager_llm:
     provider: openrouter
@@ -24,4 +24,4 @@ providers:
     api_key_env: GUARDIAN_API_KEY
     api_base_env: GUARDIAN_API_BASE
     default_api_key: sk-guardian-local
-    default_api_base: http://host.docker.internal:11434/v1
+    default_api_base: http://172.17.0.1:11434/v1

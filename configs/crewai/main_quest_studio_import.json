@@ -20,7 +20,7 @@
       "allow_delegation": true,
       "verbose": true,
       "cache": false,
-      "llm_provider_model": "OpenRouter: deepseek/deepseek-v4-pro",
+      "llm_provider_model": "Guardian: qwen3-35b-uncensored",
       "temperature": 0.15,
       "max_iter": 16,
       "tool_ids": [
@@ -35,7 +35,7 @@
       "allow_delegation": false,
       "verbose": true,
       "cache": true,
-      "llm_provider_model": "Guardian: gemma4-26b-agent",
+      "llm_provider_model": "Guardian: qwen3-35b-uncensored",
       "temperature": 0.1,
       "max_iter": 12,
       "tool_ids": [
@@ -50,7 +50,7 @@
       "allow_delegation": false,
       "verbose": true,
       "cache": false,
-      "llm_provider_model": "Guardian: qwen3-35b-reasoning-agent",
+      "llm_provider_model": "Guardian: qwen3-35b-uncensored",
       "temperature": 0.2,
       "max_iter": 12,
       "tool_ids": [
@@ -65,7 +65,7 @@
       "allow_delegation": false,
       "verbose": true,
       "cache": false,
-      "llm_provider_model": "OpenRouter: google/gemini-3.1-pro-preview-customtools",
+      "llm_provider_model": "Guardian: qwen3-35b-uncensored",
       "temperature": 0.1,
       "max_iter": 8,
       "tool_ids": [
@@ -80,7 +80,7 @@
       "allow_delegation": false,
       "verbose": true,
       "cache": false,
-      "llm_provider_model": "OpenRouter: moonshotai/kimi-k2.6",
+      "llm_provider_model": "Guardian: qwen3-35b-uncensored",
       "temperature": 0.15,
       "max_iter": 8,
       "tool_ids": [
@@ -99,7 +99,9 @@
       "temperature": 0.2,
       "max_iter": 15,
       "tool_ids": [
-        "TOOL_newnexus_github_search"
+        "TOOL_newnexus_github_search",
+        "TOOL_unreal_msbuild",
+        "TOOL_unreal_remote"
       ]
     }
   ],
@@ -175,6 +177,18 @@
         "github_repo": "m0nklabs/NewNexus",
         "content_types": "code,repo,pr,issue"
       }
+    },
+    {
+      "tool_id": "TOOL_unreal_msbuild",
+      "name": "UnrealMSBuildTool",
+      "description": "Triggers an MSBuild compilation of an Unreal Engine project over SSH.",
+      "parameters": {}
+    },
+    {
+      "tool_id": "TOOL_unreal_remote",
+      "name": "UnrealRemoteTool",
+      "description": "Interacts with Unreal Engine 5 via its Web Remote Control API over SSH.",
+      "parameters": {}
     }
   ]
 }

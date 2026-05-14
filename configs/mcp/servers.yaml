@@ -1,0 +1,168 @@
+version: 1
+updated_at: 2026-05-14
+owner: kyberm0nk
+purpose: >-
+  Canonical MCP server registry for KyberM0nk. Agents should request tools by
+  capability from this registry instead of inventing integrations or guessing
+  server names.
+
+selection_policy:
+  tool_namespace_format: "mcp__<server_id>__<tool_name>"
+  rules:
+    - "Ask for tools by capability, not by favorite framework or guessed API."
+    - "Prefer local and read-only tools first when they can answer the task."
+    - "Use write-capable tools only when the active project and scope are confirmed."
+    - "If a needed capability is missing here, request a new MCP integration instead of inventing one."
+    - "One local LLM worker may be active at a time; MCP tools can still be used for parallel validation or environment work."
+
+servers:
+  - id: crewai
+    status: active
+    scope: user
+    client_surfaces:
+      - claude_code
+    transport: stdio
+    registration:
+      command: /home/flip/kyberm0nk/docker/Claude-CrewAI-MCP/.venv/bin/fastmcp
+      args:
+        - run
+        - --transport
+        - stdio
+        - /home/flip/kyberm0nk/docker/Claude-CrewAI-MCP/crewai_mcp_server.py
+    tool_namespace_hint: mcp__crewai__
+    capabilities:
+      - crewai_setup_guidance
+      - crewai_agent_rules
+      - crewai_task_rules
+      - crewai_server_tool_listing
+    ask_for_when:
+      - "The task is about CrewAI agent, task, crew, or environment setup."
+      - "The model needs CrewAI-specific rules before generating code."
+    safety:
+      write_risk: low
+      notes:
+        - "This server is guidance-oriented, not the main coding orchestrator."
+
+  - id: github
+    status: active
+    scope: user
+    client_surfaces:
+      - claude_code
+    transport: stdio
+    registration:
+      command: /home/flip/kyberm0nk/scripts/claude_mcp_github.sh
+      args: []
+    auth:
+      type: pat_wrapper
+      secret_file: /home/flip/.secrets/kyberm0nk_github_token
+      env_var: GITHUB_PERSONAL_ACCESS_TOKEN
+    tool_namespace_hint: mcp__github__
+    capabilities:
+      - github_repository_search
+      - issues_and_prs
+      - github_file_and_metadata_ops
+    ask_for_when:
+      - "The task needs GitHub repository, issue, pull request, or remote metadata operations."
+      - "The model needs repository context that is not available in the local checkout."
+    safety:
+      write_risk: medium
+      notes:
+        - "Remote writes are possible; review scope before using issue/PR mutation flows."
+
+  - id: playwright
+    status: active
+    scope: user
+    client_surfaces:
+      - claude_code
+    transport: stdio
+    registration:
+      command: npx
+      args:
+        - -y
+        - '@playwright/mcp@latest'
+        - --headless
+        - --browser
+        - chromium
+        - --isolated
+    tool_namespace_hint: mcp__playwright__
+    capabilities:
+      - browser_navigation
+      - dom_inspection
+      - ui_validation
+      - screenshot_capture
+    ask_for_when:
+      - "The task needs browser-based validation, web UI inspection, or end-to-end smoke testing."
+      - "The model must verify a frontend or web flow rather than only reading source."
+    safety:
+      write_risk: medium
+      notes:
+        - "Keep browser work scoped to validation flows; do not treat it as the top-level orchestrator."
+
+  - id: vibeue
+    status: active_when_unreal_running
+    scope: user
+    client_surfaces:
+      - claude_code
+    transport: stdio_bridge_to_http
+    registration:
+      command: /home/flip/kyberm0nk/scripts/claude_mcp_vibeue.sh
+      args: []
+    bridge:
+      remote_host: 192.168.1.245
+      remote_user: mark1
+      default_remote_port: 62351
+      default_local_port: 56701
+      remote_url_template: http://127.0.0.1:<remote_port>/mcp
+    tool_namespace_hint: mcp__vibeue__
+    capabilities:
+      - unreal_editor_introspection
+      - unreal_python_execution
+      - asset_and_blueprint_operations
+      - materials_landscape_statetree_unreal_workflows
+    ask_for_when:
+      - "The task targets a live Unreal Editor session or VibeUE-managed project workflows."
+      - "The model needs Unreal-side discovery or mutation that cannot be done safely from disk."
+    safety:
+      write_risk: high
+      notes:
+        - "Read-only use is allowed when project identity is unclear."
+        - "Write actions require the active Unreal project to match the intended project."
+        - "Never use VibeUE writes against the wrong live Unreal session."
+
+  - id: superset
+    status: candidate
+    scope: project_or_user
+    client_surfaces:
+      - superset_cli
+      - superset_mcp
+    transport: http_or_host_service_mcp
+    registration:
+      command: null
+      args: []
+    tool_namespace_hint: mcp__superset__
+    capabilities:
+      - workspace_management
+      - task_creation
+      - agent_session_launch
+      - multi_project_orchestration
+    ask_for_when:
+      - "The task needs top-level multi-project scheduling, worktree creation, or agent session orchestration."
+      - "Kyber needs a control plane above individual coding workers."
+    safety:
+      write_risk: medium
+      notes:
+        - "Best current candidate for the orchestration layer, but not yet the default registered user MCP in Claude Code."
+
+planned_servers:
+  - id: searxng
+    status: desired
+    purpose: local_search_and_research
+    notes:
+      - "Useful as a local-first web search MCP for research-heavy agent loops."
+      - "No Kyber MCP wrapper is registered yet."
+
+  - id: openhands_proxy
+    status: exploratory
+    purpose: programmable_worker_tools
+    notes:
+      - "OpenHands exposes MCP-related surfaces internally, but it is still being evaluated as a worker substrate rather than the canonical tool registry."
