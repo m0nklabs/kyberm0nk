@@ -13,6 +13,7 @@ from mcp.client.stdio import stdio_client
 
 TOOL_TEST_ARGS = {
     "run_kyber_crewai_dry_run": {"timeout_seconds": 1},
+    "start_kyber_crewai_live_run": {"kickoff_mode": "dry_run"},
     "get_kyber_crewai_live_log_preview": {"line_count": 5},
 }
 

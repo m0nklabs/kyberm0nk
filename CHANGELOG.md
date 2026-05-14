@@ -8,6 +8,12 @@
   - Updated the MCP registry and CrewAI main quest documentation to reflect that the `crewai` server is now read-mostly operational tooling, not only static rules.
   - Hardened the vendored FastMCP tester to use the MCP virtualenv interpreter and small tool-specific smoke arguments, and fixed dry-run timeout handling so the MCP returns structured timeout responses instead of crashing on partial subprocess output.
 
+- **CrewAI MCP live-run control:**
+  - Added `scripts/crewai_main_quest_control.py` as the shared control path for tracked CrewAI main-quest runs, with `run`, `start`, `status`, and `stop` modes plus persisted PID/state under `logs/crewai_state/`.
+  - Updated `scripts/crewai_main_quest_run.sh` to delegate to the control script and accept environment overrides instead of hardcoding a one-off Docker exec path.
+  - Extended the vendored CrewAI MCP with `start_kyber_crewai_live_run` and `stop_kyber_crewai_live_run`, and enriched `get_kyber_crewai_run_status` with control-script state so Claude can manage the tracked background run directly.
+  - Validated the control script with foreground and background dry-run execution, then validated the MCP live-run control path end-to-end in `dry_run` mode.
+
 - **MCP sync check + supervisor tick MVP:**
   - Added `scripts/check_mcp_registry_sync.py` to compare live Claude MCP registrations against `configs/mcp/servers.yaml`, normalize descriptive transport labels such as `stdio_bridge_to_http`, and optionally fail CI-style on drift.
   - Validated the sync checker against the current live Claude MCP set; it reports `crewai`, `github`, `playwright`, and `vibeue` in sync with no missing registrations or command/arg mismatches.

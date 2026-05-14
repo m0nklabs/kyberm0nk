@@ -76,9 +76,22 @@ The user-scoped Claude `crewai` MCP is no longer only a rulebook. The Kyber-vend
 - `inspect_kyber_crewai_project`
 - `run_kyber_crewai_dry_run`
 - `get_kyber_crewai_run_status`
+- `start_kyber_crewai_live_run`
+- `stop_kyber_crewai_live_run`
 - `get_kyber_crewai_live_log_preview`
 
-This is the intended first step: Claude can inspect the tracked CrewAI project, validate wiring through the existing dry-run script, and review current run/log state without going through the Studio UI manually. Live run control and true mid-run steering remain separate follow-up work.
+This is the current safe operational slice: Claude can inspect the tracked CrewAI project, validate wiring through the existing dry-run script, start or stop the tracked background run, and review current run/log state without going through the Studio UI manually. True mid-run steering remains separate follow-up work.
+
+## Run Control
+
+The tracked shell entry point [scripts/crewai_main_quest_run.sh](/home/flip/kyberm0nk/scripts/crewai_main_quest_run.sh) now delegates to [scripts/crewai_main_quest_control.py](/home/flip/kyberm0nk/scripts/crewai_main_quest_control.py), which provides:
+
+- `run` for foreground execution
+- `start` for detached background execution
+- `status` for persisted PID/state inspection
+- `stop` for controlled termination
+
+The MCP uses the same control script, so terminal usage and Claude usage share one control path instead of drifting into separate wrappers.
 
 ## Crew Shape
 

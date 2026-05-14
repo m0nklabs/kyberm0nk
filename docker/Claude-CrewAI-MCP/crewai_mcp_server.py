@@ -1,5 +1,6 @@
 import json
 import subprocess
+import sys
 from collections import deque
 from pathlib import Path
 from typing import Any
@@ -22,6 +23,7 @@ MAX_LOG_LINES = 200
 
 PROJECT_SCRIPTS = {
     "main_quest_project": {
+        "control": SCRIPTS_DIR / "crewai_main_quest_control.py",
         "dry_run": SCRIPTS_DIR / "crewai_main_quest_dry_run.sh",
         "live_run": SCRIPTS_DIR / "crewai_main_quest_run.sh",
     }
@@ -79,6 +81,66 @@ def resolve_project_dir(project_id: str) -> Path:
 def resolve_project_scripts(project_id: str) -> dict[str, Path]:
     """Return the script mapping for a tracked CrewAI project."""
     return PROJECT_SCRIPTS.get(project_id, {})
+
+
+def run_control_command(
+    project_id: str,
+    action: str,
+    timeout_seconds: int = 120,
+    output: str = "json",
+    extra_args: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run the CrewAI control script and parse its JSON output."""
+    scripts = resolve_project_scripts(project_id)
+    control_script = scripts.get("control")
+    if not control_script or not control_script.exists():
+        return {
+            "success": False,
+            "project_id": project_id,
+            "error": f"No control script is registered for project {project_id}.",
+        }
+
+    command = [sys.executable, str(control_script), action, "--project-id", project_id, "--output", output]
+    for key, value in (extra_args or {}).items():
+        option = f"--{key.replace('_', '-') }"
+        if isinstance(value, bool):
+            if value:
+                command.append(option)
+            continue
+        if value is None or value == "":
+            continue
+        command.extend([option, str(value)])
+
+    result = run_command(command, timeout_seconds=timeout_seconds)
+    combined_output = (result["stdout"] + "\n" + result["stderr"]).strip()[:OUTPUT_PREVIEW_CHARS]
+    if not result["success"]:
+        return {
+            "success": False,
+            "project_id": project_id,
+            "returncode": result["returncode"],
+            "timed_out": result["timed_out"],
+            "output_preview": combined_output,
+            "error": result["error"] or combined_output,
+        }
+
+    try:
+        payload = json.loads(result["stdout"])
+    except json.JSONDecodeError:
+        return {
+            "success": False,
+            "project_id": project_id,
+            "error": "Control script did not return JSON output.",
+            "output_preview": combined_output,
+        }
+
+    if not isinstance(payload, dict):
+        return {
+            "success": False,
+            "project_id": project_id,
+            "error": "Control script returned a non-object payload.",
+            "output_preview": combined_output,
+        }
+    return payload
 
 
 def load_runtime_settings() -> dict[str, str]:
@@ -147,6 +209,7 @@ def discover_projects() -> list[dict[str, Any]]:
                 "agent_count": len(agents_config.get("agents", {})),
                 "task_count": len(tasks_config.get("tasks", {})),
                 "tool_count": len(tools_config.get("tools", {})),
+                "has_control_script": bool(scripts.get("control") and scripts["control"].exists()),
                 "has_dry_run": bool(scripts.get("dry_run") and scripts["dry_run"].exists()),
                 "has_live_run_script": bool(scripts.get("live_run") and scripts["live_run"].exists()),
             }
@@ -426,6 +489,7 @@ def get_kyber_crewai_run_status(project_id: str = DEFAULT_PROJECT_ID) -> str:
 
     runtime = load_runtime_settings()
     container_status = get_container_status(runtime["crewai_studio_web_container"])
+    controller_status = run_control_command(project_id=project_id, action="status", timeout_seconds=60)
     log_exists = LIVE_LOG_PATH.exists()
     return json_response({
         "success": True,
@@ -441,8 +505,48 @@ def get_kyber_crewai_run_status(project_id: str = DEFAULT_PROJECT_ID) -> str:
             "size_bytes": LIVE_LOG_PATH.stat().st_size if log_exists else 0,
             "last_modified": LIVE_LOG_PATH.stat().st_mtime if log_exists else None,
         },
+        "controller": controller_status,
         "scripts": project_summary["script_paths"],
     })
+
+
+@mcp.tool(name="start_kyber_crewai_live_run",
+          description="Start a Kyber CrewAI run in the background through the tracked control script.")
+def start_kyber_crewai_live_run(
+    project_id: str = DEFAULT_PROJECT_ID,
+    kickoff_mode: str = "live",
+    operator_goal: str = "",
+    project_path: str = "",
+    current_state: str = "",
+    operator_chat_guidance: str = "",
+) -> str:
+    """Start a Kyber CrewAI background run."""
+    payload = run_control_command(
+        project_id=project_id,
+        action="start",
+        timeout_seconds=120,
+        extra_args={
+            "kickoff_mode": kickoff_mode,
+            "operator_goal": operator_goal,
+            "project_path": project_path,
+            "current_state": current_state,
+            "operator_chat_guidance": operator_chat_guidance,
+        },
+    )
+    return json_response(payload)
+
+
+@mcp.tool(name="stop_kyber_crewai_live_run",
+          description="Stop an active Kyber CrewAI background run through the tracked control script.")
+def stop_kyber_crewai_live_run(project_id: str = DEFAULT_PROJECT_ID, force: bool = False) -> str:
+    """Stop a Kyber CrewAI background run."""
+    payload = run_control_command(
+        project_id=project_id,
+        action="stop",
+        timeout_seconds=60,
+        extra_args={"force": force},
+    )
+    return json_response(payload)
 
 
 @mcp.tool(name="get_kyber_crewai_live_log_preview",
@@ -513,6 +617,16 @@ def list_server_tools() -> str:
             "name": "get_kyber_crewai_run_status",
             "description": "Inspect CrewAI Studio container state and live-run metadata for Kyber projects.",
             "purpose": "Shows whether the web container is up, whether a Kyber crew process appears active, and whether the live log exists."
+        },
+        {
+            "name": "start_kyber_crewai_live_run",
+            "description": "Start a Kyber CrewAI background run through the tracked control script.",
+            "purpose": "Starts a project-aware background run with optional operator inputs and returns the persisted controller state."
+        },
+        {
+            "name": "stop_kyber_crewai_live_run",
+            "description": "Stop an active Kyber CrewAI background run.",
+            "purpose": "Stops the tracked background run cleanly and reports the resulting controller state."
         },
         {
             "name": "get_kyber_crewai_live_log_preview",
