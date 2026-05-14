@@ -96,11 +96,11 @@
 - [x] Run an OpenHands Software Agent SDK smoke test against Guardian-compatible LLM settings.
 - [x] Decide whether OpenHands should complement or replace Agent Zero for future sandbox work.
 - [ ] Prototype a minimal Kyber OpenHands worker wrapper with pinned workspace, Guardian env, iteration limits, and transcript logging.
-- [ ] Add a minimal `supervisor_tick` script after the session/worktree layer is chosen.
+- [x] Add a minimal `supervisor_tick` script after the session/worktree layer is chosen.
 - [ ] Pilot the supervisor loop against the Agent Zero NewNexus context.
 - [ ] Add repeated-thought and repeated-command detection to the first supervisor tick.
 - [ ] Teach worker wrappers and prompts to consult the MCP registry before asking for tools.
-- [ ] Add a registry sync check that compares live Claude MCP registrations against `configs/mcp/servers.yaml`.
+- [x] Add a registry sync check that compares live Claude MCP registrations against `configs/mcp/servers.yaml`.
 - [ ] Fix or replace the Windows NewNexus sync path so validation builds can consume reviewed Linux checkout changes without interactive Git credential prompts.
 - [ ] Add cloud escalation gates for repeated failures, risky diffs, and pre-commit review.
 

@@ -2,6 +2,13 @@
 
 ## 2026-05-14
 
+- **MCP sync check + supervisor tick MVP:**
+  - Added `scripts/check_mcp_registry_sync.py` to compare live Claude MCP registrations against `configs/mcp/servers.yaml`, normalize descriptive transport labels such as `stdio_bridge_to_http`, and optionally fail CI-style on drift.
+  - Validated the sync checker against the current live Claude MCP set; it reports `crewai`, `github`, `playwright`, and `vibeue` in sync with no missing registrations or command/arg mismatches.
+  - Added `scripts/supervisor_tick.py` as the first bounded supervisor-loop artifact: it inspects one repo slice, accepts optional worker context and validation output, applies protected-path heuristics, calls Guardian for a strict JSON decision, and appends JSONL records under `logs/supervisor/`.
+  - Hardened the supervisor tick for host-side execution by normalizing `host.docker.internal` Guardian URLs back to `127.0.0.1` when the Docker hostname is unavailable outside containers.
+  - Validated the supervisor tick with a live Guardian critic call against the current `kyberm0nk` worktree; the script returned a `continue` decision sourced from Guardian and wrote the decision log entry locally.
+
 - **Always-on local coding stack + MCP registry:**
   - Added `docs/CODING_MONSTER_STACK.md` to capture the current recommendation for a multi-project, local-first coding stack: Superset as orchestration layer, OpenCode/Aider as default local workers, OpenHands as programmable worker substrate, Claude Code as premium escalation, CrewAI as planning layer, and LangGraph only if the supervisor loop outgrows a small custom tick.
   - Added `configs/mcp/servers.yaml` as the canonical machine-readable MCP server registry for KyberM0nk, covering active Claude MCP servers (`crewai`, `github`, `playwright`, `vibeue`), the Superset orchestration candidate, and planned MCP gaps such as local search.

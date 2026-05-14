@@ -24,6 +24,8 @@ Planned scripts:
 - `agent_zero_unstick.sh`: stop a repetitive Agent Zero UI run, reprovision tracked config, and start the UI with fresh runtime state.
 - `provision_windows_unreal_ssh.sh`: copy the dedicated Windows Unreal SSH config and key into the running Agent Zero sandbox without rebuilding or recreating it.
 - `test_windows_unreal_ssh.sh`: verify host and Agent Zero sandbox SSH access to the Windows Unreal executor.
+- `check_mcp_registry_sync.py`: compare live `claude mcp` registrations against `configs/mcp/servers.yaml` and fail on drift when requested.
+- `supervisor_tick.py`: inspect one repo plus worker slice, apply protected-path heuristics, ask Guardian for a bounded decision, and append a JSONL supervisor log entry.
 
 Scripts must be non-interactive by default and log with timestamps where practical.
 
