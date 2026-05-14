@@ -519,6 +519,8 @@ def start_kyber_crewai_live_run(
     project_path: str = "",
     current_state: str = "",
     operator_chat_guidance: str = "",
+    repo_write_mode: str = "",
+    github_target_branch: str = "",
 ) -> str:
     """Start a Kyber CrewAI background run."""
     payload = run_control_command(
@@ -531,6 +533,8 @@ def start_kyber_crewai_live_run(
             "project_path": project_path,
             "current_state": current_state,
             "operator_chat_guidance": operator_chat_guidance,
+            "repo_write_mode": repo_write_mode,
+            "github_target_branch": github_target_branch,
         },
     )
     return json_response(payload)
@@ -545,6 +549,8 @@ def restart_kyber_crewai_live_run(
     project_path: str = "",
     current_state: str = "",
     operator_chat_guidance: str = "",
+    repo_write_mode: str = "",
+    github_target_branch: str = "",
     force: bool = False,
 ) -> str:
     """Restart a Kyber CrewAI background run."""
@@ -558,6 +564,8 @@ def restart_kyber_crewai_live_run(
             "project_path": project_path,
             "current_state": current_state,
             "operator_chat_guidance": operator_chat_guidance,
+            "repo_write_mode": repo_write_mode,
+            "github_target_branch": github_target_branch,
             "force": force,
         },
     )
@@ -584,6 +592,8 @@ def update_kyber_crewai_operator_inputs(
     project_path: str = "",
     current_state: str = "",
     operator_chat_guidance: str = "",
+    repo_write_mode: str = "",
+    github_target_branch: str = "",
 ) -> str:
     """Update persisted operator inputs for a tracked Kyber CrewAI project."""
     payload = run_control_command(
@@ -595,6 +605,8 @@ def update_kyber_crewai_operator_inputs(
             "project_path": project_path,
             "current_state": current_state,
             "operator_chat_guidance": operator_chat_guidance,
+            "repo_write_mode": repo_write_mode,
+            "github_target_branch": github_target_branch,
         },
     )
     return json_response(payload)

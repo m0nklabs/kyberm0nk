@@ -5,15 +5,18 @@ tasks:
     context: []
     description: >
       Read the operator input for {operator_goal}, {project_path}, {current_state},
-      and {operator_chat_guidance}. Convert it into a short NewNexus Unreal
+      {operator_chat_guidance}, {repo_write_mode}, and {github_target_branch}.
+      Convert it into a short NewNexus Unreal
       playable-slice brief. If project_path is empty, assume the GitHub repo
       m0nklabs/NewNexus and the local workspace .agent-projects/NewNexus / Agent
       Zero path /a0/usr/projects/newnexus. Identify unclear requirements, but
-      continue with reasonable Unreal-specific assumptions when safe.
+      continue with reasonable Unreal-specific assumptions when safe. Treat
+      repo_write_mode=disabled as a hard non-destructive constraint.
     expected_output: >
       A compact Unreal/NewNexus playable-slice brief with objective, assumptions,
-      non-goals, likely repository files or systems, validation target, and open
-      steering questions. Explicitly name NewNexus and Unreal Engine.
+      non-goals, likely repository files or systems, validation target, write
+      policy, target branch, and open steering questions. Explicitly name
+      NewNexus and Unreal Engine.
 
   research_project_state:
     agent: local_game_researcher
@@ -39,11 +42,13 @@ tasks:
       - research_project_state
     description: >
       Create a small execution plan for the NewNexus Unreal slice. Prefer Guardian
-      workers for routine work. Define clear escalation gates: two failed local
+      workers for routine work. Respect repo_write_mode and github_target_branch
+      when proposing edits. Define clear escalation gates: two failed local
       attempts, risky Unreal architecture changes, or hard engine/build blockers.
     expected_output: >
       A numbered implementation plan with owner role per step, expected artifacts,
-      Unreal/NewNexus validation commands, and cloud-escalation triggers.
+      Unreal/NewNexus validation commands, write mode, target branch, and
+      cloud-escalation triggers.
 
   draft_implementation:
     agent: local_game_builder
@@ -52,12 +57,19 @@ tasks:
       - plan_and_delegate
     description: >
       Implement the next smallest NewNexus Unreal step. Do not invent unrelated systems or switch engines.
-      You MUST use the newnexus_github_push tool to actually commit and push the code changes to the repository!
+      If repo_write_mode is enabled, use the newnexus_github_push tool to commit
+      and push the code changes, defaulting to github_target_branch unless a
+      narrower branch is explicitly justified. If repo_write_mode is disabled,
+      do not fabricate a push; instead produce the exact patch plan and
+      verification commands needed for a reviewed follow-up.
       Include exact files to edit, expected behavior, Unreal-specific edge cases,
       and fallback if blocked.
     expected_output: >
-      Confirmation that the file(s) were successfully pushed, behavior added/fixed,
-      Unreal edge cases, and commands to verify the slice.
+      If repo_write_mode is enabled: confirmation that the file(s) were
+      successfully pushed, behavior added/fixed, Unreal edge cases, and commands
+      to verify the slice. If repo_write_mode is disabled: the exact patch plan,
+      affected files, expected behavior, Unreal edge cases, verification
+      commands, and an explicit note that repository writes were blocked.
 
   review_and_acceptance:
     agent: qa_playtest_reviewer
@@ -69,8 +81,9 @@ tasks:
     description: >
       Review the implementation package against the operator goal and steering
       guidance. Flag missing Unreal validation, likely gameplay regressions,
-      compile/reflection/config issues, UX issues, and any case where a stronger
-      model should be used before code is accepted.
+      compile/reflection/config issues, UX issues, ignored write-mode
+      constraints, and any case where a stronger model should be used before
+      code is accepted.
     expected_output: >
       A pass/fail review with severity-ordered findings, required fixes, and the
       final NewNexus acceptance checklist for the operator.

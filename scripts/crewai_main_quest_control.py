@@ -26,7 +26,16 @@ DEFAULT_PROJECT_PATH = "/workspace/project/.agent-projects/NewNexus"
 DEFAULT_OPERATOR_GOAL = "Create the first playable NewNexus Unreal slice."
 DEFAULT_CURRENT_STATE = "NewNexus is the Unreal Engine project in m0nklabs/NewNexus."
 DEFAULT_OPERATOR_CHAT_GUIDANCE = "Stay on Unreal Engine and NewNexus. Do not switch to Unity or generic 2D assumptions."
-INPUT_FIELDS = ("project_path", "operator_goal", "current_state", "operator_chat_guidance")
+DEFAULT_REPO_WRITE_MODE = "disabled"
+DEFAULT_GITHUB_TARGET_BRANCH = "main"
+INPUT_FIELDS = (
+    "project_path",
+    "operator_goal",
+    "current_state",
+    "operator_chat_guidance",
+    "repo_write_mode",
+    "github_target_branch",
+)
 STOP_WAIT_SECONDS = 8.0
 
 
@@ -80,6 +89,8 @@ def default_operator_inputs() -> dict[str, str]:
         "operator_goal": DEFAULT_OPERATOR_GOAL,
         "current_state": DEFAULT_CURRENT_STATE,
         "operator_chat_guidance": DEFAULT_OPERATOR_CHAT_GUIDANCE,
+        "repo_write_mode": DEFAULT_REPO_WRITE_MODE,
+        "github_target_branch": DEFAULT_GITHUB_TARGET_BRANCH,
     }
 
 
@@ -137,6 +148,8 @@ def build_crew_command(
     operator_goal: str,
     current_state: str,
     operator_chat_guidance: str,
+    repo_write_mode: str,
+    github_target_branch: str,
     kickoff_mode: str,
 ) -> list[str]:
     """Build the docker exec command for the CrewAI project."""
@@ -154,6 +167,10 @@ def build_crew_command(
         current_state,
         "--operator-chat-guidance",
         operator_chat_guidance,
+        "--repo-write-mode",
+        repo_write_mode,
+        "--github-target-branch",
+        github_target_branch,
     ]
     if kickoff_mode == "dry_run":
         command.append("--dry-run")
@@ -357,6 +374,8 @@ def parse_args() -> argparse.Namespace:
     kickoff.add_argument("--operator-goal", default="")
     kickoff.add_argument("--current-state", default="")
     kickoff.add_argument("--operator-chat-guidance", default="")
+    kickoff.add_argument("--repo-write-mode", choices=("disabled", "enabled"), default="")
+    kickoff.add_argument("--github-target-branch", default="")
 
     inputs = argparse.ArgumentParser(add_help=False)
     inputs.add_argument("--project-id", default=DEFAULT_PROJECT_ID)
@@ -365,6 +384,8 @@ def parse_args() -> argparse.Namespace:
     inputs.add_argument("--operator-goal", default="")
     inputs.add_argument("--current-state", default="")
     inputs.add_argument("--operator-chat-guidance", default="")
+    inputs.add_argument("--repo-write-mode", choices=("disabled", "enabled"), default="")
+    inputs.add_argument("--github-target-branch", default="")
 
     subparsers.add_parser("run", parents=[kickoff], help="Run the CrewAI project in the foreground.")
     subparsers.add_parser("start", parents=[kickoff], help="Start the CrewAI project in the background.")
@@ -404,6 +425,8 @@ def run_foreground(args: argparse.Namespace) -> int:
         operator_goal=operator_inputs["operator_goal"],
         current_state=operator_inputs["current_state"],
         operator_chat_guidance=operator_inputs["operator_chat_guidance"],
+        repo_write_mode=operator_inputs["repo_write_mode"],
+        github_target_branch=operator_inputs["github_target_branch"],
         kickoff_mode=args.kickoff_mode,
     )
 
@@ -435,6 +458,8 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
         operator_goal=operator_inputs["operator_goal"],
         current_state=operator_inputs["current_state"],
         operator_chat_guidance=operator_inputs["operator_chat_guidance"],
+        repo_write_mode=operator_inputs["repo_write_mode"],
+        github_target_branch=operator_inputs["github_target_branch"],
         kickoff_mode=args.kickoff_mode,
     )
 

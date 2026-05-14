@@ -12,6 +12,11 @@ In upstream form this server is mostly a CrewAI rulebook. In the KyberM0nk vendo
 - checking CrewAI-Studio/container status
 - previewing the live CrewAI log
 
+The Kyber extension also carries two safety improvements for live NewNexus runs:
+
+- persisted `repo_write_mode` and `github_target_branch` inputs, so a pilot can run in explicit no-write mode instead of pushing blindly to the default branch
+- path-aware GitHub file lookup for the main quest crew, so queries like `NewNexus.uproject` return the actual Unreal file instead of a documentation mention
+
 This keeps the first useful version safe enough while still being operational: Claude can inspect, validate, start, stop, steer between runs, and review the tracked CrewAI project wiring without needing full mid-run mutation tools yet.
 
 ## Installation

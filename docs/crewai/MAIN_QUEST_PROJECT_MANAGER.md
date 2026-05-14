@@ -102,6 +102,8 @@ The same control path now also exposes:
 - `set-inputs` for steering updates between runs
 - `restart` for applying updated guidance to a fresh background run
 
+The tracked inputs now also include `repo_write_mode` and `github_target_branch`. The current safe default is `repo_write_mode=disabled`, which lets the crew run a live research/plan/patched-output pilot without blindly committing back to `m0nklabs/NewNexus`.
+
 ## Crew Shape
 
 | Role | Provider | Model | Purpose |
@@ -117,6 +119,11 @@ The same control path now also exposes:
 
 The seeded crew includes an `operator_chat_guidance` placeholder. Use it as the steering channel for the current run: paste corrections, priorities, constraints, and course changes there before kickoff.
 
+For safe pilots, also set:
+
+- `repo_write_mode`: `disabled` for no-write runs, `enabled` only when an intentional push is allowed.
+- `github_target_branch`: the branch the GitHub push tool should target if writes are enabled.
+
 Current limitation: upstream CrewAI-Studio does not provide true mid-run chat injection into an active CrewAI execution. The usable current version is watchable and steerable between runs through the shared control path and MCP tools: update the persisted operator inputs, then restart the run. A dedicated live steering panel/tool is the next fork improvement.
 
 ## First Game Run Inputs
@@ -127,6 +134,8 @@ Use these placeholders in the kickoff screen:
 - `project_path`: the active NewNexus project path, for example `/workspace/project/.agent-projects/NewNexus` or `/a0/usr/projects/newnexus`.
 - `current_state`: a short summary of what already exists.
 - `operator_chat_guidance`: live direction from the operator, including what to avoid. Mention `Stay on Unreal/NewNexus` when the run must not drift into Unity, generic 2D, or another engine.
+- `repo_write_mode`: whether the current run may push to GitHub or must stay non-destructive.
+- `github_target_branch`: the intended GitHub branch when writes are enabled.
 
 ## Safety Rules
 
@@ -135,3 +144,8 @@ Use these placeholders in the kickoff screen:
 - Guardian and `llama-server` stay outside Docker.
 - Use Guardian for cheap routine work and OpenRouter only for management, review, or escalation.
 - Stop and rerun instead of letting an obviously wrong crew continue spending tokens.
+- Keep exploratory or first-pass live runs in `repo_write_mode=disabled` until the crew has proven that its repo context and validation commands are sound.
+
+## Pilot Observation
+
+A bounded live pilot on 2026-05-14 exposed that the original GitHub search path could return documentation mentions instead of exact Unreal files for queries such as `NewNexus.uproject`. The direct CrewAI tool now attempts an exact repository file fetch first for path/filename-style queries, which corrected the pilot immediately: the rerun retrieved the real `NewNexus.uproject` with `EngineAssociation: 5.7` and plugin/module preview instead of a docs hit.

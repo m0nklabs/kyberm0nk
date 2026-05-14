@@ -21,6 +21,8 @@ CONFIG_DIR = Path(__file__).resolve().parent
 REQUEST_TIMEOUT_SECONDS = 30
 ERROR_PREVIEW_CHARS = 1000
 FILE_PREVIEW_CHARS = 3000
+DEFAULT_REPO_WRITE_MODE = "disabled"
+DEFAULT_GITHUB_TARGET_BRANCH = "main"
 
 
 class GitHubRepoSearchInputSchema(BaseModel):
@@ -87,9 +89,40 @@ class GitHubRepoSearchTool(BaseTool):
         decoded = base64.b64decode(content).decode("utf-8", errors="replace")
         return decoded[:FILE_PREVIEW_CHARS]
 
+    def _looks_like_file_query(self, query: str) -> bool:
+        """Return whether a query looks like a specific repository file path/name."""
+        normalized = query.strip()
+        return bool(normalized and " " not in normalized and ("/" in normalized or "." in Path(normalized).name))
+
+    def _fetch_exact_file_match(self, file_path: str) -> Optional[dict[str, Any]]:
+        """Fetch one exact repository file match when the query is already a path."""
+        payload = self._get_json(f"/repos/{self.github_repo}/contents/{file_path}")
+        if payload.get("status_code") != 200 or payload.get("type") != "file":
+            return None
+        return {
+            "name": payload.get("name"),
+            "path": payload.get("path"),
+            "html_url": payload.get("html_url"),
+            "preview": self._fetch_file_preview(payload.get("url", "")),
+        }
+
     def _search_code(self, query: str, limit: int) -> dict[str, Any]:
         """Search repository code and include small file previews."""
-        payload = self._get_json("/search/code", {"q": f"{query} repo:{self.github_repo}", "per_page": limit})
+        normalized_query = query.strip()
+        if self._looks_like_file_query(normalized_query):
+            exact_match = self._fetch_exact_file_match(normalized_query)
+            if exact_match is not None:
+                return {
+                    "status_code": 200,
+                    "total_count": 1,
+                    "match_mode": "exact_path",
+                    "items": [exact_match],
+                }
+            search_query = f"filename:{Path(normalized_query).name} repo:{self.github_repo}"
+        else:
+            search_query = f"{normalized_query} repo:{self.github_repo}"
+
+        payload = self._get_json("/search/code", {"q": search_query, "per_page": limit})
         items = []
         for item in payload.get("items", [])[:limit]:
             items.append(
@@ -209,9 +242,17 @@ class GitHubRepoPushTool(BaseTool):
     github_repo: str
     gh_token: str = Field(exclude=True)
     api_base: str = "https://api.github.com"
+    allow_repo_writes: bool = False
+    default_branch: str = DEFAULT_GITHUB_TARGET_BRANCH
 
-    def __init__(self, github_repo: str, gh_token: str, **kwargs: Any) -> None:
-        super().__init__(github_repo=github_repo, gh_token=gh_token, **kwargs)
+    def __init__(self, github_repo: str, gh_token: str, allow_repo_writes: bool = False, default_branch: str = DEFAULT_GITHUB_TARGET_BRANCH, **kwargs: Any) -> None:
+        super().__init__(
+            github_repo=github_repo,
+            gh_token=gh_token,
+            allow_repo_writes=allow_repo_writes,
+            default_branch=default_branch,
+            **kwargs,
+        )
         self._generate_description()
 
     def _headers(self) -> dict[str, str]:
@@ -221,9 +262,16 @@ class GitHubRepoPushTool(BaseTool):
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
-    def _run(self, file_path: str, content: str, commit_message: str, branch: str = "main") -> str:
+    def _run(self, file_path: str, content: str, commit_message: str, branch: str = "") -> str:
+        resolved_branch = (branch or self.default_branch or DEFAULT_GITHUB_TARGET_BRANCH).strip() or DEFAULT_GITHUB_TARGET_BRANCH
+        if not self.allow_repo_writes:
+            return (
+                "Blocked: repository writes are disabled for this CrewAI run. "
+                f"Prepare an exact patch plan instead of pushing. Requested target: {file_path} on branch {resolved_branch}."
+            )
+
         file_url = f"{self.api_base}/repos/{self.github_repo}/contents/{file_path}"
-        get_response = requests.get(f"{file_url}?ref={branch}", headers=self._headers(), timeout=REQUEST_TIMEOUT_SECONDS)
+        get_response = requests.get(f"{file_url}?ref={resolved_branch}", headers=self._headers(), timeout=REQUEST_TIMEOUT_SECONDS)
         
         sha = None
         if get_response.status_code == 200:
@@ -232,7 +280,7 @@ class GitHubRepoPushTool(BaseTool):
         data = {
             "message": commit_message,
             "content": base64.b64encode(content.encode("utf-8")).decode("utf-8"),
-            "branch": branch
+            "branch": resolved_branch
         }
         if sha:
             data["sha"] = sha
@@ -240,9 +288,20 @@ class GitHubRepoPushTool(BaseTool):
         put_response = requests.put(file_url, headers=self._headers(), json=data, timeout=REQUEST_TIMEOUT_SECONDS)
         
         if put_response.status_code in [200, 201]:
-            return f"Success! File '{file_path}' committed and pushed to {branch}."
+            return f"Success! File '{file_path}' committed and pushed to {resolved_branch}."
         else:
             return f"Failed to commit file. Code: {put_response.status_code}, Resp: {put_response.text}"
+
+
+def repo_writes_enabled() -> bool:
+    """Return whether GitHub write actions are enabled for the current run."""
+    value = os.getenv("KYBER_CREWAI_REPO_WRITE_MODE", DEFAULT_REPO_WRITE_MODE).strip().lower()
+    return value in {"1", "true", "yes", "enabled"}
+
+
+def target_branch() -> str:
+    """Return the default GitHub branch for the current run."""
+    return os.getenv("KYBER_CREWAI_GITHUB_TARGET_BRANCH", DEFAULT_GITHUB_TARGET_BRANCH).strip() or DEFAULT_GITHUB_TARGET_BRANCH
 
 def load_yaml(path: Path) -> dict[str, Any]:
     """Load a YAML file as a dictionary."""
@@ -290,6 +349,8 @@ def create_tool(tool_name: str, tools_config: dict[str, Any]) -> Any:
         return GitHubRepoPushTool(
             github_repo=config["github_repo"],
             gh_token=gh_token,
+            allow_repo_writes=repo_writes_enabled(),
+            default_branch=target_branch(),
         )
     elif config["type"] == "windows_ssh_command":
         return WindowsSSHCommandTool()
@@ -409,7 +470,12 @@ def main() -> int:
     parser.add_argument("--project-path", default="/workspace/project/.agent-projects/NewNexus")
     parser.add_argument("--current-state", default="NewNexus is the Unreal Engine project in m0nklabs/NewNexus.")
     parser.add_argument("--operator-chat-guidance", default="Stay on Unreal Engine and NewNexus. Do not switch to Unity or generic 2D assumptions.")
+    parser.add_argument("--repo-write-mode", choices=("disabled", "enabled"), default=DEFAULT_REPO_WRITE_MODE)
+    parser.add_argument("--github-target-branch", default=DEFAULT_GITHUB_TARGET_BRANCH)
     args = parser.parse_args()
+
+    os.environ["KYBER_CREWAI_REPO_WRITE_MODE"] = args.repo_write_mode
+    os.environ["KYBER_CREWAI_GITHUB_TARGET_BRANCH"] = args.github_target_branch
 
     crew = build_crew()
     if args.dry_run:
@@ -422,6 +488,8 @@ def main() -> int:
             "project_path": args.project_path,
             "current_state": args.current_state,
             "operator_chat_guidance": args.operator_chat_guidance,
+            "repo_write_mode": args.repo_write_mode,
+            "github_target_branch": args.github_target_branch,
         }
     )
     print(result)

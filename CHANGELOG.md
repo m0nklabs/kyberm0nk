@@ -20,6 +20,12 @@
   - Hardened the vendored FastMCP tester to skip disruptive mutation tools during the generic smoke test while still validating the safe read and status surface.
   - Validated the new steering path end-to-end: MCP guidance update, dry-run restart, status readback, restoration to the default guidance, and clean stop all completed successfully.
 
+- **CrewAI safe live-pilot guardrails:**
+  - Extended `scripts/crewai_main_quest_control.py` and `configs/crewai/main_quest_project/crew.py` with persisted `repo_write_mode` and `github_target_branch` inputs so live pilots can run in explicit no-write mode instead of blindly pushing to `m0nklabs/NewNexus`.
+  - Updated the main quest task graph so `draft_implementation` produces an exact patch plan and validation checklist when repository writes are disabled, instead of pretending a push happened.
+  - Extended the vendored CrewAI MCP start/restart/input-update tools to carry the same write-mode and target-branch inputs through the shared control path.
+  - Fixed the direct GitHub search tool for path-style queries by attempting an exact repository file fetch before generic code search; a bounded live rerun confirmed that `filename:.uproject` now resolves to the real `NewNexus.uproject` with the expected UE 5.7 metadata instead of a documentation mention.
+
 - **MCP sync check + supervisor tick MVP:**
   - Added `scripts/check_mcp_registry_sync.py` to compare live Claude MCP registrations against `configs/mcp/servers.yaml`, normalize descriptive transport labels such as `stdio_bridge_to_http`, and optionally fail CI-style on drift.
   - Validated the sync checker against the current live Claude MCP set; it reports `crewai`, `github`, `playwright`, and `vibeue` in sync with no missing registrations or command/arg mismatches.
