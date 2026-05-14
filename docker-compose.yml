@@ -35,7 +35,7 @@ services:
       - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY:-}
       - WINDOWS_UNREAL_SSH_ALIAS=${WINDOWS_UNREAL_SSH_ALIAS:-unreal-windows}
       - WINDOWS_UNREAL_SSH_HOST=${WINDOWS_UNREAL_SSH_HOST:-192.168.1.245}
-      - WINDOWS_UNREAL_SSH_USER=${WINDOWS_UNREAL_SSH_USER:-onyou}
+      - WINDOWS_UNREAL_SSH_USER=${WINDOWS_UNREAL_SSH_USER:-ue_agent}
       # Agent Zero: route the generic "other" OpenAI-compatible provider to Guardian
       - OTHER_API_KEY=${GUARDIAN_API_KEY}
       # Agent Zero internal overrides (Knowledge base skip)

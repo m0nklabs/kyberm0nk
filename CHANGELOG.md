@@ -2,6 +2,11 @@
 
 ## 2026-05-14
 
+- **Windows Unreal SSH identity alignment:**
+  - Updated Kyber's Windows Unreal SSH defaults and sandbox SSH config to use the `ue_agent` account instead of stale `mark1`/`onyou` assumptions for headless access.
+  - Updated `scripts/claude_mcp_vibeue.sh` so Claude/VibeUE tunnel setup now defaults to `ue_agent@192.168.1.245`.
+  - Updated the Windows Unreal executor and headless pipeline docs to explicitly distinguish the SSH user (`ue_agent`) from the desktop/Epic Launcher user (`onyou`).
+
 - **CrewAI MCP read-mostly v1:**
   - Extended `docker/Claude-CrewAI-MCP/crewai_mcp_server.py` from a guidance-only rulebook into a Kyber project-aware MCP surface.
   - Added project inspection, dry-run execution, CrewAI-Studio container status, and live-log preview tools so Claude can interrogate `configs/crewai/main_quest_project/` and the existing run scripts directly.

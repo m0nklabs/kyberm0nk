@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-remote_user="${VIBEUE_WINDOWS_USER:-mark1}"
+remote_user="${VIBEUE_WINDOWS_USER:-ue_agent}"
 remote_host="${VIBEUE_WINDOWS_HOST:-192.168.1.245}"
 remote_port="${VIBEUE_REMOTE_PORT:-62351}"
 local_port="${VIBEUE_LOCAL_PORT:-56701}"

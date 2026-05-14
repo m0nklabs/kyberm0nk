@@ -9,7 +9,7 @@ KyberM0nk can hand Unreal build and runtime work to the Windows workstation over
 | Host alias from Linux host | `unreal-windows` |
 | Host alias inside sandbox | `unreal-windows` |
 | Hostname | `192.168.1.245` |
-| SSH user | `mark1` |
+| SSH user | `ue_agent` |
 | Desktop / Epic Launcher user | `onyou` |
 | Verified host response | `14700K` |
 
@@ -59,7 +59,7 @@ UnrealBuildTool: C:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\
 .NET runtime: Microsoft.NETCore.App 8.0.26 installed in C:\Program Files\dotnet
 ```
 
-The SSH user and GUI user are not the same. SSH commands run under `mark1`, while Epic Launcher and Unreal Editor GUI state live under `onyou`. When fixing project discovery or startup browser settings, patch the `onyou` profile:
+The SSH user and GUI user are not the same. Headless SSH commands run under `ue_agent`, while Epic Launcher and Unreal Editor GUI state live under `onyou`. When fixing project discovery or startup browser settings, patch the `onyou` profile:
 
 ```text
 C:\Users\onyou\AppData\Local\UnrealEngine\5.7\Saved\Config\WindowsEditor\EditorSettings.ini
@@ -94,7 +94,7 @@ Use the Windows Unreal executor over SSH.
 Connection:
 - Generate direct Windows commands yourself and run them through `ssh unreal-windows "<command>"`.
 - Use PowerShell explicitly when Windows path handling or Unreal tooling needs it.
-- The target is Windows host 14700K as user onyou.
+- The target is Windows host 14700K over SSH as user ue_agent.
 - Do not use teams-host; use unreal-windows only.
 
 First verify access:

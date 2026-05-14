@@ -9,12 +9,14 @@ This section documents the recovery path for the NewNexus project on the Windows
 | Field | Value |
 |-------|-------|
 | Windows host | `192.168.1.245` |
-| SSH user | `mark1` |
+| SSH user | `ue_agent` |
 | Desktop / Epic Launcher user | `onyou` |
 | Engine root | `C:\UNREAL_ENGINE\UE_5.7` |
 | Project root | `J:\UnrealProjects\NewNexus` |
 | Project file | `J:\UnrealProjects\NewNexus\NewNexus.uproject` |
 | UnrealBuildTool | `C:\UNREAL_ENGINE\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe` |
+
+Headless SSH and CI/CD commands for this workstation run under `ue_agent`. Keep GUI-facing launcher/project-browser fixes anchored to `onyou`, but assume remote PowerShell, UnrealBuildTool, and headless editor runs execute as `ue_agent`.
 
 ### Symptom: VS2022 reports missing `v143` and `Win64`
 
