@@ -11,6 +11,8 @@ Use the MARK1 operating model as the default instruction layer for Claude Code s
 - Treat project configs such as NerveSplat's `llm.model: gemma4-e4b` as application runtime only. They do not describe or override Claude Code's own runtime model.
 - Do not rewrite a sibling app's model setting just to match Claude Code. A project may intentionally use a lighter or different model for its own runtime behavior.
 - If asked what model Claude Code is currently using, prefer the active launcher arguments or the current per-session JSONL under `~/.claude/projects/` over historical counters in `~/.claude.json`.
+- If Claude is about to start a CrewAI run that will use local Guardian workers, Claude must let the current local Guardian/GPU work finish first. Do not kick off Guardian-backed CrewAI workers while Guardian is still busy with local coding requests.
+- If a CrewAI run will use OpenRouter providers, Claude must say that cloud credits will be spent. If the control script reports low or critical remaining credits, Claude should tell the operator to top up before leaning on cloud escalation.
 
 ## NerveSplat Note
 - NerveSplat can stay on a lighter conversational model such as `gemma4-e4b` for its in-app dialogue loop while Claude Code keeps a stronger coding model for repo work.

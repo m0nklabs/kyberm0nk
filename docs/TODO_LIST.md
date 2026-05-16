@@ -119,3 +119,4 @@
 - [x] Add a safe live-pilot mode for the main quest crew with explicit repo-write guardrails and better exact-file repository lookup.
 - [ ] Add a true live steering panel or tool so operator chat can be injected into an active run instead of only between reruns.
 - [ ] Pilot the main quest crew against a disposable game project slice.
+- [x] Serialize Guardian-backed CrewAI kickoff behind Guardian idle status and surface OpenRouter credit warnings before cloud-backed live runs.

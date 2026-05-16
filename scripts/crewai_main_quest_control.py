@@ -10,9 +10,14 @@ import signal
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -28,6 +33,10 @@ DEFAULT_CURRENT_STATE = "NewNexus is the Unreal Engine project in m0nklabs/NewNe
 DEFAULT_OPERATOR_CHAT_GUIDANCE = "Stay on Unreal Engine and NewNexus. Do not switch to Unity or generic 2D assumptions."
 DEFAULT_REPO_WRITE_MODE = "disabled"
 DEFAULT_GITHUB_TARGET_BRANCH = "main"
+DEFAULT_GUARDIAN_IDLE_WAIT_SECONDS = 900.0
+DEFAULT_GUARDIAN_IDLE_POLL_SECONDS = 2.0
+DEFAULT_OPENROUTER_LOW_CREDIT_THRESHOLD_USD = 15.0
+DEFAULT_OPENROUTER_CRITICAL_CREDIT_THRESHOLD_USD = 5.0
 INPUT_FIELDS = (
     "project_path",
     "operator_goal",
@@ -52,6 +61,317 @@ def load_env_file(path: Path) -> dict[str, str]:
         key, value = line.split("=", 1)
         values[key.strip()] = value.strip().strip('"').strip("'")
     return values
+
+
+def load_controller_env() -> dict[str, str]:
+    """Load host and CrewAI-Studio environment values used by the controller."""
+    combined = load_env_file(REPO_ROOT / ".agent-projects" / "CrewAI-Studio" / ".env")
+    combined.update(load_env_file(REPO_ROOT / ".env"))
+    return combined
+
+
+def load_yaml_file(path: Path) -> dict[str, Any]:
+    """Load a YAML file into a mapping, returning an empty mapping on blank files."""
+    if not path.exists():
+        raise FileNotFoundError(f"Missing YAML config: {path}")
+    with path.open("r", encoding="utf-8") as handle:
+        payload = yaml.safe_load(handle) or {}
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected YAML mapping in {path}")
+    return payload
+
+
+def read_secret_value(path: str) -> str:
+    """Read a secret string from a file path."""
+    return Path(path).read_text(encoding="utf-8").strip()
+
+
+def resolve_runtime_secret(root_env: dict[str, str], env_name: str, file_env_name: str | None = None) -> str:
+    """Resolve a secret from process env, repo env, or an optional file pointer."""
+    direct_value = os.environ.get(env_name) or root_env.get(env_name, "")
+    if direct_value:
+        return direct_value
+    if not file_env_name:
+        return ""
+    file_path = os.environ.get(file_env_name) or root_env.get(file_env_name, "")
+    if not file_path:
+        return ""
+    secret_path = Path(file_path).expanduser()
+    if not secret_path.exists():
+        return ""
+    return read_secret_value(str(secret_path))
+
+
+def normalize_local_api_base(api_base: str) -> str:
+    """Normalize Docker-style local hostnames for host-side scripts."""
+    return api_base.replace("host.docker.internal", "127.0.0.1")
+
+
+def inspect_project_llm_usage(project_id: str) -> dict[str, Any]:
+    """Summarize the providers and models required by a CrewAI project."""
+    project_root = project_dir(project_id)
+    crew_config = load_yaml_file(project_root / "crew.yaml")
+    agent_config = load_yaml_file(project_root / "agents.yaml")
+
+    llm_entries: list[dict[str, str]] = []
+
+    def add_entry(role: str, provider: str | None, model: str | None) -> None:
+        if not provider or not model:
+            return
+        llm_entries.append({
+            "role": role,
+            "provider": provider.strip().lower(),
+            "model": model.strip(),
+        })
+
+    crew_block = crew_config.get("crew", {})
+    manager = crew_block.get("manager_llm", {})
+    planning = crew_block.get("planning_llm", {})
+    if isinstance(manager, dict):
+        add_entry("manager", manager.get("provider"), manager.get("model"))
+    if isinstance(planning, dict):
+        add_entry("planning", planning.get("provider"), planning.get("model"))
+
+    for agent_name, agent_settings in (agent_config.get("agents", {}) or {}).items():
+        if isinstance(agent_settings, dict):
+            add_entry(agent_name, agent_settings.get("provider"), agent_settings.get("model"))
+
+    provider_counts = Counter(entry["provider"] for entry in llm_entries)
+    provider_models: dict[str, list[str]] = {}
+    for entry in llm_entries:
+        provider_models.setdefault(entry["provider"], []).append(entry["model"])
+
+    for provider_name, models in provider_models.items():
+        provider_models[provider_name] = sorted(set(models))
+
+    return {
+        "providers": sorted(provider_counts.keys()),
+        "provider_counts": dict(sorted(provider_counts.items())),
+        "provider_models": provider_models,
+        "uses_guardian": "guardian" in provider_counts,
+        "uses_openrouter": "openrouter" in provider_counts,
+        "entries": llm_entries,
+        "provider_settings": crew_config.get("providers", {}) or {},
+    }
+
+
+def guardian_status_url(api_base: str) -> str:
+    """Convert an OpenAI-compatible Guardian base URL into the status endpoint."""
+    normalized = normalize_local_api_base(api_base).rstrip("/")
+    if normalized.endswith("/v1"):
+        return f"{normalized[:-3]}/api/status"
+    return f"{normalized}/api/status"
+
+
+def fetch_json(url: str, headers: dict[str, str] | None = None, timeout_seconds: float = 15.0) -> tuple[int, dict[str, Any]]:
+    """Fetch JSON from an HTTP endpoint and return status plus payload."""
+    request = urllib.request.Request(url, headers=headers or {})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            status_code = getattr(response, "status", 200)
+            payload = json.loads(response.read().decode("utf-8"))
+            return status_code, payload if isinstance(payload, dict) else {"data": payload}
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        try:
+            payload = json.loads(body)
+        except json.JSONDecodeError:
+            payload = {"error": body}
+        return exc.code, payload if isinstance(payload, dict) else {"error": body}
+
+
+def fetch_guardian_runtime_status(llm_usage: dict[str, Any]) -> dict[str, Any]:
+    """Fetch Guardian runtime status for Guardian-backed CrewAI runs."""
+    provider_settings = llm_usage.get("provider_settings", {}).get("guardian", {}) or {}
+    controller_env = load_controller_env()
+    api_base_env = provider_settings.get("api_base_env", "GUARDIAN_API_BASE")
+    api_base = os.environ.get(api_base_env) or controller_env.get(api_base_env) or provider_settings.get("default_api_base", "")
+    if not api_base:
+        return {"success": False, "status": "unavailable", "message": "Guardian API base is not configured."}
+
+    api_key_env = provider_settings.get("api_key_env", "GUARDIAN_API_KEY")
+    api_key = resolve_runtime_secret(controller_env, api_key_env)
+    headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+    status_url = guardian_status_url(api_base)
+    status_code, payload = fetch_json(status_url, headers=headers)
+    if status_code != 200:
+        return {
+            "success": False,
+            "status": "unavailable",
+            "status_code": status_code,
+            "status_url": status_url,
+            "message": payload.get("detail") or payload.get("error") or "Failed to query Guardian status.",
+        }
+
+    queue = payload.get("queue", {}) or {}
+    switch = payload.get("switch", {}) or {}
+    startup = payload.get("startup", {}) or {}
+    busy_reasons: list[str] = []
+    if int(queue.get("active_count", 0) or 0) > 0:
+        busy_reasons.append(f"active_requests={queue.get('active_count', 0)}")
+    if int(queue.get("queue_length", 0) or 0) > 0:
+        busy_reasons.append(f"queued_requests={queue.get('queue_length', 0)}")
+    if bool(switch.get("active")):
+        busy_reasons.append(f"switch={switch.get('phase') or switch.get('state')}")
+    startup_state = str(startup.get("state") or "")
+    if startup_state in {"pending", "checking", "switching", "running"}:
+        busy_reasons.append(f"startup={startup_state}")
+
+    return {
+        "success": True,
+        "status": "busy" if busy_reasons else "idle",
+        "status_url": status_url,
+        "busy_reasons": busy_reasons,
+        "current_model": payload.get("current_model"),
+        "queue": queue,
+        "switch": switch,
+        "startup": startup,
+    }
+
+
+def wait_for_guardian_idle(project_id: str, llm_usage: dict[str, Any], kickoff_mode: str) -> dict[str, Any]:
+    """Wait until Guardian is idle before starting Guardian-backed live CrewAI runs."""
+    if kickoff_mode != "live" or not llm_usage.get("uses_guardian"):
+        return {
+            "required": False,
+            "status": "skipped",
+            "message": "Guardian idle wait not required for this kickoff.",
+        }
+
+    timeout_seconds = float(os.environ.get("KYBER_CREWAI_GUARDIAN_IDLE_WAIT_SECONDS", DEFAULT_GUARDIAN_IDLE_WAIT_SECONDS))
+    poll_seconds = float(os.environ.get("KYBER_CREWAI_GUARDIAN_IDLE_POLL_SECONDS", DEFAULT_GUARDIAN_IDLE_POLL_SECONDS))
+    deadline = time.monotonic() + timeout_seconds
+    first_busy_logged = False
+
+    while True:
+        status = fetch_guardian_runtime_status(llm_usage)
+        if not status.get("success"):
+            raise RuntimeError(
+                f"Cannot verify Guardian availability before starting {project_id}: {status.get('message', 'unknown error')}"
+            )
+        if status.get("status") == "idle":
+            waited_seconds = max(0.0, timeout_seconds - max(0.0, deadline - time.monotonic()))
+            return {
+                "required": True,
+                "status": "ready",
+                "waited_seconds": round(waited_seconds, 2),
+                "current_model": status.get("current_model"),
+                "busy_reasons": [],
+                "status_url": status.get("status_url"),
+                "message": "Guardian is idle; Guardian-backed CrewAI workers may start.",
+            }
+
+        if not first_busy_logged:
+            log(
+                "Guardian-backed CrewAI workers share the same local GPU route. "
+                f"Waiting for Guardian to go idle before starting {project_id}: {', '.join(status.get('busy_reasons', []))}"
+            )
+            first_busy_logged = True
+
+        if time.monotonic() >= deadline:
+            raise RuntimeError(
+                "Timed out waiting for Guardian to go idle before starting Guardian-backed CrewAI workers. "
+                f"Still busy: {', '.join(status.get('busy_reasons', []))}"
+            )
+        time.sleep(poll_seconds)
+
+
+def check_openrouter_credits(llm_usage: dict[str, Any], kickoff_mode: str) -> dict[str, Any]:
+    """Check OpenRouter credit balance when a live run will spend cloud credits."""
+    if kickoff_mode != "live" or not llm_usage.get("uses_openrouter"):
+        return {
+            "required": False,
+            "status": "skipped",
+            "message": "OpenRouter credit check not required for this kickoff.",
+        }
+
+    provider_settings = llm_usage.get("provider_settings", {}).get("openrouter", {}) or {}
+    controller_env = load_controller_env()
+    api_base_env = provider_settings.get("api_base_env", "OPENROUTER_API_BASE")
+    api_key_env = provider_settings.get("api_key_env", "OPENROUTER_API_KEY")
+    api_base = os.environ.get(api_base_env) or controller_env.get(api_base_env) or provider_settings.get("default_api_base", "https://openrouter.ai/api/v1")
+    api_key = resolve_runtime_secret(controller_env, api_key_env, "OPENROUTER_API_KEY_FILE")
+    if not api_key:
+        return {
+            "required": True,
+            "status": "unavailable",
+            "message": "OpenRouter-backed agents are configured, but no OpenRouter API key is available for a credit check.",
+        }
+
+    credits_url = f"{api_base.rstrip('/')}/credits"
+    status_code, payload = fetch_json(
+        credits_url,
+        headers={"Authorization": f"Bearer {api_key}"},
+    )
+    if status_code != 200:
+        message = payload.get("error", {}).get("message") if isinstance(payload.get("error"), dict) else payload.get("error")
+        if not message:
+            message = payload.get("message") or payload.get("detail") or "OpenRouter credit check unavailable."
+        return {
+            "required": True,
+            "status": "unavailable",
+            "status_code": status_code,
+            "credits_url": credits_url,
+            "message": (
+                f"OpenRouter-backed agents will spend cloud credits, but the balance check is unavailable: {message}. "
+                "Use a management key for automatic remaining-credit warnings."
+            ),
+        }
+
+    data = payload.get("data", {}) or {}
+    total_credits = float(data.get("total_credits", 0.0) or 0.0)
+    total_usage = float(data.get("total_usage", 0.0) or 0.0)
+    remaining_credits = total_credits - total_usage
+    low_threshold = float(os.environ.get("OPENROUTER_LOW_CREDIT_THRESHOLD_USD", DEFAULT_OPENROUTER_LOW_CREDIT_THRESHOLD_USD))
+    critical_threshold = float(os.environ.get("OPENROUTER_CRITICAL_CREDIT_THRESHOLD_USD", DEFAULT_OPENROUTER_CRITICAL_CREDIT_THRESHOLD_USD))
+
+    if remaining_credits <= critical_threshold:
+        status = "critical"
+        message = (
+            f"OpenRouter-backed agents will spend cloud credits and only about ${remaining_credits:.2f} remains. "
+            "Top up credits now before starting another live run."
+        )
+    elif remaining_credits <= low_threshold:
+        status = "low"
+        message = (
+            f"OpenRouter-backed agents will spend cloud credits and only about ${remaining_credits:.2f} remains. "
+            "Plan a top-up soon."
+        )
+    else:
+        status = "ok"
+        message = f"OpenRouter credit balance looks healthy at about ${remaining_credits:.2f} remaining."
+
+    return {
+        "required": True,
+        "status": status,
+        "credits_url": credits_url,
+        "total_credits": round(total_credits, 4),
+        "total_usage": round(total_usage, 4),
+        "remaining_credits": round(remaining_credits, 4),
+        "low_threshold": low_threshold,
+        "critical_threshold": critical_threshold,
+        "message": message,
+    }
+
+
+def evaluate_kickoff_policies(project_id: str, kickoff_mode: str) -> dict[str, Any]:
+    """Evaluate local-GPU and cloud-credit policies before a run starts."""
+    llm_usage = inspect_project_llm_usage(project_id)
+    guardian_local_policy = wait_for_guardian_idle(project_id, llm_usage, kickoff_mode)
+    openrouter_credit_policy = check_openrouter_credits(llm_usage, kickoff_mode)
+    if openrouter_credit_policy.get("required"):
+        log(openrouter_credit_policy.get("message", "OpenRouter credit status checked."))
+    return {
+        "llm_usage": {
+            "providers": llm_usage.get("providers", []),
+            "provider_counts": llm_usage.get("provider_counts", {}),
+            "provider_models": llm_usage.get("provider_models", {}),
+            "uses_guardian": llm_usage.get("uses_guardian", False),
+            "uses_openrouter": llm_usage.get("uses_openrouter", False),
+        },
+        "guardian_local_policy": guardian_local_policy,
+        "openrouter_credit_policy": openrouter_credit_policy,
+    }
 
 
 def log(message: str) -> None:
@@ -261,6 +581,15 @@ def is_pid_active(pid: int | None, command_signature: str) -> bool:
 
 def build_status_payload(project_id: str) -> dict[str, Any]:
     """Build the current controller status for a project."""
+    llm_usage = inspect_project_llm_usage(project_id)
+    default_guardian_policy = {
+        "status": "unknown",
+        "message": "No persisted Guardian kickoff policy is available for this run yet.",
+    }
+    default_openrouter_policy = {
+        "status": "unknown",
+        "message": "No persisted OpenRouter credit policy is available for this run yet.",
+    }
     state = load_state(project_id)
     if not state:
         return {
@@ -268,6 +597,15 @@ def build_status_payload(project_id: str) -> dict[str, Any]:
             "project_id": project_id,
             "active": False,
             "status": "idle",
+            "llm_usage": {
+                "providers": llm_usage.get("providers", []),
+                "provider_counts": llm_usage.get("provider_counts", {}),
+                "provider_models": llm_usage.get("provider_models", {}),
+                "uses_guardian": llm_usage.get("uses_guardian", False),
+                "uses_openrouter": llm_usage.get("uses_openrouter", False),
+            },
+            "guardian_local_policy": default_guardian_policy,
+            "openrouter_credit_policy": default_openrouter_policy,
             "operator_inputs": default_operator_inputs(),
             "state_path": str(state_path(project_id)),
         }
@@ -285,6 +623,15 @@ def build_status_payload(project_id: str) -> dict[str, Any]:
         "project_id": project_id,
         "active": active,
         "status": state.get("status", "unknown"),
+        "llm_usage": {
+            "providers": llm_usage.get("providers", []),
+            "provider_counts": llm_usage.get("provider_counts", {}),
+            "provider_models": llm_usage.get("provider_models", {}),
+            "uses_guardian": llm_usage.get("uses_guardian", False),
+            "uses_openrouter": llm_usage.get("uses_openrouter", False),
+        },
+        "guardian_local_policy": state.get("guardian_local_policy", default_guardian_policy),
+        "openrouter_credit_policy": state.get("openrouter_credit_policy", default_openrouter_policy),
         "operator_inputs": resolve_operator_inputs(project_id),
         "state_path": str(state_path(project_id)),
         **state,
@@ -413,6 +760,7 @@ def emit(payload: dict[str, Any], output_mode: str) -> int:
 
 def run_foreground(args: argparse.Namespace) -> int:
     """Run the CrewAI project in the foreground with inherited stdio."""
+    guardrails = evaluate_kickoff_policies(args.project_id, args.kickoff_mode)
     runtime = load_runtime_settings()
     container_name = runtime["crewai_studio_web_container"]
     ensure_container_running(container_name)
@@ -431,6 +779,7 @@ def run_foreground(args: argparse.Namespace) -> int:
     )
 
     log(f"Starting CrewAI foreground run for {args.project_id} in {args.kickoff_mode} mode")
+    log(f"Kickoff policy summary: {json.dumps(guardrails, sort_keys=True)}")
     result = subprocess.run(command, check=False)
     return result.returncode
 
@@ -446,6 +795,7 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
             **current,
         }
 
+    guardrails = evaluate_kickoff_policies(args.project_id, args.kickoff_mode)
     runtime = load_runtime_settings()
     container_name = runtime["crewai_studio_web_container"]
     ensure_container_running(container_name)
@@ -466,6 +816,7 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
     with LIVE_LOG_PATH.open("a", encoding="utf-8") as log_handle:
         log_handle.write(f"[{datetime.now(timezone.utc).isoformat()}] Starting background CrewAI run for {args.project_id} ({args.kickoff_mode})\n")
+        log_handle.write(f"[{datetime.now(timezone.utc).isoformat()}] Kickoff policy summary: {json.dumps(guardrails, sort_keys=True)}\n")
 
     log_stream = LIVE_LOG_PATH.open("a", encoding="utf-8")
     process = subprocess.Popen(
@@ -488,6 +839,7 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
         "container_name": container_name,
         "container_project_target": target,
         "command_signature": target,
+        **guardrails,
     }
     save_state(args.project_id, payload)
     return {

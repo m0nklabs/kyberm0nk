@@ -77,6 +77,8 @@ scripts/crewai_studio_seed_main_quest.sh
 
 Open `http://127.0.0.1:8505`, import `.agent-projects/CrewAI-Studio/kyber-imports/main_quest_studio_import.json`, then run the `Kyber Main Quest Game Project Manager` crew.
 
+The shared `scripts/crewai_main_quest_control.py` path now enforces two kickoff guardrails for live runs: Guardian-backed workers wait for Guardian to go idle before they start competing for the same local GPU route, and OpenRouter-backed runs emit a credit warning before cloud spend begins. The balance check uses `GET /credits` when the configured key is a management key; otherwise Kyber still warns that cloud spend will happen, but cannot show remaining credits automatically.
+
 See [docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md](docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md).
 
 ## Repository Status

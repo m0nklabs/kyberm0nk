@@ -16,6 +16,12 @@ Runtime safety knobs in `crew.py`:
 - `--repo-write-mode disabled|enabled`: controls whether `newnexus_github_push` may actually write to GitHub during the run.
 - `--github-target-branch <name>`: sets the default GitHub branch for push attempts when writes are enabled.
 
+Runtime kickoff guardrails in `scripts/crewai_main_quest_control.py`:
+
+- Live runs that use Guardian workers wait for Guardian `/api/status` to go idle before kickoff, so the same local GPU route is not contended by an already-active local coding session.
+- Live runs that use OpenRouter providers emit a cloud-spend warning before kickoff and attempt a `/credits` balance check when the configured OpenRouter key is a management key.
+- The control-script status payload persists the last kickoff policy summary under `guardian_local_policy`, `openrouter_credit_policy`, and `llm_usage` so Claude/MCP tooling can explain why a run waited or why cloud spend needs attention.
+
 The GitHub search tool is path-aware for file-style queries. Exact queries such as `NewNexus.uproject` or `Source/NewNexus/NewNexus.Build.cs` attempt a direct repository file fetch before falling back to GitHub code search, which keeps live Unreal context gathering anchored to real files instead of docs mentions.
 
 Dry-run inside the CrewAI-Studio container:

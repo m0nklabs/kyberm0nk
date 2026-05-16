@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-05-16
+
+- **CrewAI local-GPU serialization + cloud-credit warnings:**
+  - Extended `scripts/crewai_main_quest_control.py` to inspect each CrewAI project's LLM providers before kickoff, wait for Guardian `/api/status` to go idle before starting Guardian-backed live runs, and persist the resulting `guardian_local_policy` in run state.
+  - Added best-effort OpenRouter credit warnings to the same control path: live runs now announce cloud spend up front and query `GET /credits` when the configured key is a management key, falling back to an explicit "cloud spend without balance visibility" warning when only a normal key is available.
+  - Enriched the control-script status payload with `llm_usage`, `guardian_local_policy`, and `openrouter_credit_policy` so Claude/MCP tools can explain why a run is waiting or when OpenRouter credits need topping up.
+  - Updated `CLAUDE.md`, the root README, and the direct main-quest README so Claude is explicitly told to finish local Guardian GPU work before starting Guardian-backed CrewAI workers and to warn the operator when OpenRouter cloud spend is about to happen.
+
 ## 2026-05-15
 
 - **Claude VibeUE bridge recovery:**
