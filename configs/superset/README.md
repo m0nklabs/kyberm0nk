@@ -37,7 +37,7 @@ That adds or updates:
 | --- | --- | --- |
 | `kyber-opencode` | `/workspace/project/scripts/superset-opencode-agent.sh` | stdin |
 | `kyber-aider` | `/workspace/project/scripts/superset-aider-agent.sh` | stdin |
-| `kyber-claude-code` | `claude --permission-mode acceptEdits` | argv, only when Claude Code is installed unless forced |
+| `kyber-claude-code` | `claude --permission-mode bypassPermissions` | argv, only when Claude Code is installed unless forced |
 
 The OpenCode and Aider wrappers run from the mounted Kyber workspace and route model calls through Guardian.
 

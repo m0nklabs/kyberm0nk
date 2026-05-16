@@ -74,7 +74,7 @@ def agent_configs(include_claude_code: bool) -> list[AgentConfig]:
                 preset_id="kyber-claude-code",
                 label="Claude Code (Premium)",
                 command="claude",
-                args=["--permission-mode", "acceptEdits"],
+                args=["--permission-mode", "bypassPermissions"],
                 prompt_transport="argv",
                 prompt_args=[],
                 env={},

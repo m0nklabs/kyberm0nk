@@ -262,6 +262,67 @@ class GitHubRepoPushTool(BaseTool):
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
+    def _get_repo_default_branch(self) -> str:
+        """Return the repository default branch from the GitHub API."""
+        response = requests.get(
+            f"{self.api_base}/repos/{self.github_repo}",
+            headers=self._headers(),
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+        if response.status_code >= 400:
+            raise RuntimeError(
+                f"Failed to fetch repository metadata for {self.github_repo}: {response.status_code} {response.text[:ERROR_PREVIEW_CHARS]}"
+            )
+        payload = response.json()
+        default_branch = str(payload.get("default_branch", "")).strip()
+        return default_branch or DEFAULT_GITHUB_TARGET_BRANCH
+
+    def _get_branch_head_sha(self, branch: str) -> Optional[str]:
+        """Return the HEAD SHA for a branch, or None if it does not exist."""
+        response = requests.get(
+            f"{self.api_base}/repos/{self.github_repo}/git/ref/heads/{branch}",
+            headers=self._headers(),
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+        if response.status_code == 404:
+            return None
+        if response.status_code >= 400:
+            raise RuntimeError(
+                f"Failed to inspect branch {branch}: {response.status_code} {response.text[:ERROR_PREVIEW_CHARS]}"
+            )
+        payload = response.json()
+        return str(payload.get("object", {}).get("sha", "")).strip() or None
+
+    def _ensure_branch_exists(self, branch: str) -> tuple[str, bool]:
+        """Ensure the target branch exists, creating it from the repo default branch when missing."""
+        existing_sha = self._get_branch_head_sha(branch)
+        if existing_sha:
+            return branch, False
+
+        base_branch = self._get_repo_default_branch()
+        base_sha = self._get_branch_head_sha(base_branch)
+        if not base_sha:
+            raise RuntimeError(f"Could not resolve base SHA for default branch {base_branch}.")
+
+        response = requests.post(
+            f"{self.api_base}/repos/{self.github_repo}/git/refs",
+            headers=self._headers(),
+            json={"ref": f"refs/heads/{branch}", "sha": base_sha},
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+        if response.status_code not in {201, 422}:
+            raise RuntimeError(
+                f"Failed to create branch {branch} from {base_branch}: {response.status_code} {response.text[:ERROR_PREVIEW_CHARS]}"
+            )
+        if response.status_code == 422:
+            existing_sha = self._get_branch_head_sha(branch)
+            if existing_sha:
+                return branch, False
+            raise RuntimeError(
+                f"GitHub refused to create branch {branch}: {response.text[:ERROR_PREVIEW_CHARS]}"
+            )
+        return branch, True
+
     def _run(self, file_path: str, content: str, commit_message: str, branch: str = "") -> str:
         resolved_branch = (branch or self.default_branch or DEFAULT_GITHUB_TARGET_BRANCH).strip() or DEFAULT_GITHUB_TARGET_BRANCH
         if not self.allow_repo_writes:
@@ -269,6 +330,11 @@ class GitHubRepoPushTool(BaseTool):
                 "Blocked: repository writes are disabled for this CrewAI run. "
                 f"Prepare an exact patch plan instead of pushing. Requested target: {file_path} on branch {resolved_branch}."
             )
+
+        try:
+            resolved_branch, branch_created = self._ensure_branch_exists(resolved_branch)
+        except RuntimeError as exc:
+            return f"Failed to prepare target branch {resolved_branch}: {exc}"
 
         file_url = f"{self.api_base}/repos/{self.github_repo}/contents/{file_path}"
         get_response = requests.get(f"{file_url}?ref={resolved_branch}", headers=self._headers(), timeout=REQUEST_TIMEOUT_SECONDS)
@@ -288,7 +354,8 @@ class GitHubRepoPushTool(BaseTool):
         put_response = requests.put(file_url, headers=self._headers(), json=data, timeout=REQUEST_TIMEOUT_SECONDS)
         
         if put_response.status_code in [200, 201]:
-            return f"Success! File '{file_path}' committed and pushed to {resolved_branch}."
+            branch_note = " (branch bootstrapped)" if branch_created else ""
+            return f"Success! File '{file_path}' committed and pushed to {resolved_branch}{branch_note}."
         else:
             return f"Failed to commit file. Code: {put_response.status_code}, Resp: {put_response.text}"
 

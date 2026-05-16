@@ -120,9 +120,13 @@ servers:
       args: []
     bridge:
       remote_host: 192.168.1.245
-      remote_user: mark1
-      default_remote_port: 62351
+      remote_user: ue_agent
+      default_remote_port: 56701
       default_local_port: 56701
+      fallback_remote_ports:
+        - 56700
+        - 62352
+        - 62351
       remote_url_template: http://127.0.0.1:<remote_port>/mcp
     tool_namespace_hint: mcp__vibeue__
     capabilities:

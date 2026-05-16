@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-05-15
+
+- **Claude VibeUE bridge recovery:**
+  - Reworked `scripts/claude_mcp_vibeue.sh` to probe the known Windows-side VibeUE MCP ports (`56701`, `56700`, `62352`, `62351`) and tunnel the first healthy endpoint instead of hardcoding the dead `62351` default.
+  - Updated the MCP registry entry to the real Windows SSH user `ue_agent` and documented the fallback VibeUE ports so the registry matches the current multi-project Unreal setup.
+
+- **Claude runtime/app-model separation:**
+  - Updated the local `claude-local` launcher to default Claude Code to Guardian alias `qwen3-35b-uncensored`, while still allowing an explicit `--model` flag or `CLAUDE_MODEL` environment override.
+  - Added a Kyber `CLAUDE.md` instruction layer and README/TODO notes clarifying that sibling app configs such as NerveSplat's `gemma4-e4b` are application-runtime settings, not Claude Code runtime settings.
+
+- **Claude multi-project access defaults:**
+  - Expanded the local `claude` and `claude-local` launchers to add all active sibling project roots (`github-copilot-config`, `kyberm0nk`, `llama_cpp_guardian`, `monifuse`, `NewNexus`, and `nervesplat`) instead of only one extra directory.
+  - Added `CLAUDE_EXTRA_DIRS` support so extra project roots can be injected as a colon-separated list without editing the wrapper again.
+
+- **Claude auto-proceed defaults:**
+  - Updated the local `claude-local` launcher to default to `--permission-mode bypassPermissions`, while still allowing an explicit permission override when one is passed on the command line.
+  - Updated the Kyber Superset Claude preset seed from `acceptEdits` to `bypassPermissions` so Claude sessions launched through that cockpit path stop asking to proceed on each action.
+
 ## 2026-05-14
 
 - **Windows Unreal SSH identity alignment:**

@@ -87,6 +87,7 @@
 - [x] Document the supervisor-loop plan and framework shortlist.
 - [x] Add a canonical MCP server registry under `configs/mcp/servers.yaml` for capability-based tool selection.
 - [ ] Run a contained Claude Code / Claude Agent SDK smoke test as the premium quality baseline.
+- [x] Separate Claude Code's local default model pinning from sibling app runtime model configs so repo-specific Gemma settings do not bleed into Claude runtime assumptions.
 - [x] Check host prerequisites for Claude Squad and Superset evaluation.
 - [x] Evaluate Claude Squad as the fastest tmux/worktree TUI spike for local agents.
 - [x] Evaluate Superset as the richer multi-agent worktree cockpit.
