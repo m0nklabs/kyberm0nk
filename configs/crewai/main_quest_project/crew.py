@@ -388,14 +388,28 @@ def load_configs(config_dir: Path = CONFIG_DIR) -> tuple[dict[str, Any], dict[st
     return crew_config, agents_config, tasks_config, tools_config
 
 
-def create_llm(provider_name: str, model: str, temperature: float, providers: dict[str, Any]) -> LLM:
+def create_llm(
+    provider_name: str,
+    model: str,
+    temperature: float,
+    providers: dict[str, Any],
+    llm_kwargs: Optional[dict[str, Any]] = None,
+) -> LLM:
     """Create a CrewAI LLM from provider policy."""
     provider = providers[provider_name]
     api_key = os.getenv(provider["api_key_env"], provider.get("default_api_key", ""))
     api_base = os.getenv(provider["api_base_env"], provider["default_api_base"])
     if not api_key:
         raise ValueError(f"Missing required API key env var: {provider['api_key_env']}")
-    return LLM(model=model, temperature=temperature, api_key=api_key, base_url=api_base)
+    llm_config: dict[str, Any] = {
+        "model": model,
+        "temperature": temperature,
+        "api_key": api_key,
+        "base_url": api_base,
+    }
+    if llm_kwargs:
+        llm_config.update(llm_kwargs)
+    return LLM(**llm_config)
 
 
 def create_tool(tool_name: str, tools_config: dict[str, Any]) -> Any:
@@ -444,6 +458,7 @@ def build_agents(agents_config: dict[str, Any], providers: dict[str, Any], tools
                 model=config["model"],
                 temperature=config.get("temperature", 0.1),
                 providers=providers,
+                llm_kwargs=config.get("llm_kwargs"),
             ),
         )
     return agents
@@ -497,6 +512,7 @@ def build_crew(config_dir: Path = CONFIG_DIR) -> Crew:
             model=manager["model"],
             temperature=manager.get("temperature", 0.15),
             providers=providers,
+            llm_kwargs=manager.get("llm_kwargs"),
         )
         try:
             from crewai.utilities.i18n import I18N
@@ -524,6 +540,7 @@ def build_crew(config_dir: Path = CONFIG_DIR) -> Crew:
             model=planning["model"],
             temperature=planning.get("temperature", 0.2),
             providers=providers,
+            llm_kwargs=planning.get("llm_kwargs"),
         )
 
     return Crew(**crew_args)

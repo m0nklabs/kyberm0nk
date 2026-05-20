@@ -1,5 +1,5 @@
 version: 1
-updated_at: 2026-05-14
+updated_at: 2026-05-19
 owner: kyberm0nk
 purpose: >-
   Canonical MCP server registry for KyberM0nk. Agents should request tools by
@@ -114,6 +114,7 @@ servers:
     scope: user
     client_surfaces:
       - claude_code
+      - github_copilot
     transport: stdio_bridge_to_http
     registration:
       command: /home/flip/kyberm0nk/scripts/claude_mcp_vibeue.sh

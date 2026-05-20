@@ -6,9 +6,9 @@
   "memory": false,
   "cache": true,
   "planning": true,
-  "planning_llm": "OpenRouter: deepseek/deepseek-v4-flash",
+  "planning_llm": "OpenRouter: z-ai/glm-4.7-flash",
   "max_rpm": 30,
-  "manager_llm": "OpenRouter: deepseek/deepseek-v4-pro",
+  "manager_llm": "OpenRouter: deepseek/deepseek-v4-flash",
   "manager_agent": null,
   "created_at": "2026-05-10T00:00:00",
   "agents": [

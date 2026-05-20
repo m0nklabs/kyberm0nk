@@ -1,6 +1,8 @@
 import asyncio
-import re
+import json
 import os
+import re
+import shlex
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, StreamingResponse
 import uvicorn
@@ -82,6 +84,25 @@ HTML_PAGE = """
     <script>
         let eventSource = null;
 
+        function appendLine(text, options = {}) {
+            const term = document.getElementById('terminal');
+            const line = document.createElement('div');
+            if (options.className) {
+                line.className = options.className;
+            }
+
+            if (options.timestamp) {
+                const stamp = document.createElement('span');
+                stamp.className = 'text-gray';
+                stamp.textContent = `[${options.timestamp}] `;
+                line.appendChild(stamp);
+            }
+
+            line.appendChild(document.createTextNode(text));
+            term.appendChild(line);
+            term.scrollTop = term.scrollHeight;
+        }
+
         function startRun() {
             const btn = document.getElementById('startBtn');
             const term = document.getElementById('terminal');
@@ -89,31 +110,37 @@ HTML_PAGE = """
             
             btn.disabled = true;
             btn.innerText = "Ingehaakt...";
-            badge.innerText = "Live";
-            badge.className = "badge active";
-            term.innerHTML += "<span class='text-blue'>[System] Hooking into live session file (/logs/crewai_live.log)...</span>\\n\\n";
+            badge.innerText = "Connecting";
+            badge.className = "badge";
+            term.textContent = "";
+            appendLine("[System] Hooking into live session file (/logs/crewai_live.log). Showing new lines only.", { className: 'text-blue' });
             
             if (eventSource) {
                 eventSource.close();
             }
             
             eventSource = new EventSource('/stream');
+
+            eventSource.onopen = function() {
+                badge.innerText = "Live";
+                badge.className = "badge active";
+            };
             
             eventSource.onmessage = function(event) {
-                let text = event.data;
-                if (text.includes("[INFO]")) {
-                    text = "<span class='text-blue'>" + text + "</span>";
-                } else if (text.includes("Agent:") || text.includes("Task:")) {
-                    text = "<span class='text-yellow'>" + text + "</span>";
+                const payload = JSON.parse(event.data);
+                let className = '';
+                if (payload.text.includes("[INFO]")) {
+                    className = 'text-blue';
+                } else if (payload.text.includes("Agent:") || payload.text.includes("Task:")) {
+                    className = 'text-yellow';
                 }
-                
-                term.innerHTML += text + "\\n";
-                // Force autoscroll to bottom
-                term.scrollTop = term.scrollHeight;
+
+                appendLine(payload.text, { timestamp: payload.time, className });
             };
             
             eventSource.onerror = function() {
-                // Connection might just reset, don't show error immediately unless it stays broken
+                badge.innerText = "Reconnecting";
+                badge.className = "badge";
             };
         }
     </script>
@@ -130,9 +157,9 @@ async def tail_stream():
     if not os.path.exists(LOG_FILE):
         open(LOG_FILE, 'w').close()
 
-    # Gebruik tail -f om simpel in te haken op het bestand (startend met laatste 100 regels geschiedenis)
+    # Attach to new live lines only and survive log rotation or truncation.
     process = await asyncio.create_subprocess_shell(
-        f"tail -n 150 -f {LOG_FILE}",
+        f"tail -n 0 -F {shlex.quote(LOG_FILE)}",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT
     )
@@ -150,11 +177,9 @@ async def tail_stream():
             # Add timestamp
             import datetime
             now = datetime.datetime.now().strftime('%H:%M:%S')
-            clean_text = f"<span class='text-gray'>[{now}]</span> {clean_text}"
-            
-            # Format for SSE safely
-            clean_text = clean_text.replace('\\', '\\\\').replace('"', '\\"')
-            yield f"data: {clean_text}\n\n"
+
+            payload = json.dumps({"time": now, "text": clean_text})
+            yield f"data: {payload}\n\n"
     finally:
         process.terminate()
 

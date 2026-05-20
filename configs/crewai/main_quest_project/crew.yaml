@@ -8,11 +8,11 @@ crew:
   max_rpm: 30
   manager_llm:
     provider: openrouter
-    model: deepseek/deepseek-v4-pro
+    model: deepseek/deepseek-v4-flash
     temperature: 0.15
   planning_llm:
     provider: openrouter
-    model: deepseek/deepseek-v4-flash
+    model: z-ai/glm-4.7-flash
     temperature: 0.2
 
 providers:

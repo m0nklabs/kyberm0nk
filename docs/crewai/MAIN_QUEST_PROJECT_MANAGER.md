@@ -106,14 +106,29 @@ The tracked inputs now also include `repo_write_mode` and `github_target_branch`
 
 ## Crew Shape
 
+The table below describes the seeded fallback crew, not a hard lock. Claude may assemble or revise a different team through the CrewAI MCP when needed, but OpenRouter picks must stay inside the MoniFuse top20 value pool in `configs/crewai/model_policy.yaml` unless the operator explicitly overrides policy. If Claude chooses `openai/gpt-5.4`, it should request `reasoning.effort=xhigh` through OpenRouter rather than using GPT-5.4 as a plain no-reasoning pass.
+
 | Role | Provider | Model | Purpose |
 |------|----------|-------|---------|
-| Main Quest Project Manager | OpenRouter | `deepseek/deepseek-v4-pro` | Breaks the game goal into milestones, delegates, and gates escalation. |
-| Planner | OpenRouter | `deepseek/deepseek-v4-flash` | Cheap planning and run summaries. |
+| Main Quest Project Manager | OpenRouter | `deepseek/deepseek-v4-flash` | Breaks the game goal into milestones, delegates, and gates escalation. |
+| Planner | OpenRouter | `z-ai/glm-4.7-flash` | Cheap planning and run summaries. |
 | Local Game Researcher | Guardian | `gemma4-26b-agent` | Local context gathering and summarization. |
 | Local Game Builder | Guardian | `qwen3-35b-reasoning-agent` | Routine implementation planning and patch drafting. |
-| QA Playtest Reviewer | OpenRouter | `google/gemini-3.1-pro-preview-customtools` | Final review, regression risk, and acceptance checks. |
-| Expert Escalation Engineer | OpenRouter | `moonshotai/kimi-k2.6` | Narrow blocker escalation after local failure. |
+| QA Playtest Reviewer | OpenRouter | `z-ai/glm-5.1` | Final review, regression risk, and acceptance checks. |
+| Expert Escalation Engineer | OpenRouter | `deepseek/deepseek-v4-pro` | Narrow blocker escalation after local failure. |
+
+Allowed cloud pool for Claude-built crews via CrewAI MCP:
+
+- `deepseek/deepseek-v4-flash`
+- `deepseek/deepseek-v4-pro`
+- `z-ai/glm-4.7-flash`
+- `moonshotai/kimi-k2.5`
+- `moonshotai/kimi-k2.6`
+- `google/gemini-3-flash-preview`
+- `deepseek/deepseek-v3.2-speciale`
+- `z-ai/glm-5.1`
+- `google/gemini-3.1-pro-preview-customtools`
+- `openai/gpt-5.2`
 
 ## Operator Steering
 

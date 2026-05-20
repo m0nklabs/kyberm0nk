@@ -88,6 +88,8 @@
 - [x] Add a canonical MCP server registry under `configs/mcp/servers.yaml` for capability-based tool selection.
 - [ ] Run a contained Claude Code / Claude Agent SDK smoke test as the premium quality baseline.
 - [x] Separate Claude Code's local default model pinning from sibling app runtime model configs so repo-specific Gemma settings do not bleed into Claude runtime assumptions.
+- [x] Add project-scoped Claude context guardrails: compact-preservation instructions, a live statusline warning at roughly 100k tokens, and hooks that block large whole-file reads or `@file` inlines.
+- [x] Make the Claude statusline prefer Guardian-advertised context for local `claude-local` sessions instead of Claude Code's rounded `200k` provider default.
 - [x] Check host prerequisites for Claude Squad and Superset evaluation.
 - [x] Evaluate Claude Squad as the fastest tmux/worktree TUI spike for local agents.
 - [x] Evaluate Superset as the richer multi-agent worktree cockpit.
@@ -120,3 +122,7 @@
 - [ ] Add a true live steering panel or tool so operator chat can be injected into an active run instead of only between reruns.
 - [ ] Pilot the main quest crew against a disposable game project slice.
 - [x] Serialize Guardian-backed CrewAI kickoff behind Guardian idle status and surface OpenRouter credit warnings before cloud-backed live runs.
+- [x] Switch the main quest's default OpenRouter route to MoniFuse top20 value-ranked models instead of premium-priced defaults.
+- [x] Allow Claude to assemble or revise a CrewAI team through the CrewAI MCP while constraining all OpenRouter picks to the MoniFuse top20 value pool.
+- [x] Add direct CrewAI YAML passthrough for provider-specific LLM request options so OpenRouter GPT-5.4 can be requested with `reasoning.effort=xhigh`.
+- [x] Harden the CrewAI live watcher so raw log content is escaped safely and the page hooks into new live lines without replaying stale historical errors.

@@ -1,6 +1,46 @@
 # Changelog
 
+## 2026-05-19
+
+- **VibeUE GitHub Copilot bridge:**
+  - Validated the live Windows VibeUE MCP endpoint through a Linux-side SSH forward published on `http://192.168.1.35:56701/mcp`, with the same tunnel still reachable locally at `http://127.0.0.1:56701/mcp`.
+  - Updated the Kyber MCP registry so the tracked `vibeue` bridge is no longer treated as Claude-only; GitHub Copilot is now an explicit supported client surface for the same Unreal-side tunnel pattern.
+
+## 2026-05-18
+
+- **Claude auto-compact threshold correction:**
+  - Lowered the `claude-local` launcher default to a true `compact@120k` target by setting `CLAUDE_CODE_AUTO_COMPACT_WINDOW=120000` and `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=100`.
+  - Kept Guardian's runtime context at `131072`; the fix stays on the Claude side so a normal turn still has headroom before the provider limit is hit.
+
+## 2026-05-17
+
+- **Claude-side auto-compact tuning:**
+  - Switched the local `claude-local` launcher to use documented Claude Code environment variables for compaction behavior on the Guardian-backed Qwen route instead of lowering Guardian's own runtime context.
+  - Set launcher defaults for `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`, and `CLAUDE_CODE_MAX_OUTPUT_TOKENS`, and intentionally left `CLAUDE_CODE_MAX_CONTEXT_TOKENS` unset because the docs say it only takes effect when compaction is disabled.
+  - Updated both global and project Claude status lines to display the real Claude-side `compact@...` threshold derived from those environment variables instead of the earlier fixed `warn@100k` heuristic.
+
+- **Claude launcher default correction:**
+  - Reverted the short-lived lower-context Claude-specific Guardian alias experiment and restored `~/.local/bin/claude-local` to the normal `qwen3-35b-uncensored` default.
+  - Kept Claude-side guardrails such as statusline and hooks, but stopped using a reduced Guardian runtime window as a fake early-compaction mechanism.
+
 ## 2026-05-16
+
+- **Claude context guardrails:**
+  - Added a project-scoped `.claude/settings.json` so Kyber Claude sessions now load a custom status line showing live context pressure, remaining tokens, and a `warn@100k` threshold instead of waiting to discover an overfull context after the fact.
+  - Updated the custom status line to prefer Guardian's advertised context window for local `claude-local` sessions when Claude Code reports a rounded `200k` provider default, so local Qwen runs show the real usable window instead of an inflated budget.
+  - Added `.claude/hooks/guard_large_read.py` and `.claude/hooks/block_large_mentions.py` plus shared sizing helpers so oversized whole-file `Read` calls and large local `@file` inlines are blocked before they can waste context; the deny reason tells Claude to switch to Grep or Glob plus roughly 200-line slices.
+  - Extended `CLAUDE.md` with explicit context-discipline and compact-preservation rules so compaction keeps the current goal, validation state, blockers, and live operational facts instead of collapsing them into vague summaries.
+
+- **CrewAI live watcher hardening:**
+  - Reworked `scripts/crewai_web_watcher.py` so the browser renders streamed log lines through DOM text nodes instead of raw `innerHTML`; raw log content such as `</think>` and C++ template syntax like `CreateDefaultSubobject<...>` no longer breaks the page.
+  - Switched the watcher from `tail -n 150 -f` to `tail -n 0 -F` so the screen attaches to new live lines only and does not front-load stale historical errors every time it opens.
+
+- **CrewAI MoniFuse top20 value routing:**
+  - Replaced the main quest's default premium OpenRouter picks with MoniFuse value-ranked models: `deepseek/deepseek-v4-flash` for manager orchestration, `z-ai/glm-4.7-flash` for planning, `z-ai/glm-5.1` for QA review, and `deepseek/deepseek-v4-pro` only for narrow escalation.
+  - Expanded the allowed OpenRouter pool from the MoniFuse top10 to a curated MoniFuse top20 route set so Claude can reach additional high-value models such as `openai/gpt-5.4`, `anthropic/claude-sonnet-4.6`, and `moonshotai/kimi-k2-thinking` without leaving the value guardrails.
+  - Updated `CLAUDE.md`, `configs/crewai/model_policy.yaml`, and the main quest docs so Claude is explicitly told to stay inside the MoniFuse top20 value set for CrewAI cloud roles unless the operator asks for a premium override.
+  - Added runtime `llm_kwargs` passthrough support to `configs/crewai/main_quest_project/crew.py` so direct CrewAI YAML runs can forward provider-specific OpenRouter request options such as `extra_body.reasoning.effort`.
+  - Documented `openai/gpt-5.4` as an OpenRouter reasoning route that should be requested with `reasoning.effort=xhigh` when Claude picks it for a hard blocker.
 
 - **CrewAI local-GPU serialization + cloud-credit warnings:**
   - Extended `scripts/crewai_main_quest_control.py` to inspect each CrewAI project's LLM providers before kickoff, wait for Guardian `/api/status` to go idle before starting Guardian-backed live runs, and persist the resulting `guardian_local_policy` in run state.

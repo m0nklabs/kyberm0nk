@@ -22,6 +22,13 @@ Runtime kickoff guardrails in `scripts/crewai_main_quest_control.py`:
 - Live runs that use OpenRouter providers emit a cloud-spend warning before kickoff and attempt a `/credits` balance check when the configured OpenRouter key is a management key.
 - The control-script status payload persists the last kickoff policy summary under `guardian_local_policy`, `openrouter_credit_policy`, and `llm_usage` so Claude/MCP tooling can explain why a run waited or why cloud spend needs attention.
 
+OpenRouter default model policy for this project:
+
+- Keep routine cloud orchestration inside the MoniFuse top20 value list instead of defaulting to premium-priced OpenRouter models outside that pool.
+- Current defaults are fallback seeds, not hard pins: `deepseek/deepseek-v4-flash` for the manager, `z-ai/glm-4.7-flash` for planning, `z-ai/glm-5.1` for QA review, and `deepseek/deepseek-v4-pro` for narrow escalations.
+- Claude may use the CrewAI MCP to assemble or reconfigure a team and pick a different OpenRouter model when it is a better fit for the task, as long as that model stays inside the MoniFuse top20 value pool documented in `configs/crewai/model_policy.yaml`.
+- When that selected model is `openai/gpt-5.4`, the expected OpenRouter request profile is `extra_body.reasoning.effort=xhigh` with reasoning blocks excluded unless the run explicitly needs them returned.
+
 The GitHub search tool is path-aware for file-style queries. Exact queries such as `NewNexus.uproject` or `Source/NewNexus/NewNexus.Build.cs` attempt a direct repository file fetch before falling back to GitHub code search, which keeps live Unreal context gathering anchored to real files instead of docs mentions.
 
 Dry-run inside the CrewAI-Studio container:

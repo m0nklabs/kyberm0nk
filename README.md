@@ -26,11 +26,11 @@ KyberM0nk is the control workspace for a local coding-agent stack. It coordinate
 
 ## Intended Default Model
 
-The initial local model target is Guardian alias `qwen3-35b-uncensored`, which currently resolves to `Qwen3.6-35B-A3B-HauhauCS-Aggressive` in Guardian.
+The initial local deep model target remains Guardian alias `qwen3-35b-uncensored`, which currently resolves to `Qwen3.6-35B-A3B-HauhauCS-Aggressive` in Guardian.
 
 KyberM0nk must not edit Guardian model settings automatically. Model loading, pinning, tensor split, context, and VRAM policy remain owned by `~/llama_cpp_guardian/config/models.yaml`.
 
-Kyber's `claude-local` launcher also defaults Claude Code to `qwen3-35b-uncensored`. That choice is independent from per-project application configs, so a sibling app such as NerveSplat may keep `gemma4-e4b` for its own runtime without changing what Claude Code should use for coding work.
+Kyber's `claude-local` launcher defaults Claude Code to `qwen3-35b-uncensored` and exports Claude-side compaction tuning for the local Guardian/Qwen route, with the default threshold set to `compact@120k` instead of shrinking Guardian's runtime context. That choice is independent from per-project application configs, so a sibling app such as NerveSplat may keep `gemma4-e4b` for its own runtime without changing what Claude Code should use for coding work.
 
 ## Documentation
 

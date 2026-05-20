@@ -2,7 +2,7 @@ agents:
   main_quest_project_manager:
     role: Main Quest Project Manager
     provider: openrouter
-    model: openai/deepseek/deepseek-v4-pro
+    model: openai/deepseek/deepseek-v4-flash
     temperature: 0.15
     max_iter: 16
     allow_delegation: true
@@ -72,7 +72,7 @@ agents:
   qa_playtest_reviewer:
     role: QA Playtest Reviewer
     provider: openrouter
-    model: openai/google/gemini-3.1-pro-preview-customtools
+    model: openai/z-ai/glm-5.1
     temperature: 0.1
     max_iter: 8
     allow_delegation: false
@@ -92,7 +92,7 @@ agents:
   expert_escalation_engineer:
     role: Expert Escalation Engineer
     provider: openrouter
-    model: openai/moonshotai/kimi-k2.6
+    model: openai/deepseek/deepseek-v4-pro
     temperature: 0.15
     max_iter: 8
     allow_delegation: false
@@ -104,7 +104,7 @@ agents:
       Resolve the narrow blocker with a minimal, high-confidence recommendation
       and explain exactly why the local route failed.
     backstory: >
-      You are the expensive Unreal/NewNexus specialist. You are called only after
+      You are the cloud escalation specialist for Unreal/NewNexus. You are called only after
       local workers fail twice or when the issue requires stronger reasoning about
       Unreal architecture, engine constraints, build failures, reflection macros,
       or hard debugging.

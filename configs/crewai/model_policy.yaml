@@ -1,6 +1,48 @@
 version: 1
 purpose: KyberM0nk CrewAI-Studio model routing for the main quest project manager.
 
+selection_policy:
+  crewai_mcp_authority: Claude may assemble or reconfigure a Kyber crew through the CrewAI MCP instead of staying locked to the seeded role layout.
+  cloud_pool_rule: Any OpenRouter model chosen for Kyber CrewAI work must come from the MoniFuse top20 value-ranked pool unless the operator explicitly overrides that rule.
+  default_role_models_are_fallbacks: The per-role `model` entries below are fallback defaults for seeded or unattended runs, not hard pins.
+  local_first_rule: Keep routine work on Guardian and only spend cloud tokens when the task shape or repeated failure justifies it.
+  openrouter_reasoning_rule: When Claude selects `openai/gpt-5.4`, request it through OpenRouter with `reasoning.effort=xhigh`; prefer `exclude=true` unless the run explicitly needs returned reasoning blocks.
+
+model_pools:
+  monifuse_openrouter_value_top20: &monifuse_openrouter_value_top20
+    - deepseek/deepseek-v4-flash
+    - deepseek/deepseek-v4-pro
+    - z-ai/glm-4.7-flash
+    - moonshotai/kimi-k2.5
+    - moonshotai/kimi-k2.6
+    - google/gemini-3-flash-preview
+    - deepseek/deepseek-v3.2-speciale
+    - z-ai/glm-5.1
+    - google/gemini-3.1-pro-preview-customtools
+    - openai/gpt-5.2
+    - moonshotai/kimi-k2-thinking
+    - openai/gpt-5.1
+    - anthropic/claude-sonnet-4.6
+    - openai/gpt-5
+    - openai/gpt-5.1-chat
+    - openai/gpt-5.4
+    - anthropic/claude-opus-4.7
+    - google/gemma-4-31b-it
+    - openai/gpt-oss-20b
+    - openai/gpt-oss-120b
+
+openrouter_request_profiles:
+  gpt_5_4_xhigh: &gpt_5_4_xhigh
+    extra_body:
+      reasoning:
+        effort: xhigh
+        exclude: true
+
+model_overrides:
+  openai/gpt-5.4:
+    llm_kwargs: *gpt_5_4_xhigh
+    note: Use GPT-5.4 with OpenRouter's unified reasoning object and request xhigh effort when the task justifies the extra spend.
+
 providers:
   openrouter:
     studio_provider: OpenRouter
@@ -22,15 +64,27 @@ providers:
 roles:
   main_quest_project_manager:
     provider: openrouter
-    model: deepseek/deepseek-v4-pro
-    ranking_source: MoniFuse value ranking and reasoning/coding balance
+    model: deepseek/deepseek-v4-flash
+    allowed_models: *monifuse_openrouter_value_top20
+    preferred_models:
+      - deepseek/deepseek-v4-flash
+      - z-ai/glm-4.7-flash
+      - deepseek/deepseek-v4-pro
+    ranking_source: MoniFuse top20 value ranking (#1) for cheap orchestration with strong coding and reasoning
+    selection_guidance: Prefer the cheaper end of the value pool for milestone slicing and delegation. Step up inside the same pool only when the task clearly needs more reasoning depth.
     use_when: Break the game goal into milestones, delegate work, and decide escalation.
     max_iter: 16
     temperature: 0.15
   planner:
     provider: openrouter
-    model: deepseek/deepseek-v4-flash
-    ranking_source: MoniFuse value ranking
+    model: z-ai/glm-4.7-flash
+    allowed_models: *monifuse_openrouter_value_top20
+    preferred_models:
+      - z-ai/glm-4.7-flash
+      - deepseek/deepseek-v4-flash
+      - deepseek/deepseek-v3.2-speciale
+    ranking_source: MoniFuse top20 value ranking (#3) for low-cost planning and summaries
+    selection_guidance: Keep planning cheap unless the backlog slice is unusually ambiguous or architecture-heavy.
     use_when: Cheap planning, backlog slicing, and run summaries.
     max_iter: 10
     temperature: 0.2
@@ -50,15 +104,29 @@ roles:
     temperature: 0.2
   qa_reviewer:
     provider: openrouter
-    model: google/gemini-3.1-pro-preview-customtools
-    ranking_source: MoniFuse coding/reasoning rank
+    model: z-ai/glm-5.1
+    allowed_models: *monifuse_openrouter_value_top20
+    preferred_models:
+      - z-ai/glm-5.1
+      - deepseek/deepseek-v4-pro
+      - google/gemini-3.1-pro-preview-customtools
+      - openai/gpt-5.4
+    ranking_source: MoniFuse top20 value ranking (#8) with stronger coding/reasoning than the cheap planner tier
+    selection_guidance: Choose a stronger reviewer from the same value pool when compile-risk, UX review, or acceptance quality matters more than pure token economy. If GPT-5.4 is the best fit, request it with the `gpt_5_4_xhigh` OpenRouter reasoning profile.
     use_when: Review changes, catch regressions, and evaluate whether the output is playable.
     max_iter: 8
     temperature: 0.1
   expert_escalation_engineer:
     provider: openrouter
-    model: moonshotai/kimi-k2.6
-    ranking_source: MoniFuse coding/value balance
+    model: deepseek/deepseek-v4-pro
+    allowed_models: *monifuse_openrouter_value_top20
+    preferred_models:
+      - deepseek/deepseek-v4-pro
+      - moonshotai/kimi-k2.5
+      - z-ai/glm-5.1
+      - openai/gpt-5.4
+    ranking_source: MoniFuse top20 value ranking (#2) reserved for narrow escalation, not routine cloud work
+    selection_guidance: Use the strongest fit inside the value pool for a narrow blocker, but do not jump to premium non-pool models by default. When GPT-5.4 is selected, treat `reasoning.effort=xhigh` as the expected OpenRouter request shape.
     use_when: Escalate after two local failures or when the blocker is complex engine/code architecture.
     max_iter: 8
     temperature: 0.15
@@ -68,3 +136,5 @@ escalation_rules:
   - Escalate immediately for destructive file operations, broad refactors, or engine-level build failures.
   - Keep cloud prompts narrow: include exact files, error messages, and the failed local attempt summary.
   - Prefer Guardian for scanning, summarizing, boilerplate, and cheap iteration.
+  - Keep default cloud models inside the MoniFuse top20 value list; do not fall back to premium-priced OpenRouter models unless the operator explicitly asks.
+  - Claude may assemble or revise the crew through the CrewAI MCP, but every OpenRouter role must stay inside the allowed top20 pool for that run.
