@@ -1,11 +1,64 @@
 # Changelog
 
-
 ## 2026-05-25
 
 - **Framework stewardship boundary:**
   - Documented the Kyber operator boundary explicitly in project instructions: Kyber sessions should manage agent frameworks themselves, especially Hermes, instead of manually doing the frameworks' downstream repo or operating work.
   - Clarified that bounded validation runs are allowed, but the steady-state goal is to push recurring work back into Hermes' own prompts, cron jobs, kanban flow, skills, and runtime policy.
+
+- **Host-native framework pivot:**
+  - Retired Docker as the active Kyber development path for local agent frameworks and repositioned Kyber as the control repo for host-native framework checkouts plus supporting extras.
+  - Rehomed Aider to the explicit host-native runtime root at `~/aider`, updated the bootstrap and wrapper defaults to use that path, and refreshed the active docs to match.
+  - Moved the active Superset lane to the host checkout at `~/superset` with local state in `~/.superset`, and updated the wrapper/bootstrap flow plus docs to match the new path.
+  - Moved the active Agent Zero lane to `~/agentzero` with isolated runtime home/secrets, restored tracked project provisioning on the host, and stopped the legacy Docker sandbox that was still holding port `50001`.
+  - Repointed the active NewNexus checkout from `kyberm0nk/.agent-projects/NewNexus` to `~/NewNexus` across the CrewAI controller, Agent Zero provisioning, runtime defaults, and active docs/templates.
+  - Documented a workspace-first policy for Kyber so each agentic framework is expected to bind to one explicit project workspace, with framework-specific metadata treated as a separate concern from the real source checkout.
+  - Added a workspace inventory that distinguishes real Git checkouts from runtime roots, local install trees, and lab directories so Kyber docs stop implying every top-level path is a cloned upstream repo.
+  - Converted `~/aider` from a venv-only runtime into a real upstream checkout while preserving its `.venv`, cloned upstream repos at `~/opencode`, `~/langgraph`, and `~/crewAI`, and rewired the shared multi-root workspace away from `~/.opencode`, `~/langgraph-lab`, and runtime-only `~/crewai`.
+  - Hardened `scripts/agent_zero_up.sh` so it can clear stale root-owned listeners on `50001` via `sudo -n fuser` before relaunch.
+  - Updated the host worker bootstrap and Agent Zero bootstrap away from the old `httpx<0.28` downgrade path, made the worker bootstrap prefer Python 3.11, split Aider/OpenCode into isolated sub-venvs under `~/venvs/kyber-workers` to avoid dependency conflicts, and pinned the OpenCode venv to `setuptools<81` so the current OpenInterpreter build still gets `pkg_resources`.
+  - Refreshed the root README, workspace setup docs, environment template, and Superset/Agent Zero config docs so they describe the current host-native operating model.
+
+- **Superset cockpit recovery:**
+  - Repointed `scripts/superset.sh` from the missing `/usr/local/superset` path to the tracked local Linux bundle under `tmp/framework-evals/superset/packages/cli/dist/superset-linux-x64/bin/superset`.
+  - Added an explicit sandbox-side binary check so the wrapper now fails with a precise bundle-missing message instead of an opaque OCI exec error.
+  - Updated the active Superset integration docs to match the tracked bundle-based wrapper path.
+
+- **Direct CrewAI comeback:**
+  - Retired CrewAI-Studio from the active Kyber path and restored host-native direct CrewAI as the supported main-quest runtime alongside the Superset cockpit.
+  - Added a direct bootstrap/runtime flow around `.venv/crewai`, including supported-Python selection for CrewAI 1.5.0 on hosts where `python3` is already 3.14.
+  - Fixed direct dry-run/provider construction so Guardian and OpenRouter are routed through CrewAI's native OpenAI-compatible path instead of falling back to unavailable LiteLLM.
+  - Normalized persisted controller state and Claude MCP status output so old Studio/container metadata is migrated to direct host-runtime paths.
+  - Updated active operator docs and `.env.example` to describe direct CrewAI plus the Superset cockpit instead of the old Studio workflow.
+  - Moved the active direct runtime default from `kyberm0nk/.venv/crewai` to `~/crewai` so CrewAI now lives at the requested host path outside Docker and outside the Kyber repo tree.
+
+- **CrewAI-Studio host checkout rehome:**
+  - Changed Kyber's default `CREWAI_STUDIO_DIR` from `kyberm0nk/.agent-projects/CrewAI-Studio` to `~/CrewAI-Studio` so the fork checkout lives outside the Kyber repo tree while staying host-local.
+  - Updated the CrewAI bootstrap, status, seed, dry-run, live-run, controller, and MCP helper paths to resolve the new default location while keeping the explicit `CREWAI_STUDIO_DIR` override.
+  - Refreshed the README, CrewAI docs, `.env.example`, and helper patch scripts so manual imports and local tooling point at `~/CrewAI-Studio` instead of the old `.agent-projects` path.
+
+## 2026-05-22
+
+- **ClaudeCode ownership split:**
+  - Added the dedicated `~/claudecode/` host-native repo as the tracked home for the live `~/.claude` payload and `claude-local` launcher.
+  - Repositioned Kyber docs so Claude Code is described as the primary operator lane on this server instead of a Docker-adjacent or escalation-only side path.
+  - Fixed the shared Claude statusline fallback so empty smoke-test payloads no longer report a false red `COMPACT SOON` state.
+
+- **VibeUE Claude bridge hardening:**
+  - Updated `scripts/claude_mcp_vibeue.sh` to reuse an already healthy local bridge before trying to rebuild the SSH tunnel, so an existing good MCP forward no longer fails just because the port is occupied.
+  - Broadened stale tunnel cleanup so old `0.0.0.0:56701` SSH forwards are actually recycled instead of surviving the wrapper's `pkill` pattern.
+  - Added an explicit Windows-side hint when no interactive user session exists, because VibeUE cannot come back until a live Unreal/editor session is available.
+  - Added exit-time tunnel cleanup so Claude-side MCP health checks do not leave orphaned local SSH forwards behind when the wrapper is terminated early.
+  - Stopped `exec`-replacing the wrapper with `mcp-remote` so successful Claude MCP health checks also return through the shell and trigger the EXIT cleanup path.
+
+- **Claude MCP ownership cleanup:**
+  - Moved the host-level Claude MCP bridge ownership for `vibeue` and the legacy GitHub PAT wrapper into `~/claudecode/scripts/`.
+  - Left compatibility shims in `kyberm0nk/scripts/` so older registrations or docs do not break during the transition.
+  - Updated the Kyber MCP registry to point at the new `claudecode` wrapper paths for user-scoped Claude infrastructure.
+  - Marked the old GitHub PAT wrapper as fallback-only in the Kyber MCP registry because the official `plugin:github:github` route is the active live surface now.
+  - Taught the registry sync checker to ignore official plugin registrations and only enforce drift for the active user-scoped Claude MCP servers tracked in the registry.
+  - Refreshed the Kyber MCP registry to match the current live Claude setup by marking Playwright as plugin-managed fallback and adding the active `modelcontextprotocol-servers-fetch`, `-git`, `-memory`, and `-sequentialthinking` registrations.
+
 ## 2026-05-19
 
 - **VibeUE GitHub Copilot bridge:**

@@ -18,13 +18,27 @@
 - [x] Verify Agent Zero Docker deployment and mount strategy.
 - [x] Verify Continue local provider config format.
 
-## Phase 2 - Docker Stack
+## Phase 2 - Legacy Docker Stack (retired)
 
 - [x] Add a minimal base image for shared agent tooling. (Opted for separate tool images)
 - [x] Add a compose service for Aider.
 - [x] Add a compose service for OpenCode.
 - [x] Add a compose service for Agent Zero.
 - [x] Add shell wrappers under `scripts/`.
+
+## Phase 2b - Host-Native Runtime Pivot
+
+- [x] Retire Docker as the active Kyber development path for local agent frameworks.
+- [x] Rehome direct CrewAI to `~/crewai`.
+- [x] Rehome Aider to `~/aider` as its explicit host-native runtime root.
+- [x] Rehome Superset to `~/superset` with state at `~/.superset`.
+- [x] Rehome Agent Zero to `~/agentzero` with isolated runtime home and secrets.
+- [x] Repoint the active NewNexus checkout from `.agent-projects/NewNexus` to `~/NewNexus`.
+- [x] Document a workspace-first policy so each agentic framework maps back to one explicit project workspace.
+- [x] Document which top-level workspace directories are real repos versus runtime roots or local lab/install trees.
+- [x] Clone the missing upstream framework repos under their exact GitHub repo names and repoint the shared workspace file at those real checkouts.
+- [x] Stop the legacy Kyber sandbox that was still holding Agent Zero port `50001`.
+- [x] Finish the host worker bootstrap with Aider under `~/aider` and OpenCode under `~/venvs/kyber-workers`.
 
 ## Phase 3 - Safety and Observability
 
@@ -36,23 +50,23 @@
 ## Phase 4 - Aider Smoke Test (The Scalpel)
 
 - [x] Execute `scripts/aider.sh` against the KyberM0nk repo itself.
-- [x] Verify Aider can read the Guardian model via `host.docker.internal:11434/v1`.
+- [ ] Verify Aider can read the Guardian model via the host-native Guardian route.
 - [x] Verify Aider can successfully apply a file edit (smoke test).
   - *Note: Proved volume mount & proxy work via shell commands, but Aider's parser struggles with Qwen3's diff generation. `whole` or `udiff` formats fail to apply automatically. Requires tuning `edit-format`.*
 - [x] Confirm Aider logging output has proper timestamps in `logs/aider/`.
 
 ## Phase 5 - OpenCode Integration (The General)
 
-- [x] Bootstrap OpenCode configuration inside its Docker context.
-- [x] Verify it identifies the active project (`/workspace/project`).
+- [ ] Bootstrap OpenCode in the shared host worker venv.
+- [ ] Verify it identifies the active project from the host path.
 - [x] Evaluate OpenCode's workspace context gathering capabilities.
 - [x] Update `configs/opencode` with optimized system prompts for the General role.
 
-## Phase 6 - Agent Zero Sandbox (Special Ops)
+## Phase 6 - Agent Zero Host Runtime (Special Ops)
 
-- [x] Verify Agent Zero strict mounts (rw on active, ro on references).
-- [x] Run a test script via Agent Zero to confirm execution bounds.
-- [x] Restrict Agent Zero from modifying parent/host resources unexpectedly (impl. via Docker `cap_drop` and `security_opt: no-new-privileges` in compose).
+- [x] Bootstrap Agent Zero under `~/agentzero`.
+- [x] Restore tracked projects and runtime helpers into the host runtime tree.
+- [x] Validate `scripts/agent_zero_up.sh` serves health on `http://127.0.0.1:50001/api/health`.
 
 ## Phase 7 - Continue IDE Integration (The Glasses)
 
@@ -86,7 +100,8 @@
 
 - [x] Document the supervisor-loop plan and framework shortlist.
 - [x] Add a canonical MCP server registry under `configs/mcp/servers.yaml` for capability-based tool selection.
-- [ ] Run a contained Claude Code / Claude Agent SDK smoke test as the premium quality baseline.
+- [x] Promote Claude Code to a dedicated host-native repo with tracked global config and install flow.
+- [ ] Reduce Kyber surfaces that still assume Claude is only an escalation path.
 - [x] Separate Claude Code's local default model pinning from sibling app runtime model configs so repo-specific Gemma settings do not bleed into Claude runtime assumptions.
 - [x] Add project-scoped Claude context guardrails: compact-preservation instructions, a live statusline warning at roughly 100k tokens, and hooks that block large whole-file reads or `@file` inlines.
 - [x] Make the Claude statusline prefer Guardian-advertised context for local `claude-local` sessions instead of Claude Code's rounded `200k` provider default.
@@ -96,6 +111,9 @@
 - [x] Build the Superset Linux CLI from source and verify the command surface starts locally.
 - [x] Prototype a Guardian-backed Superset custom agent preset for OpenCode or Aider.
 - [x] Test Superset CLI host-server flow with a disposable local workspace after a Superset session or API key is available.
+- [x] Repoint the sandbox Superset wrapper to the tracked local Linux bundle so the cockpit does not depend on a missing `/usr/local/superset` install.
+- [x] Move the active Superset checkout to `~/superset` and default host state to `~/.superset`.
+- [ ] Complete Superset login/auth on the host-native wrapper path.
 - [x] Run an OpenHands Software Agent SDK smoke test against Guardian-compatible LLM settings.
 - [x] Decide whether OpenHands should complement or replace Agent Zero for future sandbox work.
 - [ ] Prototype a minimal Kyber OpenHands worker wrapper with pinned workspace, Guardian env, iteration limits, and transcript logging.
@@ -106,6 +124,7 @@
 - [x] Add a registry sync check that compares live Claude MCP registrations against `configs/mcp/servers.yaml`.
 - [ ] Fix or replace the Windows NewNexus sync path so validation builds can consume reviewed Linux checkout changes without interactive Git credential prompts.
 - [ ] Add cloud escalation gates for repeated failures, risky diffs, and pre-commit review.
+- [x] Document the Kyber operator boundary: manage agent frameworks themselves, especially Hermes, and avoid doing the framework's downstream domain work by hand.
 
 ## Phase 10 - CrewAI Main Quest Project Manager
 
@@ -116,6 +135,7 @@
 - [x] Document the watchable CrewAI project-manager workflow.
 - [x] Add direct CrewAI project config files and a no-token dry-run validator.
 - [x] Add a DB seeder so the main quest crew can be installed without manual Import/Export UI steps.
+- [x] Rehome the default CrewAI-Studio checkout to `~/CrewAI-Studio` so the fork stays outside the Kyber repo tree while the Docker workflow remains unchanged.
 - [x] Extend the CrewAI MCP from read-mostly project inspection into live run control hooks.
 - [x] Add steering hooks to the CrewAI MCP so operator guidance can be updated without dropping to manual file or terminal flows.
 - [x] Add a safe live-pilot mode for the main quest crew with explicit repo-write guardrails and better exact-file repository lookup.
@@ -124,6 +144,7 @@
 - [x] Serialize Guardian-backed CrewAI kickoff behind Guardian idle status and surface OpenRouter credit warnings before cloud-backed live runs.
 - [x] Switch the main quest's default OpenRouter route to MoniFuse top20 value-ranked models instead of premium-priced defaults.
 - [x] Allow Claude to assemble or revise a CrewAI team through the CrewAI MCP while constraining all OpenRouter picks to the MoniFuse top20 value pool.
-- [x] Document the Kyber operator boundary: manage agent frameworks themselves, especially Hermes, and avoid doing the framework's downstream domain work by hand.
 - [x] Add direct CrewAI YAML passthrough for provider-specific LLM request options so OpenRouter GPT-5.4 can be requested with `reasoning.effort=xhigh`.
 - [x] Harden the CrewAI live watcher so raw log content is escaped safely and the page hooks into new live lines without replaying stale historical errors.
+- [x] Retire CrewAI-Studio from the active Kyber path and restore direct host-native CrewAI as the supported main-quest lane.
+- [x] Normalize CrewAI control/MCP state so legacy Studio metadata is translated to direct-runtime paths and status output.
