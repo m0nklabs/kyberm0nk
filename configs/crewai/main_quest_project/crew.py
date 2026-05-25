@@ -23,6 +23,7 @@ ERROR_PREVIEW_CHARS = 1000
 FILE_PREVIEW_CHARS = 3000
 DEFAULT_REPO_WRITE_MODE = "disabled"
 DEFAULT_GITHUB_TARGET_BRANCH = "main"
+DEFAULT_PROJECT_PATH = str((Path.home() / "NewNexus").resolve())
 
 
 class GitHubRepoSearchInputSchema(BaseModel):
@@ -407,6 +408,9 @@ def create_llm(
         "api_key": api_key,
         "base_url": api_base,
     }
+    sdk_provider = provider.get("sdk_provider")
+    if sdk_provider:
+        llm_config["provider"] = sdk_provider
     if llm_kwargs:
         llm_config.update(llm_kwargs)
     return LLM(**llm_config)
@@ -551,7 +555,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true", help="Build the crew without calling any model.")
     parser.add_argument("--operator-goal", default="Create the first playable NewNexus Unreal slice.")
-    parser.add_argument("--project-path", default="/workspace/project/.agent-projects/NewNexus")
+    parser.add_argument("--project-path", default=DEFAULT_PROJECT_PATH)
     parser.add_argument("--current-state", default="NewNexus is the Unreal Engine project in m0nklabs/NewNexus.")
     parser.add_argument("--operator-chat-guidance", default="Stay on Unreal Engine and NewNexus. Do not switch to Unity or generic 2D assumptions.")
     parser.add_argument("--repo-write-mode", choices=("disabled", "enabled"), default=DEFAULT_REPO_WRITE_MODE)

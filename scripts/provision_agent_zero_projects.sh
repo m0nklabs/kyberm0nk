@@ -2,6 +2,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+source ./scripts/agent_zero_env.sh
 
 force=false
 if [[ "${1:-}" == "--force" ]]; then
@@ -15,74 +16,55 @@ if [[ ! -d "${template_root}" ]]; then
   exit 0
 fi
 
-container_id="$(docker compose ps -q sandbox)"
-if [[ -z "${container_id}" ]]; then
-  echo "[agent-zero-projects] sandbox container not found; creating without rebuild..."
-  docker compose up -d --no-build sandbox >/dev/null
-  container_id="$(docker compose ps -q sandbox)"
-fi
+newnexus_checkout_path="${NEWNEXUS_CHECKOUT_PATH:-${HOME}/NewNexus}"
 
-if [[ -z "${container_id}" ]]; then
-  echo "[agent-zero-projects] sandbox container is unavailable" >&2
-  exit 1
-fi
-
-if [[ "$(docker inspect --format '{{.State.Running}}' "${container_id}")" != "true" ]]; then
-  echo "[agent-zero-projects] starting existing sandbox container..."
-  docker start "${container_id}" >/dev/null
-fi
+ensure_agent_zero_root
+ensure_agent_zero_runtime_dirs
 
 if [[ -d "${template_root}/newnexus" ]]; then
   ./scripts/ensure_newnexus_checkout.sh
 fi
 
-docker compose exec -T sandbox sh -lc 'mkdir -p /opt/agent-zero/usr/projects /a0/usr/projects'
+mkdir -p "${AGENT_ZERO_ROOT}/usr/projects"
+
+if sudo -n true >/dev/null 2>&1; then
+  sudo -n mkdir -p "${AGENT_ZERO_COMPAT_ROOT}/projects"
+else
+  echo "[agent-zero-projects] sudo -n is required to maintain ${AGENT_ZERO_COMPAT_ROOT}" >&2
+  exit 1
+fi
 
 for deprecated_command in windows-pwsh windows-unreal-probe newnexus-windows-build; do
-  docker compose cp "configs/agent-zero/bin/${deprecated_command}" "sandbox:/usr/local/bin/${deprecated_command}"
+  cp "configs/agent-zero/bin/${deprecated_command}" "${AGENT_ZERO_BIN_DIR}/${deprecated_command}"
 done
-docker compose exec -T sandbox sh -lc 'chmod 755 /usr/local/bin/windows-pwsh /usr/local/bin/windows-unreal-probe /usr/local/bin/newnexus-windows-build'
+chmod 755 "${AGENT_ZERO_BIN_DIR}/windows-pwsh" "${AGENT_ZERO_BIN_DIR}/windows-unreal-probe" "${AGENT_ZERO_BIN_DIR}/newnexus-windows-build"
 
 for project_dir in "${template_root}"/*; do
   [[ -d "${project_dir}" ]] || continue
 
   slug="$(basename "${project_dir}")"
-  target="/opt/agent-zero/usr/projects/${slug}"
+  target="${AGENT_ZERO_ROOT}/usr/projects/${slug}"
 
-  if docker compose exec -T sandbox sh -lc "test -e '${target}/.a0proj/project.json'" >/dev/null 2>&1 && [[ "${force}" != true ]]; then
+  if [[ -e "${target}/.a0proj/project.json" ]] && [[ "${force}" != true ]]; then
     echo "[agent-zero-projects] ${slug}: exists, keeping runtime copy"
   else
     echo "[agent-zero-projects] ${slug}: restoring tracked template"
-    docker compose exec -T sandbox sh -lc "mkdir -p '${target}'"
-    docker cp "${project_dir}/." "${container_id}:${target}"
+    rm -rf "${target}"
+    mkdir -p "${target}"
+    cp -a "${project_dir}/." "${target}"
   fi
 
   if [[ "${slug}" == "newnexus" ]]; then
-    docker compose exec -T sandbox sh -lc '
-set -eu
-target="/a0/usr/projects/newnexus"
-source="/workspace/project/.agent-projects/NewNexus"
-mkdir -p /a0/usr/projects
-if [ -L "${target}" ]; then
-  ln -sfn "${source}" "${target}"
-elif [ -e "${target}" ]; then
-  if [ -z "$(find "${target}" -mindepth 1 -maxdepth 1 2>/dev/null | head -n 1)" ]; then
-    rmdir "${target}"
-    ln -s "${source}" "${target}"
+    source_path="${newnexus_checkout_path}"
+    compat_target="${AGENT_ZERO_COMPAT_ROOT}/projects/newnexus"
+    test -d "${source_path}"
+    if [[ -L "${compat_target}" ]]; then
+      sudo -n rm -f "${compat_target}"
+    fi
+    sudo -n ln -sfn "${AGENT_ZERO_ROOT}/usr/uploads" "${AGENT_ZERO_COMPAT_ROOT}/uploads"
+    HOME="${AGENT_ZERO_RUNTIME_HOME}" git config --global --add safe.directory "${source_path}" >/dev/null 2>&1 || true
   else
-    backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
-    mv "${target}" "${backup}"
-    ln -s "${source}" "${target}"
-    echo "[agent-zero-projects] moved non-empty ${target} to ${backup}"
-  fi
-else
-  ln -s "${source}" "${target}"
-fi
-test -d "${source}"
-git config --global --add safe.directory "${source}" >/dev/null 2>&1 || true
-'
-  else
-    docker compose exec -T sandbox sh -lc "mkdir -p '/a0/usr/projects/${slug}'"
+    sudo -n mkdir -p "${AGENT_ZERO_COMPAT_ROOT}/projects/${slug}"
   fi
 done
 

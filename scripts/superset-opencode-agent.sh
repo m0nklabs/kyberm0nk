@@ -59,14 +59,5 @@ printf '[%s] Kyber OpenCode Superset agent starting in %s\n' "$(date -Iseconds)"
 (
     export ACTIVE_PROJECT="$workspace_path"
     cd "$DIR"
-    "${compose_cmd[@]}" run --rm --no-deps -T sandbox interpreter \
-        --model "openai/${DEFAULT_MODEL}" \
-        --api_base "${GUARDIAN_BASE_URL}" \
-        --api_key "${GUARDIAN_API_KEY}" \
-        --context_window "$OPENCODE_CONTEXT_WINDOW" \
-        --max_tokens "$OPENCODE_MAX_TOKENS" \
-        --temperature "$OPENCODE_TEMPERATURE" \
-        --max_output "$OPENCODE_MAX_OUTPUT_CHARS" \
-        --system_message "$system_message" \
-        "$prompt"
+    ./scripts/opencode.sh "$prompt"
 ) 2>&1 | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }' | tee -a "$log_file"

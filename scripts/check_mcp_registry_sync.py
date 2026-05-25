@@ -17,6 +17,7 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REGISTRY_PATH = REPO_ROOT / "configs" / "mcp" / "servers.yaml"
+EXPECTED_ACTIVE_STATUSES = {"active", "active_when_unreal_running"}
 
 
 @dataclass
@@ -85,6 +86,8 @@ def parse_live_server_ids(list_output: str) -> list[str]:
     for line in list_output.splitlines():
         if not line or line.startswith(" "):
             continue
+        if line.startswith("plugin:"):
+            continue
         if ":" not in line:
             continue
         server_id = line.split(":", 1)[0].strip()
@@ -148,6 +151,8 @@ def expected_claude_servers(registry: dict[str, Any]) -> dict[str, dict[str, Any
         if not isinstance(server, dict):
             continue
         if "claude_code" not in server.get("client_surfaces", []):
+            continue
+        if server.get("status") not in EXPECTED_ACTIVE_STATUSES:
             continue
         server_id = server.get("id")
         if isinstance(server_id, str):

@@ -108,7 +108,7 @@
   "tasks": [
     {
       "id": "T_capture_operator_intent",
-      "description": "Read the operator input for {operator_goal}, {project_path}, {current_state}, and {operator_chat_guidance}. Convert it into a short NewNexus Unreal playable-slice brief. If project_path is empty, assume the GitHub repo m0nklabs/NewNexus and the local workspace .agent-projects/NewNexus / Agent Zero path /a0/usr/projects/newnexus. Identify unclear requirements, but continue with reasonable Unreal-specific assumptions when safe.",
+      "description": "Read the operator input for {operator_goal}, {project_path}, {current_state}, and {operator_chat_guidance}. Convert it into a short NewNexus Unreal playable-slice brief. If project_path is empty, assume the GitHub repo m0nklabs/NewNexus and the local workspace ~/NewNexus. Identify unclear requirements, but continue with reasonable Unreal-specific assumptions when safe.",
       "expected_output": "A compact Unreal/NewNexus playable-slice brief with objective, assumptions, non-goals, likely repository files or systems, validation target, and open steering questions. Explicitly name NewNexus and Unreal Engine.",
       "async_execution": false,
       "agent_id": "A_main_quest_project_manager",

@@ -20,6 +20,8 @@ Do not use it for small surgical edits when Aider can do the job faster.
 
 Aider is the focused code-editing tool.
 
+Host runtime: `~/aider`
+
 Use it for:
 
 - targeted bug fixes

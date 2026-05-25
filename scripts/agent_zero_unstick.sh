@@ -3,9 +3,10 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+source ./scripts/agent_zero_env.sh
 
 echo "[agent-zero] stopping stuck run_ui.py if present..."
-docker compose exec -T sandbox bash -lc 'pkill -f "[r]un_ui.py" || true'
+pkill -f "${AGENT_ZERO_ROOT}/run_ui.py" || true
 
 echo "[agent-zero] applying tracked project templates and model config..."
 ./scripts/provision_agent_zero_projects.sh --force

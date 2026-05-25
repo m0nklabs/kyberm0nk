@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build a multi-project, multi-agent coding cockpit where work keeps moving even when the operator is doing something else, while local models do the routine heavy lifting and premium/cloud agents are only used at high-value checkpoints.
+Build a multi-project, multi-agent coding cockpit where work keeps moving even when the operator is doing something else, while local models do the routine heavy lifting and Claude Code remains the main high-trust operator lane.
 
 ## Hard Constraint
 
@@ -69,17 +69,17 @@ Why:
 
 OpenHands should complement Agent Zero first, not replace everything immediately.
 
-### 4. Premium Escalation Layer: Claude Code / Claude Agent SDK
+### 4. Primary Operator Lane: Claude Code / Claude Agent SDK
 
-Use **Claude Code** as the premium benchmark and escalation agent.
+Use **Claude Code** as the main operator tool on this server.
 
 Why:
 
 - strongest coding-agent quality bar in the current stack
 - already proven to work with Guardian, MCP, and project instruction layering
-- best reserved for hard debugging, risky review, architecture-sensitive decisions, and final judgment
+- now has a dedicated host-native home under `/home/flip/claudecode` instead of being buried inside Kyber ownership drift
 
-It should not be the default always-on worker when the whole point is to keep most routine work local.
+OpenCode, Aider, OpenHands, and Agent Zero still matter, but as supporting workers and throughput helpers around the main Claude lane rather than as replacements for it.
 
 ### 5. Planning / PM Layer: CrewAI, Not Main Orchestrator
 
@@ -124,7 +124,7 @@ Examples:
 | Default local coding worker | OpenCode | Strongest local-first generalist role |
 | Surgical local editing | Aider | Best focused edit loop |
 | Programmable autonomous worker | OpenHands SDK | Strong API/runtime shape for controlled loops |
-| Premium escalation | Claude Code | Highest coding-agent quality bar |
+| Primary operator lane | Claude Code | Main goto tool and highest coding-agent quality bar |
 | Planning / PM | CrewAI | Good planner, wrong primary coding cockpit |
 | Durable supervisor graph | LangGraph | Useful later if the supervisor becomes complex |
 
@@ -160,7 +160,7 @@ These do not need to block on the local model lane:
 
 ### Escalation rules
 
-Escalate to Claude Code or another premium agent only when:
+Escalate from supporting local workers to Claude Code or another premium agent only when:
 
 - the same task fails twice
 - the worker touches risky paths
@@ -191,7 +191,7 @@ The better pattern is:
 2. Add a small Kyber scheduler that grants a single local LLM lease at a time.
 3. Keep OpenCode and Aider as the default local workers behind that lease.
 4. Add an OpenHands worker wrapper for longer programmable runs.
-5. Keep Claude Code as escalation and review.
+5. Keep Claude Code as the primary operator lane and final review surface.
 6. Use CrewAI for per-project PM/planning, not as the main coding runtime.
 7. Require all tool requests to resolve through the MCP registry before new wrappers are invented.
 

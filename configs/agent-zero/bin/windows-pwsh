@@ -10,7 +10,7 @@ printf '%s\n' \
   "Use instead:" \
   "  ssh unreal-windows \"powershell -NoProfile -ExecutionPolicy Bypass -Command \\\"<your PowerShell command>\\\"\"" \
   "" \
-  "Keep source edits in /a0/usr/projects/newnexus. Use Windows only for Git sync, Unreal builds, editor launches, and validation." \
+  "Keep source edits in /home/flip/NewNexus. Use Windows only for Git sync, Unreal builds, editor launches, and validation." \
   "If quoting fails, report the exact command and output instead of retrying random variants." >&2
 
 exit 2

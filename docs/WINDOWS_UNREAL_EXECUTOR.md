@@ -42,11 +42,11 @@ That script copies only the sandbox SSH config and the dedicated private key int
 
 Agent Zero should generate Windows commands directly and run them through the `unreal-windows` SSH alias. Do not route NewNexus validation through Kyber wrapper commands.
 
-Use Windows only for environment discovery, Git sync of the Windows checkout, Unreal project generation, UnrealBuildTool, editor launches, and runtime validation. Source inspection and source edits should happen under `/a0/usr/projects/newnexus`.
+Use Windows only for environment discovery, Git sync of the Windows checkout, Unreal project generation, UnrealBuildTool, editor launches, and runtime validation. Source inspection and source edits should happen under `/home/flip/NewNexus`.
 
 When Windows-side work is needed, generate the exact command for the task and run it with `ssh unreal-windows "<command>"`. For Windows-specific logic, generate a PowerShell command explicitly rather than relying on a sandbox wrapper. If quoting fails, report the exact command and output instead of retrying random quote variants.
 
-Do not route GitHub commits or pushes through this Windows executor. Agent Zero should commit and push from `/a0/usr/projects/newnexus` in the sandbox, then use Windows only to pull the pushed revision and run Unreal validation.
+Do not route GitHub commits or pushes through this Windows executor. Agent Zero should commit and push from `/home/flip/NewNexus` on the host runtime, then use Windows only to pull the pushed revision and run Unreal validation.
 
 Deprecated compatibility stubs may exist at the old command names in the sandbox. They intentionally do not run validation; they print a deprecation message and point the worker back to direct `ssh unreal-windows` commands.
 

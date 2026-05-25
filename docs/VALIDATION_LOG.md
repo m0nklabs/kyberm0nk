@@ -234,6 +234,7 @@ Operational note:
 - `scripts/agent_zero_up.sh` now restores tracked project templates on startup. Existing runtime projects are preserved unless `scripts/provision_agent_zero_projects.sh --force` is used.
 - `.agent-projects/` is ignored by KyberM0nk because the game source belongs to the NewNexus repository, not this cockpit repository.
 - Follow-up hardening removed stale runtime-only `windows-pwsh` / `windows-unreal-probe` binaries from the sandbox, configured Git `safe.directory` for `/workspace/project/.agent-projects/NewNexus`, and clarified that Agent Zero should edit `/a0/usr/projects/newnexus` while using Windows SSH only for build/run validation.
+- Legacy note added 2026-05-25: the rows above document the old compatibility bridge. The current host-native path keeps the actual source repo at `~/NewNexus`, restores only Agent Zero project metadata under `~/agentzero/usr/projects/newnexus/.a0proj`, and no longer requires a NewNexus source symlink under `/a0/usr/projects/newnexus`.
 
 
 ## 2026-05-09 - Agent Zero Gemma4 Vision Route

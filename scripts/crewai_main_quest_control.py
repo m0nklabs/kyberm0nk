@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import signal
+import shlex
 import subprocess
 import sys
 import time
@@ -26,8 +27,8 @@ LOGS_DIR = REPO_ROOT / "logs"
 STATE_DIR = LOGS_DIR / "crewai_state"
 LIVE_LOG_PATH = LOGS_DIR / "crewai_live.log"
 DEFAULT_PROJECT_ID = "main_quest_project"
-DEFAULT_WEB_CONTAINER = "crewai_studio_kyber"
-DEFAULT_PROJECT_PATH = "/workspace/project/.agent-projects/NewNexus"
+DEFAULT_CREWAI_VENV_DIR = Path.home() / "crewai"
+DEFAULT_PROJECT_PATH = str((Path.home() / "NewNexus").resolve())
 DEFAULT_OPERATOR_GOAL = "Create the first playable NewNexus Unreal slice."
 DEFAULT_CURRENT_STATE = "NewNexus is the Unreal Engine project in m0nklabs/NewNexus."
 DEFAULT_OPERATOR_CHAT_GUIDANCE = "Stay on Unreal Engine and NewNexus. Do not switch to Unity or generic 2D assumptions."
@@ -37,6 +38,9 @@ DEFAULT_GUARDIAN_IDLE_WAIT_SECONDS = 900.0
 DEFAULT_GUARDIAN_IDLE_POLL_SECONDS = 2.0
 DEFAULT_OPENROUTER_LOW_CREDIT_THRESHOLD_USD = 15.0
 DEFAULT_OPENROUTER_CRITICAL_CREDIT_THRESHOLD_USD = 5.0
+LEGACY_PROJECT_PATH_PREFIX = "/workspace/project/.agent-projects/"
+LEGACY_HOST_PROJECTS_DIR = (REPO_ROOT / ".agent-projects").resolve()
+LEGACY_COMMAND_SIGNATURE_PREFIX = "/tmp/kyber-"
 INPUT_FIELDS = (
     "project_path",
     "operator_goal",
@@ -64,10 +68,8 @@ def load_env_file(path: Path) -> dict[str, str]:
 
 
 def load_controller_env() -> dict[str, str]:
-    """Load host and CrewAI-Studio environment values used by the controller."""
-    combined = load_env_file(REPO_ROOT / ".agent-projects" / "CrewAI-Studio" / ".env")
-    combined.update(load_env_file(REPO_ROOT / ".env"))
-    return combined
+    """Load host environment values used by the direct CrewAI controller."""
+    return load_env_file(REPO_ROOT / ".env")
 
 
 def load_yaml_file(path: Path) -> dict[str, Any]:
@@ -95,6 +97,19 @@ def resolve_runtime_secret(root_env: dict[str, str], env_name: str, file_env_nam
         return ""
     file_path = os.environ.get(file_env_name) or root_env.get(file_env_name, "")
     if not file_path:
+        fallback_paths: tuple[str, ...] = ()
+        if env_name == "OPENROUTER_API_KEY":
+            fallback_paths = (
+                "~/.secrets/openrouter.key",
+                "~/.secrets/keys/openrouter.key",
+            )
+        elif env_name == "GITHUB_TOKEN":
+            fallback_paths = ("~/.secrets/kyberm0nk_github_token",)
+
+        for fallback_path in fallback_paths:
+            secret_path = Path(fallback_path).expanduser()
+            if secret_path.exists():
+                return read_secret_value(str(secret_path))
         return ""
     secret_path = Path(file_path).expanduser()
     if not secret_path.exists():
@@ -393,8 +408,8 @@ def project_dir(project_id: str) -> Path:
 
 
 def project_target(project_id: str) -> str:
-    """Return the container-side path for a CrewAI project copy."""
-    return f"/tmp/kyber-{project_id.replace('_', '-') }"
+    """Return the direct run signature path for a CrewAI project."""
+    return str(project_dir(project_id) / "crew.py")
 
 
 def state_path(project_id: str) -> Path:
@@ -414,16 +429,101 @@ def default_operator_inputs() -> dict[str, str]:
     }
 
 
+def normalize_project_path(project_path: str) -> str:
+    """Normalize legacy container-side project paths into host-side Kyber paths."""
+    normalized = project_path.strip()
+    if not normalized:
+        return DEFAULT_PROJECT_PATH
+    if normalized.startswith(LEGACY_PROJECT_PATH_PREFIX):
+        suffix = normalized.removeprefix(LEGACY_PROJECT_PATH_PREFIX).strip("/")
+        if suffix:
+            return str((Path.home() / suffix).resolve())
+    legacy_host_projects_prefix = f"{LEGACY_HOST_PROJECTS_DIR}{os.sep}"
+    if normalized == str(LEGACY_HOST_PROJECTS_DIR / "NewNexus"):
+        return DEFAULT_PROJECT_PATH
+    if normalized.startswith(legacy_host_projects_prefix):
+        suffix = normalized.removeprefix(legacy_host_projects_prefix).strip("/")
+        if suffix:
+            return str((Path.home() / suffix).resolve())
+    if normalized.startswith(".agent-projects/"):
+        suffix = normalized.removeprefix(".agent-projects/").strip("/")
+        if suffix:
+            return str((Path.home() / suffix).resolve())
+    return normalized
+
+
+def sanitize_state_payload(project_id: str, payload: dict[str, Any]) -> tuple[dict[str, Any], bool]:
+    """Normalize persisted state from older Studio-backed runs into direct-runtime form."""
+    sanitized = dict(payload)
+    changed = False
+
+    project_path = str(sanitized.get("project_path", "") or "")
+    normalized_project_path = normalize_project_path(project_path)
+    if project_path != normalized_project_path:
+        sanitized["project_path"] = normalized_project_path
+        changed = True
+
+    command_signature = str(sanitized.get("command_signature", "") or "")
+    direct_signature = project_target(project_id)
+    if not command_signature or command_signature.startswith(LEGACY_COMMAND_SIGNATURE_PREFIX):
+        if command_signature != direct_signature:
+            sanitized["command_signature"] = direct_signature
+            changed = True
+
+    for legacy_key in ("container_name", "container_project_target"):
+        if legacy_key in sanitized:
+            sanitized.pop(legacy_key, None)
+            changed = True
+
+    if sanitized.get("runtime_mode") != "direct":
+        sanitized["runtime_mode"] = "direct"
+        changed = True
+
+    return sanitized, changed
+
+
 def load_runtime_settings() -> dict[str, str]:
-    """Load runtime settings from repo and optional Studio env files."""
+    """Load runtime settings for the direct CrewAI host environment."""
     root_env = load_env_file(REPO_ROOT / ".env")
-    studio_dir = Path(root_env.get("CREWAI_STUDIO_DIR", REPO_ROOT / ".agent-projects" / "CrewAI-Studio"))
-    studio_env = load_env_file(studio_dir / ".env")
-    container_name = studio_env.get("CREWAI_STUDIO_WEB_CONTAINER") or root_env.get("CREWAI_STUDIO_WEB_CONTAINER") or DEFAULT_WEB_CONTAINER
+    venv_dir = Path(root_env.get("CREWAI_VENV_DIR", str(DEFAULT_CREWAI_VENV_DIR))).expanduser()
     return {
-        "crewai_studio_dir": str(studio_dir),
-        "crewai_studio_web_container": container_name,
+        "crewai_venv_dir": str(venv_dir),
+        "crewai_python": str(venv_dir / "bin" / "python"),
     }
+
+
+def resolve_runtime_environment() -> dict[str, str]:
+    """Build the direct CrewAI runtime environment from repo env and secret files."""
+    root_env = load_controller_env()
+    env = os.environ.copy()
+    env.update(root_env)
+
+    openrouter_key = resolve_runtime_secret(root_env, "OPENROUTER_API_KEY", "OPENROUTER_API_KEY_FILE")
+    if openrouter_key:
+        env["OPENROUTER_API_KEY"] = openrouter_key
+
+    github_token = resolve_runtime_secret(root_env, "GITHUB_TOKEN", "GITHUB_TOKEN_FILE")
+    if not github_token:
+        github_token = os.environ.get("GH_TOKEN") or root_env.get("GH_TOKEN", "")
+    if github_token:
+        env["GITHUB_TOKEN"] = github_token
+        env["GH_TOKEN"] = github_token
+
+    guardian_base = (
+        os.environ.get("CREWAI_GUARDIAN_API_BASE")
+        or root_env.get("CREWAI_GUARDIAN_API_BASE")
+        or os.environ.get("CREWAI_STUDIO_GUARDIAN_API_BASE")
+        or root_env.get("CREWAI_STUDIO_GUARDIAN_API_BASE")
+        or os.environ.get("GUARDIAN_API_BASE")
+        or root_env.get("GUARDIAN_API_BASE")
+        or "http://127.0.0.1:11434/v1"
+    )
+    normalized_guardian_base = normalize_local_api_base(guardian_base)
+    env["GUARDIAN_API_BASE"] = normalized_guardian_base
+    env["CREWAI_GUARDIAN_API_BASE"] = normalized_guardian_base
+    env.setdefault("OPENROUTER_API_BASE", root_env.get("OPENROUTER_API_BASE", "https://openrouter.ai/api/v1"))
+    env.setdefault("PYTHONUNBUFFERED", "1")
+    return env
 
 
 def run_command(command: list[str], capture_output: bool = True, timeout_seconds: int | None = None) -> subprocess.CompletedProcess[str]:
@@ -437,33 +537,18 @@ def run_command(command: list[str], capture_output: bool = True, timeout_seconds
     )
 
 
-def ensure_container_running(container_name: str) -> None:
-    """Ensure the CrewAI Studio web container exists and is running."""
-    result = run_command(["docker", "inspect", "-f", "{{.State.Running}}", container_name], timeout_seconds=20)
-    if result.returncode != 0 or result.stdout.strip().lower() != "true":
-        detail = (result.stderr or result.stdout).strip() or "container not running"
-        raise RuntimeError(f"CrewAI-Studio container {container_name} is not available: {detail}")
-
-
-def stage_project_copy(container_name: str, project_id: str) -> str:
-    """Copy the tracked project into the Studio container."""
-    source = project_dir(project_id)
-    target = project_target(project_id)
-    remove_result = run_command(["docker", "exec", container_name, "rm", "-rf", target], timeout_seconds=60)
-    if remove_result.returncode != 0:
-        detail = (remove_result.stderr or remove_result.stdout).strip()
-        raise RuntimeError(f"Failed to clear project target {target}: {detail}")
-
-    copy_result = run_command(["docker", "cp", str(source), f"{container_name}:{target}"], timeout_seconds=120)
-    if copy_result.returncode != 0:
-        detail = (copy_result.stderr or copy_result.stdout).strip()
-        raise RuntimeError(f"Failed to copy project into container: {detail}")
-    return target
+def ensure_runtime_ready(python_executable: str) -> None:
+    """Ensure the direct CrewAI Python runtime exists."""
+    python_path = Path(python_executable)
+    if not python_path.exists():
+        raise RuntimeError(
+            f"Direct CrewAI runtime is missing: {python_path}. Run scripts/crewai_bootstrap.sh first."
+        )
 
 
 def build_crew_command(
-    container_name: str,
-    container_project_target: str,
+    python_executable: str,
+    project_script_path: str,
     project_path: str,
     operator_goal: str,
     current_state: str,
@@ -472,13 +557,10 @@ def build_crew_command(
     github_target_branch: str,
     kickoff_mode: str,
 ) -> list[str]:
-    """Build the docker exec command for the CrewAI project."""
+    """Build the direct host-side command for the CrewAI project."""
     command = [
-        "docker",
-        "exec",
-        container_name,
-        "python",
-        f"{container_project_target}/crew.py",
+        python_executable,
+        project_script_path,
         "--project-path",
         project_path,
         "--operator-goal",
@@ -509,10 +591,12 @@ def load_state(project_id: str) -> dict[str, Any]:
 
 def extract_operator_inputs(state: dict[str, Any]) -> dict[str, str]:
     """Extract operator input fields from persisted state."""
-    return {
+    inputs = {
         field: str(state.get(field, "") or "")
         for field in INPUT_FIELDS
     }
+    inputs["project_path"] = normalize_project_path(inputs.get("project_path", ""))
+    return inputs
 
 
 def kickoff_overrides_from_args(args: argparse.Namespace) -> dict[str, str]:
@@ -555,8 +639,9 @@ def update_operator_inputs(project_id: str, overrides: dict[str, str]) -> dict[s
 def save_state(project_id: str, payload: dict[str, Any]) -> None:
     """Persist the controller state as JSON."""
     STATE_DIR.mkdir(parents=True, exist_ok=True)
+    sanitized_payload, _ = sanitize_state_payload(project_id, payload)
     with state_path(project_id).open("w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=2, sort_keys=True)
+        json.dump(sanitized_payload, handle, indent=2, sort_keys=True)
 
 
 def get_process_args(pid: int) -> str:
@@ -609,6 +694,10 @@ def build_status_payload(project_id: str) -> dict[str, Any]:
             "operator_inputs": default_operator_inputs(),
             "state_path": str(state_path(project_id)),
         }
+
+    state, state_changed = sanitize_state_payload(project_id, state)
+    if state_changed:
+        save_state(project_id, state)
 
     command_signature = state.get("command_signature", project_target(project_id))
     pid = int(state.get("pid", 0) or 0)
@@ -679,15 +768,6 @@ def stop_active_run(project_id: str, force: bool = False) -> dict[str, Any]:
 
     if active and force:
         os.killpg(pid, signal.SIGKILL)
-        active = is_pid_active(pid, command_signature)
-
-    runtime = load_runtime_settings()
-    container_name = state.get("container_name") or runtime["crewai_studio_web_container"]
-    if active:
-        run_command(
-            ["docker", "exec", container_name, "pkill", "-f", f"{project_target(project_id)}/crew.py"],
-            timeout_seconds=20,
-        )
         active = is_pid_active(pid, command_signature)
 
     state["status"] = "stopped" if not active else "stop_failed"
@@ -762,13 +842,11 @@ def run_foreground(args: argparse.Namespace) -> int:
     """Run the CrewAI project in the foreground with inherited stdio."""
     guardrails = evaluate_kickoff_policies(args.project_id, args.kickoff_mode)
     runtime = load_runtime_settings()
-    container_name = runtime["crewai_studio_web_container"]
-    ensure_container_running(container_name)
-    target = stage_project_copy(container_name, args.project_id)
+    ensure_runtime_ready(runtime["crewai_python"])
     operator_inputs = resolve_operator_inputs(args.project_id, kickoff_overrides_from_args(args))
     command = build_crew_command(
-        container_name=container_name,
-        container_project_target=target,
+        python_executable=runtime["crewai_python"],
+        project_script_path=str(project_dir(args.project_id) / "crew.py"),
         project_path=operator_inputs["project_path"],
         operator_goal=operator_inputs["operator_goal"],
         current_state=operator_inputs["current_state"],
@@ -780,7 +858,12 @@ def run_foreground(args: argparse.Namespace) -> int:
 
     log(f"Starting CrewAI foreground run for {args.project_id} in {args.kickoff_mode} mode")
     log(f"Kickoff policy summary: {json.dumps(guardrails, sort_keys=True)}")
-    result = subprocess.run(command, check=False)
+    result = subprocess.run(
+        command,
+        check=False,
+        cwd=str(project_dir(args.project_id)),
+        env=resolve_runtime_environment(),
+    )
     return result.returncode
 
 
@@ -797,13 +880,11 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
 
     guardrails = evaluate_kickoff_policies(args.project_id, args.kickoff_mode)
     runtime = load_runtime_settings()
-    container_name = runtime["crewai_studio_web_container"]
-    ensure_container_running(container_name)
-    target = stage_project_copy(container_name, args.project_id)
+    ensure_runtime_ready(runtime["crewai_python"])
     operator_inputs = resolve_operator_inputs(args.project_id, kickoff_overrides_from_args(args))
     command = build_crew_command(
-        container_name=container_name,
-        container_project_target=target,
+        python_executable=runtime["crewai_python"],
+        project_script_path=str(project_dir(args.project_id) / "crew.py"),
         project_path=operator_inputs["project_path"],
         operator_goal=operator_inputs["operator_goal"],
         current_state=operator_inputs["current_state"],
@@ -826,6 +907,8 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
         stderr=subprocess.STDOUT,
         start_new_session=True,
         text=True,
+        cwd=str(project_dir(args.project_id)),
+        env=resolve_runtime_environment(),
     )
     log_stream.close()
 
@@ -836,9 +919,7 @@ def start_background(args: argparse.Namespace) -> dict[str, Any]:
         "started_at": datetime.now(timezone.utc).isoformat(),
         "kickoff_mode": args.kickoff_mode,
         **operator_inputs,
-        "container_name": container_name,
-        "container_project_target": target,
-        "command_signature": target,
+        "command_signature": str(project_dir(args.project_id) / "crew.py"),
         **guardrails,
     }
     save_state(args.project_id, payload)

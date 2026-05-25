@@ -45,19 +45,13 @@ The tracked `newnexus` project restores:
 - Agent Zero project title and instructions.
 - Project model config matching the current Guardian `gemma4-26b-agent` route.
 - Project knowledge and instruction files.
-- A stable `/a0/usr/projects/newnexus` workspace path.
+- Project metadata under `~/agentzero/usr/projects/newnexus/.a0proj`.
 
-The source checkout is not committed to KyberM0nk. It lives under `.agent-projects/NewNexus`, which is ignored by Git and is a normal clone of `https://github.com/m0nklabs/NewNexus.git`.
+The source checkout is not committed to KyberM0nk. It lives at `~/NewNexus`, which is the normal host clone of `https://github.com/m0nklabs/NewNexus.git`.
 
-Agent Zero should commit and push NewNexus changes from `/a0/usr/projects/newnexus` through the sandbox credential helper. The Windows checkout is only for pulling those commits and running Unreal build/editor validation through direct `ssh unreal-windows` commands.
+Agent Zero should commit and push NewNexus changes from `/home/flip/NewNexus` through the host runtime credential helper. The Windows checkout is only for pulling those commits and running Unreal build/editor validation through direct `ssh unreal-windows` commands.
 
-The workspace path is restored as:
-
-```text
-/a0/usr/projects/newnexus -> /workspace/project/.agent-projects/NewNexus
-```
-
-That gives Agent Zero a stable project workspace while the actual game source remains in the NewNexus repository.
+The host-native setup no longer requires a NewNexus source symlink under `/a0/usr/projects/newnexus`. The repository stays at `~/NewNexus`, and only the Agent Zero project metadata is restored under `~/agentzero/usr/projects/newnexus/.a0proj`.
 
 For Windows validation, the project instructions point Agent Zero at:
 

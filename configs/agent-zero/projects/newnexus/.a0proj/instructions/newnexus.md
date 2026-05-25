@@ -2,13 +2,13 @@
 
 You are building NewNexus, the user's Unreal Engine game.
 
-Use `/a0/usr/projects/newnexus` as the working directory. It is restored by KyberM0nk as a symlink to the persistent checkout under `/workspace/project/.agent-projects/NewNexus`, so it survives Docker rebuilds.
+Use `/home/flip/NewNexus` as the working directory. KyberM0nk restores the Agent Zero project metadata separately under `/home/flip/agentzero/usr/projects/newnexus/.a0proj`, so no NewNexus source symlink is required.
 
-Edit source files in `/a0/usr/projects/newnexus`. Use the Windows workstation only for build/run/editor validation after syncing through Git.
+Edit source files in `/home/flip/NewNexus`. Use the Windows workstation only for build/run/editor validation after syncing through Git.
 
-Commit and push from `/a0/usr/projects/newnexus` inside the sandbox. KyberM0nk provisions a GitHub credential helper for the running sandbox; do not push via the Windows workstation and do not put tokens in Git remotes or command output.
+Commit and push from `/home/flip/NewNexus` on the host runtime. KyberM0nk provisions a GitHub credential helper for the running runtime; do not push via the Windows workstation and do not put tokens in Git remotes or command output.
 
-Generate Windows validation commands yourself and run them through `ssh unreal-windows "<command>"`. Use Windows for Git sync of the Windows checkout, UnrealBuildTool, project generation, editor launches, and runtime validation. Do not use Windows SSH as the primary source editor; inspect and edit source files directly in `/a0/usr/projects/newnexus`.
+Generate Windows validation commands yourself and run them through `ssh unreal-windows "<command>"`. Use Windows for Git sync of the Windows checkout, UnrealBuildTool, project generation, editor launches, and runtime validation. Do not use Windows SSH as the primary source editor; inspect and edit source files directly in `/home/flip/NewNexus`.
 
 Known Windows Unreal install:
 
@@ -48,7 +48,7 @@ Hard rules:
 - Do not use `teams-host`; use `unreal-windows` only.
 - Do not work in `/opt/agent-zero/usr/workdir` for this project.
 - Do not edit source files directly through `J:\Unreal Projects\NewNexus`; edit the local project workspace and sync the Windows checkout for builds.
-- Do not route GitHub pushes through Windows; push from `/a0/usr/projects/newnexus`, then pull on Windows before build validation.
+- Do not route GitHub pushes through Windows; push from `/home/flip/NewNexus`, then pull on Windows before build validation.
 - Do not rely on Kyber NewNexus Windows helper commands. Generate the direct Windows SSH, PowerShell, Git, and Unreal command for the current task.
 - Do not delete Unreal plugin metadata just to disable a plugin. Prefer `"Enabled": false` and preserve fields such as `Name`, `SupportedTargetPlatforms`, and `MarketplaceURL` unless explicitly told otherwise.
 - Do not commit generated Unreal folders such as `Binaries/`, `Intermediate/`, `Saved/`, `DerivedDataCache/`, `Build/`, or `.vs/`.

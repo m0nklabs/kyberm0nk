@@ -2,17 +2,27 @@
 
 Agent Zero should act as the Operator layer.
 
-Planned configuration:
+Active configuration:
 
-- run via Docker
-- mount the active project read-write only when required
-- mount reference projects read-only
-- do not mount Docker socket by default
+- run host-native from `~/agentzero`
+- keep runtime home under `~/agentzero/runtime/home`
+- keep runtime secrets under `~/agentzero/runtime/secrets`
+- restore tracked projects into `~/agentzero/usr/projects`
+- keep the real NewNexus source checkout at `~/NewNexus` and restore only project metadata under `~/agentzero/usr/projects/newnexus/.a0proj`
 - log all task output with timestamps
+
+Bootstrap and launch with:
+
+```bash
+scripts/agent_zero_bootstrap.sh
+scripts/agent_zero_up.sh
+```
+
+The current launcher serves the UI on `http://127.0.0.1:50001` and clears stale listeners on that port before restart, including root-owned leftovers from the retired Docker sandbox when `sudo -n` is available.
 
 ## Model Budget
 
-Agent Zero uses a loop-safe local coding profile for routine sandbox work:
+Agent Zero uses a loop-safe local coding profile for routine host-runtime work:
 
 - Guardian alias: `gemma4-26b-agent`
 - chat model: `ctx_length: 65536`, `ctx_history: 0.35`, `max_tokens: 1536`, `timeout: 240s`

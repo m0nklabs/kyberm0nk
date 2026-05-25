@@ -1,6 +1,6 @@
 # Main Quest CrewAI Project
 
-This directory is the direct CrewAI version of the Studio main quest crew. It is
+This directory is the direct host-native CrewAI version of the main quest crew. It is
 anchored to the NewNexus Unreal Engine project by default.
 
 Files:
@@ -31,21 +31,22 @@ OpenRouter default model policy for this project:
 
 The GitHub search tool is path-aware for file-style queries. Exact queries such as `NewNexus.uproject` or `Source/NewNexus/NewNexus.Build.cs` attempt a direct repository file fetch before falling back to GitHub code search, which keeps live Unreal context gathering anchored to real files instead of docs mentions.
 
-Dry-run inside the CrewAI-Studio container:
+Bootstrap and dry-run locally:
 
 ```bash
+scripts/crewai_bootstrap.sh
 scripts/crewai_main_quest_dry_run.sh
 ```
 
-The dry-run builds the CrewAI objects without calling any model.
+The dry-run builds the CrewAI objects locally without calling any model.
 
-The GitHub tool uses the GitHub REST API and reads its token from `GITHUB_TOKEN` or `GH_TOKEN`; keep the token in the ignored Studio `.env`, not in Git.
+The GitHub tool uses the GitHub REST API and reads its token from `GITHUB_TOKEN` or `GH_TOKEN`; keep the token in Kyber's ignored root `.env` or secret files, not in Git.
 
 For first live pilots, prefer `--repo-write-mode disabled` until the crew has shown that its searches, planning, and validation commands are grounded in the actual NewNexus files.
 
 Default target context:
 
 - GitHub repository: `m0nklabs/NewNexus`
-- Host checkout: `.agent-projects/NewNexus`
-- Agent Zero workspace: `/a0/usr/projects/newnexus`
+- Host checkout: `~/NewNexus`
+- Agent Zero project metadata: `~/agentzero/usr/projects/newnexus/.a0proj`
 - Engine target: Unreal Engine 5.7

@@ -2,13 +2,17 @@
 set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SUPERSET_ROOT="${SUPERSET_ROOT:-${HOME}/superset}"
+SUPERSET_HOME_DIR="${SUPERSET_HOME_DIR:-${HOME}/.superset}"
+SUPERSET_PROJECT="${ACTIVE_PROJECT:-${DIR}}"
 
-# Execute Superset exclusively inside the Docker sandbox.
-CONTAINER_NAME="kyberm0nk-sandbox-1"
-
-# Sandbox specific paths
-SANDBOX_HOME="/root/.superset"
-SANDBOX_PROJECT="/workspace/project"
+if [[ -z "${SUPERSET_BIN:-}" ]]; then
+    if [[ -x "${SUPERSET_ROOT}/packages/cli/dist/superset-linux-x64/bin/superset" ]]; then
+        SUPERSET_BIN="${SUPERSET_ROOT}/packages/cli/dist/superset-linux-x64/bin/superset"
+    else
+        SUPERSET_BIN="${SUPERSET_ROOT}/bin/superset"
+    fi
+fi
 
 if [[ -f "$DIR/.env" ]]; then
     set -a
@@ -16,33 +20,49 @@ if [[ -f "$DIR/.env" ]]; then
     set +a
 fi
 
-if ! docker ps --format "{{.Names}}" | grep -q "^$CONTAINER_NAME$"; then
-    echo "Error: Sandbox container ($CONTAINER_NAME) is not running." >&2
-    echo "Run 'docker compose up -d sandbox' first." >&2
-    exit 1
+if [[ -n "${ACTIVE_PROJECT:-}" ]]; then
+    SUPERSET_PROJECT="${ACTIVE_PROJECT}"
 fi
 
 print_links() {
     printf 'Superset links:\n'
     printf '  Website:       https://superset.sh\n'
-    printf '  CLI install:   (Bundled in sandbox container)\n'
+    printf '  Host checkout: %s\n' "$SUPERSET_ROOT"
+    printf '  Home dir:      %s\n' "$SUPERSET_HOME_DIR"
+    printf '  Bootstrap:     scripts/superset_bootstrap.sh\n'
 }
 
 usage() {
     printf 'Usage: scripts/superset.sh <command> [args...]\n\n'
     printf 'Commands:\n'
-    printf '  status              Show sandbox Superset host status\n'
-    printf '  start               Start Superset host daemon inside the sandbox\n'
-    printf '  login               Run Superset OAuth login in sandbox\n'
-    printf '  whoami              Show Superset auth identity in sandbox\n'
-    printf '  agents              List Superset agents inside sandbox\n'
-    printf '  seed-agents         Add Kyber Guardian-backed agents inside sandbox\n'
-    printf '  import-active       Register ACTIVE_PROJECT inside the sandbox Superset\n'
-    printf '  passthrough ...     Run any raw Superset CLI command inside sandbox\n'
+    printf '  status              Show host-native Superset status\n'
+    printf '  start               Start the host-native Superset daemon\n'
+    printf '  login               Run Superset OAuth login on the host\n'
+    printf '  whoami              Show Superset auth identity on the host\n'
+    printf '  agents              List Superset agents on the host\n'
+    printf '  seed-agents         Add Kyber Guardian-backed agents on the host\n'
+    printf '  import-active       Register ACTIVE_PROJECT with host-native Superset\n'
+    printf '  passthrough ...     Run any raw host-native Superset CLI command\n'
 }
 
-docker_exec() {
-    docker exec -it "$CONTAINER_NAME" "$@"
+require_command() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        printf 'Error: required command is missing: %s\n' "$1" >&2
+        exit 1
+    fi
+}
+
+ensure_superset_bin() {
+    if [[ ! -x "$SUPERSET_BIN" ]]; then
+        printf 'Error: Superset CLI bundle is missing at %s.\n' "$SUPERSET_BIN" >&2
+        printf 'Run scripts/superset_bootstrap.sh or set SUPERSET_ROOT/SUPERSET_BIN explicitly.\n' >&2
+        exit 1
+    fi
+}
+
+run_superset() {
+    ensure_superset_bin
+    env SUPERSET_HOME_DIR="$SUPERSET_HOME_DIR" "$SUPERSET_BIN" "$@"
 }
 
 command_name="${1:-}"
@@ -57,34 +77,31 @@ case "$command_name" in
         print_links
         ;;
     status|start|passthrough)
-        # Note: start runs as daemon inside the container.
-        # (It binds port 45553 inside the container).
-        docker_exec /usr/local/superset/bin/superset "$command_name" "$@"
+        run_superset "$command_name" "$@"
         ;;
     login|whoami)
-        docker_exec /usr/local/superset/bin/superset auth "$command_name" "$@"
+        run_superset auth "$command_name" "$@"
         ;;
     agents)
-        docker_exec /usr/local/superset/bin/superset agents list --local --json "$@"
+        run_superset agents list --local --json "$@"
         ;;
     seed-agents)
-        docker_exec /usr/local/superset/bin/superset agents list --local --json >/dev/null 2>&1 || true
-        # Run the seeder inside the sandbox so preset command paths use container paths.
-        docker exec -i "$CONTAINER_NAME" python3 /workspace/project/scripts/seed_superset_agents.py --home "$SANDBOX_HOME" "$@"
+        require_command python3
+        run_superset agents list --local --json >/dev/null 2>&1 || true
+        python3 "$DIR/scripts/seed_superset_agents.py" --home "$SUPERSET_HOME_DIR" "$@"
         ;;
     import-active)
-        # We run the bun tRPC bypass directly INSIDE the sandbox where bun is installed.
-        docker exec -i "$CONTAINER_NAME" bash -c "
-            export SUPERSET_HOME_DIR='$SANDBOX_HOME'
-            export PROJECT_PATH='$SANDBOX_PROJECT'
-            export PROJECT_NAME='$(basename "${ACTIVE_PROJECT:-kyberm0nk}")'
-            mkdir -p /tmp/superset-trpc-bypass
-            cd /tmp/superset-trpc-bypass
-            if [ ! -f package.json ]; then
-                echo '{}' > package.json
-                bun add @trpc/client superjson >/dev/null 2>&1
-            fi
-            bun -e '
+        require_command bun
+        export SUPERSET_HOME_DIR="$SUPERSET_HOME_DIR"
+        export PROJECT_PATH="$SUPERSET_PROJECT"
+        export PROJECT_NAME="$(basename "${SUPERSET_PROJECT}")"
+        mkdir -p /tmp/superset-trpc-bypass
+        cd /tmp/superset-trpc-bypass
+        if [[ ! -f package.json ]]; then
+            printf '{}\n' > package.json
+            bun add @trpc/client superjson >/dev/null 2>&1
+        fi
+        bun -e '
                 import { existsSync, readFileSync, readdirSync } from \"node:fs\";
                 import { join } from \"node:path\";
                 import { createTRPCClient, httpBatchLink } from \"@trpc/client\";
@@ -138,12 +155,11 @@ case "$command_name" in
                     console.log(JSON.stringify({ reused: false, ...created }, null, 2));
                 }
             '
-        "
         ;;
     help|--help|-h)
         usage
         ;;
     *)
-        docker_exec /usr/local/superset/bin/superset "$command_name" "$@"
+        run_superset "$command_name" "$@"
         ;;
 esac

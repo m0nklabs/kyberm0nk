@@ -2,25 +2,31 @@
 
 Local agentic coding cockpit powered by Guardian.
 
-KyberM0nk is the control workspace for a local coding-agent stack. It coordinates open-source coding tools around the existing Guardian proxy and llama.cpp backend, without owning model files or starting standalone inference servers.
+KyberM0nk is the control workspace for a local coding-agent stack. It coordinates host-native coding frameworks and supporting extras around the existing Guardian proxy and llama.cpp backend, without owning model files or starting standalone inference servers.
+
+Claude Code is now treated as the primary host-native operator tool on this server, with its tracked home under `/home/flip/claudecode`. Kyber remains the broader lab for local supporting workers, orchestration, and sandboxed tooling.
 
 ## Core Idea
 
+- Claude Code stays host-native and out of Docker.
 - Guardian and `llama-server` stay outside Docker.
-- Agent tools run in isolated Docker containers where practical.
+- Active Kyber-managed frameworks run host-native under dedicated home paths, with upstream source checkouts kept on their real repo names such as `~/aider`, `~/crewAI`, `~/opencode`, `~/langgraph`, `~/superset`, and `~/agentzero`.
+- Workspace-first is the guiding rule: every framework should attach to one explicit project workspace, analogous to a VS Code workspace, even if the framework stores its own metadata differently.
+- Source checkouts and runtime/install paths are separate concerns: `~/crewAI`, `~/opencode`, and `~/langgraph` are upstream repos, while `~/crewai`, `~/venvs/kyber-workers`, and `~/.opencode` remain runtime/install paths. See [docs/WORKSPACE_INVENTORY.md](docs/WORKSPACE_INVENTORY.md).
+- Docker is optional for mature, shareable deployment targets, not the active Kyber development layer.
 - Continue stays in the IDE as an extension, configured against Guardian.
-- Active projects mount read-write only when explicitly selected.
-- Reference repositories mount read-only by default.
-- The Docker socket is not mounted by default.
+- Active projects are selected explicitly for host-side worker execution.
+- Reference repositories stay host-visible and should remain read-only by convention unless the operator chooses otherwise.
 
-## Initial Stack
+## Current Stack
 
 | Role | Tool | Purpose |
 |------|------|---------|
-| Strategist | OpenCode | High-level planning, task decomposition, architecture work |
-| Scalpel | Aider | Focused code edits in an active project workspace |
+| Primary operator | Claude Code | Main goto tool for high-trust repo work, review, and orchestration entry |
+| Strategist | OpenCode | Host-native planning and execution worker via `~/venvs/kyber-workers` |
+| Scalpel | Aider | Host-native focused code-edit worker under `~/aider` |
 | Lens | Continue | IDE chat and inline assistance against local Guardian models |
-| Operator | Agent Zero | Sandboxed system tasks, scripts, environment debugging |
+| Operator | Agent Zero | Host-native operator runtime under `~/agentzero` with isolated runtime home/secrets |
 | Gatekeeper | Guardian | OpenAI-compatible broker for local models |
 | Engine | llama.cpp | GPU inference backend managed by Guardian |
 
@@ -39,6 +45,8 @@ Start here:
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/TOOL_ROLES.md](docs/TOOL_ROLES.md)
 - [docs/WORKSPACE_SETUP.md](docs/WORKSPACE_SETUP.md)
+- [docs/WORKSPACE_POLICY.md](docs/WORKSPACE_POLICY.md)
+- [docs/WORKSPACE_INVENTORY.md](docs/WORKSPACE_INVENTORY.md)
 - [docs/SECURITY.md](docs/SECURITY.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
 - [docs/LOCAL_AGENT_MODEL_SETTINGS.md](docs/LOCAL_AGENT_MODEL_SETTINGS.md)
@@ -54,28 +62,39 @@ Superset is the current preferred session/worktree cockpit for KyberM0nk.
 - Docs: https://docs.superset.sh
 - Repository: https://github.com/superset-sh/superset
 
-Kyber entry point. Start the sandbox first so the wrapper can run Superset inside `kyberm0nk-sandbox-1` with container-local state at `/root/.superset`:
+Kyber entry point. Superset now runs from the host checkout at `~/superset` with local state under `~/.superset`:
 
 ```bash
-docker compose up -d sandbox
+scripts/superset_bootstrap.sh
 scripts/superset.sh link
+scripts/superset.sh login
 scripts/superset.sh status
 scripts/superset.sh start
 scripts/superset.sh seed-agents
 scripts/superset.sh import-active
 ```
 
+The Superset presets route into the host-native Aider runtime at `~/aider` and the host-native OpenCode worker root at `~/venvs/kyber-workers`.
+
 ## CrewAI Main Quest Manager
 
-CrewAI-Studio is the watchable project-manager layer for the game-development main quest. Kyber uses the `m0nklabs/CrewAI-Studio` fork so OpenRouter cloud models and Guardian local models appear as separate providers in the same crew.
+Direct host-native CrewAI is the active project-manager lane for the game-development main quest. Superset remains the broader Kyber cockpit; CrewAI is the focused planning and project-manager path around the tracked NewNexus crew.
+
+The upstream CrewAI source checkout now lives at `~/crewAI`, while the direct runnable runtime stays at `~/crewai` so the repo name can match GitHub without breaking the existing host runtime path.
 
 ```bash
-scripts/crewai_studio_bootstrap.sh
-scripts/crewai_studio_status.sh
-scripts/crewai_studio_seed_main_quest.sh
+scripts/crewai_bootstrap.sh
+scripts/crewai_status.sh
+scripts/crewai_main_quest_dry_run.sh
 ```
 
-Open `http://127.0.0.1:8505`, import `.agent-projects/CrewAI-Studio/kyber-imports/main_quest_studio_import.json`, then run the `Kyber Main Quest Game Project Manager` crew.
+Optional live foreground run:
+
+```bash
+scripts/crewai_main_quest_run.sh
+```
+
+The tracked `scripts/crewai_main_quest_control.py` path now owns foreground runs, background runs, status, stop/restart, and persisted steering inputs. Legacy `crewai_studio_*` wrappers remain only as compatibility shims and no longer define the active Kyber path.
 
 The shared `scripts/crewai_main_quest_control.py` path now enforces two kickoff guardrails for live runs: Guardian-backed workers wait for Guardian to go idle before they start competing for the same local GPU route, and OpenRouter-backed runs emit a credit warning before cloud spend begins. The balance check uses `GET /credits` when the configured key is a management key; otherwise Kyber still warns that cloud spend will happen, but cannot show remaining credits automatically.
 
@@ -83,4 +102,4 @@ See [docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md](docs/crewai/MAIN_QUEST_PROJECT_M
 
 ## Repository Status
 
-This repository starts as a documentation-first planning workspace. Implementation should be added in small, testable steps after the workspace is opened directly.
+This repository now acts as the tracked control plane for host-native local frameworks plus the helper scripts and docs needed to keep them manageable.

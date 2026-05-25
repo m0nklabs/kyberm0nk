@@ -15,23 +15,41 @@ if [[ -f "${REPO_ROOT}/.env" ]]; then
   set +a
 fi
 
-CREWAI_STUDIO_DIR="${CREWAI_STUDIO_DIR:-${REPO_ROOT}/.agent-projects/CrewAI-Studio}"
-CREWAI_STUDIO_WEB_CONTAINER="${CREWAI_STUDIO_WEB_CONTAINER:-crewai_studio_kyber}"
+CREWAI_VENV_DIR="${CREWAI_VENV_DIR:-${HOME}/crewai}"
+CREWAI_PYTHON="${CREWAI_VENV_DIR}/bin/python"
 PROJECT_SOURCE="${REPO_ROOT}/configs/crewai/main_quest_project"
-PROJECT_TARGET="/tmp/kyber-main-quest-project"
+OPENROUTER_API_KEY_FILE="${OPENROUTER_API_KEY_FILE:-${HOME}/.secrets/openrouter.key}"
+GITHUB_TOKEN_FILE="${GITHUB_TOKEN_FILE:-${HOME}/.secrets/kyberm0nk_github_token}"
+OPENROUTER_API_KEY_FALLBACK_FILE="${HOME}/.secrets/keys/openrouter.key"
 
-if [[ -f "${CREWAI_STUDIO_DIR}/.env" ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source "${CREWAI_STUDIO_DIR}/.env"
-  set +a
+normalize_api_base() {
+  printf '%s\n' "$1" | sed 's#host\.docker\.internal#127.0.0.1#g'
+}
+
+if [[ -z "${OPENROUTER_API_KEY:-}" && -f "${OPENROUTER_API_KEY_FILE}" ]]; then
+  OPENROUTER_API_KEY="$(tr -d '\r\n' < "${OPENROUTER_API_KEY_FILE}")"
+fi
+if [[ -z "${OPENROUTER_API_KEY:-}" && -f "${OPENROUTER_API_KEY_FALLBACK_FILE}" ]]; then
+  OPENROUTER_API_KEY="$(tr -d '\r\n' < "${OPENROUTER_API_KEY_FALLBACK_FILE}")"
 fi
 
-if ! docker inspect "${CREWAI_STUDIO_WEB_CONTAINER}" >/dev/null 2>&1; then
-  log "CrewAI-Studio container ${CREWAI_STUDIO_WEB_CONTAINER} is not running. Run scripts/crewai_studio_bootstrap.sh first."
+if [[ -z "${GITHUB_TOKEN:-}" && -n "${GH_TOKEN:-}" ]]; then
+  GITHUB_TOKEN="${GH_TOKEN}"
+fi
+if [[ -z "${GITHUB_TOKEN:-}" && -f "${GITHUB_TOKEN_FILE}" ]]; then
+  GITHUB_TOKEN="$(tr -d '\r\n' < "${GITHUB_TOKEN_FILE}")"
+fi
+
+GUARDIAN_API_BASE="$(normalize_api_base "${CREWAI_GUARDIAN_API_BASE:-${CREWAI_STUDIO_GUARDIAN_API_BASE:-${GUARDIAN_API_BASE:-http://127.0.0.1:11434/v1}}}")"
+
+if [[ ! -x "${CREWAI_PYTHON}" ]]; then
+  log "CrewAI runtime is missing at ${CREWAI_PYTHON}. Run scripts/crewai_bootstrap.sh first."
   exit 1
 fi
 
-docker exec "${CREWAI_STUDIO_WEB_CONTAINER}" rm -rf "${PROJECT_TARGET}"
-docker cp "${PROJECT_SOURCE}" "${CREWAI_STUDIO_WEB_CONTAINER}:${PROJECT_TARGET}"
-docker exec "${CREWAI_STUDIO_WEB_CONTAINER}" python "${PROJECT_TARGET}/crew.py" --dry-run
+export OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-}"
+export GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+export GH_TOKEN="${GITHUB_TOKEN:-}"
+export GUARDIAN_API_BASE
+
+"${CREWAI_PYTHON}" "${PROJECT_SOURCE}/crew.py" --dry-run

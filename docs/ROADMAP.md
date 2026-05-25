@@ -9,20 +9,25 @@ The KyberM0nk stack maps directly to specific roles to form a cohesive, self-con
 - **Role**: The brain driving all other tools.
 - **Setup**: Runs purely on the host (outside Docker). Configured to offload to GPU (`-ngl 99` for 35B models on 28GB VRAM). Uses the `qwen3-35b-uncensored` alias as the baseline.
 
-### 2. The General / Architect (Cockpit)
-- **Tool**: OpenCode (or open-source Claude Code wrappers).
-- **Role**: Strategic planning and autonomous orchestration. Sits "above" the rest. Understands the entire project scope, determines new architectures, and delegates chunks of work.
+### 2. The Primary Operator (Host-Native)
+- **Tool**: Claude Code via the dedicated `claudecode` repo and `claude-local` launcher.
+- **Role**: Main goto tool for high-trust coding work, architecture decisions, repo review, and orchestration entry.
+- **Setup**: Runs purely on the host against Guardian. It is not part of the Docker sandbox.
 
-### 3. The Executioner / Special Ops (Sandbox)
+### 3. The Secondary Local Generalist
+- **Tool**: OpenCode.
+- **Role**: Assists with broader local planning and routine throughput behind the main Claude lane.
+
+### 4. The Executioner / Special Ops (Sandbox)
 - **Tool**: Agent Zero.
 - **Role**: Handles the dirty, system-level work. Stands parallel to OpenCode. Executes heavy scripts, complex installations, and environment debugging.
 - **Safety**: Locked inside Docker with strictly mapped read-write targets and read-only reference mounts.
 
-### 4. The Master Carpenter (Scalpel)
+### 5. The Master Carpenter (Scalpel)
 - **Tool**: Aider.
 - **Role**: Extremely fast, precise code editor. Driven from the terminal while OpenCode sets the big picture. Highly token-efficient, performing surgical strikes on specific files.
 
-### 5. The IDE-Glasses (Assistant)
+### 6. The IDE-Glasses (Assistant)
 - **Tool**: Continue (VS Code / JetBrains extension).
 - **Role**: Direct line of sight into the code. Provides inline autocomplete and chat context. Does not perform massive autonomous structural changes, but accelerates manual typing and offers a window into the local proxy.
 
@@ -70,7 +75,7 @@ The KyberM0nk stack maps directly to specific roles to form a cohesive, self-con
 - Goal: Reduce expensive cloud-agent usage by letting local agents do routine implementation work under a lightweight critic/supervisor loop.
 - Direction:
 	- Reuse an existing session/worktree orchestrator instead of rebuilding the cockpit from scratch.
-	- Evaluate Claude Code / Claude Agent SDK as the premium coding-agent quality baseline and optional cloud worker.
+	- Keep Claude Code as the main host-native operator lane, with its own tracked server setup under `~/claudecode/`.
 	- Evaluate Claude Squad for the fast tmux/worktree TUI path.
 	- Evaluate Superset for richer parallel-agent workspaces, review UI, and agent-agnostic orchestration.
 	- Use OpenHands Software Agent SDK as a likely second worker path for programmable local coding loops; keep Agent Zero for sandbox/operator work until OpenHands remote workspace behavior is proven.

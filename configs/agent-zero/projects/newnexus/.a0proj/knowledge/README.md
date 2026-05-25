@@ -2,7 +2,9 @@
 
 Primary repository: `https://github.com/m0nklabs/NewNexus`
 
-Persistent Agent Zero workspace: `/a0/usr/projects/newnexus`
+Primary source checkout: `/home/flip/NewNexus`
+
+Agent Zero project metadata: `/home/flip/agentzero/usr/projects/newnexus/.a0proj`
 
 Windows executor: `ssh unreal-windows`
 

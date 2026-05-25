@@ -40,7 +40,7 @@ def default_home() -> Path:
     configured = os.environ.get("SUPERSET_HOME_DIR")
     if configured:
         return Path(configured).expanduser()
-    return repo_root() / "tmp" / "superset-home"
+    return Path.home() / ".superset"
 
 
 def agent_configs(include_claude_code: bool) -> list[AgentConfig]:

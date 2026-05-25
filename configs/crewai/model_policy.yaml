@@ -1,5 +1,5 @@
 version: 1
-purpose: KyberM0nk CrewAI-Studio model routing for the main quest project manager.
+purpose: KyberM0nk direct CrewAI model routing for the main quest project manager.
 
 selection_policy:
   crewai_mcp_authority: Claude may assemble or reconfigure a Kyber crew through the CrewAI MCP instead of staying locked to the seeded role layout.

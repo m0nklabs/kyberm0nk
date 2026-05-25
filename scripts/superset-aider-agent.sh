@@ -53,7 +53,7 @@ printf '[%s] Kyber Aider Superset agent starting in %s\n' "$(date -Iseconds)" "$
 (
     export ACTIVE_PROJECT="$workspace_path"
     cd "$DIR"
-    "${compose_cmd[@]}" run --rm --no-deps -T sandbox aider \
+    ./scripts/aider.sh \
         --yes-always \
         --no-auto-commits \
         --message "$prompt"

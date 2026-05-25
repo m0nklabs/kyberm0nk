@@ -1,76 +1,61 @@
-# CrewAI-Studio Main Quest Project Manager
+# Direct CrewAI Main Quest Project Manager
 
-This is the KyberM0nk path for the user's main quest: a visible CrewAI-Studio project manager that can drive game-development work while the operator watches and steers the run.
+This is the active KyberM0nk path for the user's main quest: direct host-native CrewAI for project-manager and planning work around NewNexus, with Superset staying the broader cockpit around the rest of the local coding stack.
 
 Default target: NewNexus, the Unreal Engine game project in `m0nklabs/NewNexus`.
 
-## What Exists Now
+## Active Path
 
-- Fork: `m0nklabs/CrewAI-Studio`, based on `strnad/CrewAI-Studio`.
-- Local checkout path: `.agent-projects/CrewAI-Studio`.
-- Studio UI: Streamlit on port `8505` by default.
-- Cloud models: OpenRouter through the fork's dedicated `OpenRouter` provider.
-- Local models: Guardian through the fork's dedicated `Guardian` provider.
-- Crew seed: `configs/crewai/main_quest_studio_import.json`.
-- Direct CrewAI project config: `configs/crewai/main_quest_project/`.
-- Model policy: `configs/crewai/model_policy.yaml`.
-- NewNexus source checkout: `.agent-projects/NewNexus` on the host and `/a0/usr/projects/newnexus` in Agent Zero.
-- Repository tool: `GithubSearchTool` in the Studio UI, backed by Kyber's lightweight GitHub REST implementation scoped to `m0nklabs/NewNexus`, with the token read from `GITHUB_TOKEN` or `GH_TOKEN` in the ignored Studio `.env`.
+- Runtime bootstrap: `scripts/crewai_bootstrap.sh`
+- Runtime status: `scripts/crewai_status.sh`
+- Dry-run validator: `scripts/crewai_main_quest_dry_run.sh`
+- Live wrapper: `scripts/crewai_main_quest_run.sh`
+- Shared control path: `scripts/crewai_main_quest_control.py`
+- Project config: `configs/crewai/main_quest_project/`
+- Model policy: `configs/crewai/model_policy.yaml`
+- Host checkout: `~/NewNexus`
+- Agent Zero project metadata: `~/agentzero/usr/projects/newnexus/.a0proj`
 
-## Why The Fork Exists
+Legacy `crewai_studio_*` scripts remain only as compatibility shims. They no longer define the active Kyber path.
 
-Upstream CrewAI-Studio only had a generic OpenAI-compatible provider and did not cleanly expose OpenRouter cloud models and Guardian local models side by side in the same crew. The fork adds separate providers so a manager can choose cloud escalation while routine workers stay local.
-
-Fork improvements:
-
-- `OpenRouter` provider with `OPENROUTER_API_KEY`, `OPENROUTER_API_BASE`, and `OPENROUTER_MODELS`.
-- `Guardian` provider with `GUARDIAN_API_KEY`, `GUARDIAN_API_BASE`, and `GUARDIAN_MODELS`.
-- `.env` is loaded before model lists are built, so venv and Docker runs both see configured model menus.
-- Docker Compose exposes configurable ports and maps `host.docker.internal` to the Linux host for Guardian access.
-
-## Start Studio
+## Bootstrap And Validate
 
 ```bash
-scripts/crewai_studio_bootstrap.sh
-scripts/crewai_studio_status.sh
-```
-
-Default URLs:
-
-- Host: `http://127.0.0.1:8505`
-- LAN: `http://192.168.1.35:8505`
-
-If `8505` is already in use, the bootstrap script automatically selects the next free port and writes that port into the ignored Studio `.env` when regeneration is enabled.
-
-The bootstrap script keeps secrets in the ignored fork checkout `.env`. It can read `OPENROUTER_API_KEY` from Kyber's `.env` or from `OPENROUTER_API_KEY_FILE`, defaulting to `$HOME/.secrets/openrouter.key` and then `$HOME/.secrets/keys/openrouter.key` when present. The NewNexus GitHub tool reads `GITHUB_TOKEN` from the environment or `GITHUB_TOKEN_FILE`, defaulting to `$HOME/.secrets/kyberm0nk_github_token`.
-
-## Seed The Main Quest Crew
-
-```bash
-scripts/crewai_studio_seed_main_quest.sh
-```
-
-The seed script copies the JSON into the ignored checkout and installs it directly into the running CrewAI-Studio database when the web container is up.
-
-Manual fallback: open CrewAI-Studio, go to Import/Export, and import:
-
-```text
-.agent-projects/CrewAI-Studio/kyber-imports/main_quest_studio_import.json
-```
-
-## Direct CrewAI Dry Run
-
-The same crew also exists as plain CrewAI config files under `configs/crewai/main_quest_project/`.
-
-```bash
+scripts/crewai_bootstrap.sh
+scripts/crewai_status.sh
 scripts/crewai_main_quest_dry_run.sh
 ```
 
-This copies the config into the Studio container and builds the CrewAI `Crew` object without calling a model. It verifies that the YAML config, provider policy, and CrewAI object construction all work before spending tokens.
+The bootstrap creates `~/crewai` with a supported local Python interpreter and installs the direct CrewAI runtime. The dry-run builds the tracked CrewAI object locally without calling a model, so YAML/provider wiring can be validated before any token spend.
+
+## Live Control
+
+Foreground convenience wrapper:
+
+```bash
+scripts/crewai_main_quest_run.sh
+```
+
+Shared control path:
+
+```bash
+python3 scripts/crewai_main_quest_control.py run --project-id main_quest_project
+python3 scripts/crewai_main_quest_control.py start --project-id main_quest_project
+python3 scripts/crewai_main_quest_control.py status --project-id main_quest_project --output json
+python3 scripts/crewai_main_quest_control.py stop --project-id main_quest_project
+```
+
+The control script owns foreground runs, detached background runs, restart, stop, status, and persisted operator inputs. Terminal usage and Claude MCP usage go through the same control path so they do not drift.
+
+Live kickoff guardrails:
+
+- Guardian-backed runs wait for Guardian `/api/status` to go idle before they start sharing the same local GPU route.
+- OpenRouter-backed live runs emit a cloud-spend warning and attempt a `/credits` balance check when the configured key supports it.
+- Persisted operator inputs include `repo_write_mode` and `github_target_branch` so first pilots can stay explicitly non-destructive.
 
 ## Claude MCP Surface
 
-The user-scoped Claude `crewai` MCP is no longer only a rulebook. The Kyber-vendored server now exposes a read-mostly project surface for the tracked CrewAI setup:
+The user-scoped Claude `crewai` MCP now exposes the direct tracked CrewAI lane instead of a Studio/container surface:
 
 - `list_kyber_crewai_projects`
 - `inspect_kyber_crewai_project`
@@ -83,84 +68,49 @@ The user-scoped Claude `crewai` MCP is no longer only a rulebook. The Kyber-vend
 - `stop_kyber_crewai_live_run`
 - `get_kyber_crewai_live_log_preview`
 
-This is the current safe operational slice: Claude can inspect the tracked CrewAI project, validate wiring through the existing dry-run script, start or stop the tracked background run, update the persisted operator guidance used for the next restart, and review current run/log state without going through the Studio UI manually. True mid-run steering remains separate follow-up work.
-
-## Run Control
-
-The tracked shell entry point [scripts/crewai_main_quest_run.sh](/home/flip/kyberm0nk/scripts/crewai_main_quest_run.sh) now delegates to [scripts/crewai_main_quest_control.py](/home/flip/kyberm0nk/scripts/crewai_main_quest_control.py), which provides:
-
-- `run` for foreground execution
-- `start` for detached background execution
-- `status` for persisted PID/state inspection
-- `stop` for controlled termination
-
-The MCP uses the same control script, so terminal usage and Claude usage share one control path instead of drifting into separate wrappers.
-
-The same control path now also exposes:
-
-- `get-inputs` for current persisted operator inputs
-- `set-inputs` for steering updates between runs
-- `restart` for applying updated guidance to a fresh background run
-
-The tracked inputs now also include `repo_write_mode` and `github_target_branch`. The current safe default is `repo_write_mode=disabled`, which lets the crew run a live research/plan/patched-output pilot without blindly committing back to `m0nklabs/NewNexus`.
+This is the safe operational slice today: inspect the tracked project, validate it through dry-run, start or stop the background run, update persisted steering between restarts, and read live log output.
 
 ## Crew Shape
 
-The table below describes the seeded fallback crew, not a hard lock. Claude may assemble or revise a different team through the CrewAI MCP when needed, but OpenRouter picks must stay inside the MoniFuse top20 value pool in `configs/crewai/model_policy.yaml` unless the operator explicitly overrides policy. If Claude chooses `openai/gpt-5.4`, it should request `reasoning.effort=xhigh` through OpenRouter rather than using GPT-5.4 as a plain no-reasoning pass.
+The seeded crew is a fallback layout, not a hard lock. Claude may assemble or revise a different team through the CrewAI MCP when needed, but OpenRouter picks must stay inside the MoniFuse top20 value pool in `configs/crewai/model_policy.yaml` unless the operator explicitly overrides policy.
 
-| Role | Provider | Model | Purpose |
-|------|----------|-------|---------|
-| Main Quest Project Manager | OpenRouter | `deepseek/deepseek-v4-flash` | Breaks the game goal into milestones, delegates, and gates escalation. |
-| Planner | OpenRouter | `z-ai/glm-4.7-flash` | Cheap planning and run summaries. |
-| Local Game Researcher | Guardian | `gemma4-26b-agent` | Local context gathering and summarization. |
-| Local Game Builder | Guardian | `qwen3-35b-reasoning-agent` | Routine implementation planning and patch drafting. |
-| QA Playtest Reviewer | OpenRouter | `z-ai/glm-5.1` | Final review, regression risk, and acceptance checks. |
-| Expert Escalation Engineer | OpenRouter | `deepseek/deepseek-v4-pro` | Narrow blocker escalation after local failure. |
+Current tracked defaults:
 
-Allowed cloud pool for Claude-built crews via CrewAI MCP:
+- Manager LLM: OpenRouter `deepseek/deepseek-v4-flash`
+- Planning LLM: OpenRouter `z-ai/glm-4.7-flash`
+- `main_quest_project_manager`: OpenRouter `openai/deepseek/deepseek-v4-flash`
+- `local_game_researcher`: Guardian `openai/qwen3-35b-reasoning-agent`
+- `local_game_builder`: Guardian `openai/qwen3-35b-uncensored-agent`
+- `qa_playtest_reviewer`: OpenRouter `openai/z-ai/glm-5.1`
+- `expert_escalation_engineer`: OpenRouter `openai/deepseek/deepseek-v4-pro`
 
-- `deepseek/deepseek-v4-flash`
-- `deepseek/deepseek-v4-pro`
-- `z-ai/glm-4.7-flash`
-- `moonshotai/kimi-k2.5`
-- `moonshotai/kimi-k2.6`
-- `google/gemini-3-flash-preview`
-- `deepseek/deepseek-v3.2-speciale`
-- `z-ai/glm-5.1`
-- `google/gemini-3.1-pro-preview-customtools`
-- `openai/gpt-5.2`
+When Claude selects `openai/gpt-5.4` through OpenRouter, the expected request profile is `reasoning.effort=xhigh` with returned reasoning excluded unless the run explicitly needs those blocks.
 
 ## Operator Steering
 
-The seeded crew includes an `operator_chat_guidance` placeholder. Use it as the steering channel for the current run: paste corrections, priorities, constraints, and course changes there before kickoff.
+The persisted steering fields are:
 
-For safe pilots, also set:
+- `operator_goal`: the playable slice or task to execute
+- `project_path`: the active host-side NewNexus path, normally `/home/flip/NewNexus`
+- `current_state`: the current known state of the project
+- `operator_chat_guidance`: operator corrections, priorities, and explicit constraints
+- `repo_write_mode`: `disabled` for non-destructive pilots, `enabled` only when intentional pushes are allowed
+- `github_target_branch`: the GitHub branch to target when writes are enabled
 
-- `repo_write_mode`: `disabled` for no-write runs, `enabled` only when an intentional push is allowed.
-- `github_target_branch`: the branch the GitHub push tool should target if writes are enabled.
-
-Current limitation: upstream CrewAI-Studio does not provide true mid-run chat injection into an active CrewAI execution. The usable current version is watchable and steerable between runs through the shared control path and MCP tools: update the persisted operator inputs, then restart the run. A dedicated live steering panel/tool is the next fork improvement.
-
-## First Game Run Inputs
-
-Use these placeholders in the kickoff screen:
-
-- `operator_goal`: the game feature or playable slice to build.
-- `project_path`: the active NewNexus project path, for example `/workspace/project/.agent-projects/NewNexus` or `/a0/usr/projects/newnexus`.
-- `current_state`: a short summary of what already exists.
-- `operator_chat_guidance`: live direction from the operator, including what to avoid. Mention `Stay on Unreal/NewNexus` when the run must not drift into Unity, generic 2D, or another engine.
-- `repo_write_mode`: whether the current run may push to GitHub or must stay non-destructive.
-- `github_target_branch`: the intended GitHub branch when writes are enabled.
+True mid-run operator chat injection is still not implemented. The current supported flow is: update persisted inputs, then restart the run.
 
 ## Safety Rules
 
-- Do not put OpenRouter keys in Git.
-- Keep the CrewAI-Studio checkout under `.agent-projects/`.
+- Do not put OpenRouter or GitHub tokens in Git.
 - Guardian and `llama-server` stay outside Docker.
-- Use Guardian for cheap routine work and OpenRouter only for management, review, or escalation.
-- Stop and rerun instead of letting an obviously wrong crew continue spending tokens.
-- Keep exploratory or first-pass live runs in `repo_write_mode=disabled` until the crew has proven that its repo context and validation commands are sound.
+- Use Guardian for cheap routine work and OpenRouter for management, review, or escalation.
+- Stop and rerun instead of letting an obviously wrong crew keep spending tokens.
+- Keep exploratory or first-pass live runs in `repo_write_mode=disabled` until repo context and validation commands have proven themselves.
+
+## Legacy Note
+
+The earlier `~/CrewAI-Studio` fork path is retired for active Kyber operation. Keep it only as legacy/archive material if needed for reference; the active supported path is direct CrewAI plus the existing Superset-based cockpit.
 
 ## Pilot Observation
 
-A bounded live pilot on 2026-05-14 exposed that the original GitHub search path could return documentation mentions instead of exact Unreal files for queries such as `NewNexus.uproject`. The direct CrewAI tool now attempts an exact repository file fetch first for path/filename-style queries, which corrected the pilot immediately: the rerun retrieved the real `NewNexus.uproject` with `EngineAssociation: 5.7` and plugin/module preview instead of a docs hit.
+A bounded live pilot on 2026-05-14 exposed that the original GitHub search path could return documentation mentions instead of exact Unreal files for queries such as `NewNexus.uproject`. The direct CrewAI tool now attempts an exact repository file fetch first for path-style queries, which corrected the pilot immediately.

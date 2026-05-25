@@ -16,7 +16,7 @@ SCRIPTS_DIR = REPO_ROOT / "scripts"
 LOGS_DIR = REPO_ROOT / "logs"
 LIVE_LOG_PATH = LOGS_DIR / "crewai_live.log"
 DEFAULT_PROJECT_ID = "main_quest_project"
-DEFAULT_WEB_CONTAINER = "crewai_studio_kyber"
+DEFAULT_CREWAI_VENV_DIR = Path.home() / "crewai"
 OUTPUT_PREVIEW_CHARS = 12000
 DEFAULT_LOG_LINES = 80
 MAX_LOG_LINES = 200
@@ -144,15 +144,12 @@ def run_control_command(
 
 
 def load_runtime_settings() -> dict[str, str]:
-    """Load CrewAI runtime settings from the repo and optional Studio env."""
+    """Load CrewAI runtime settings for the direct host-native lane."""
     root_env = load_env_file(REPO_ROOT / ".env")
-    crewai_studio_dir = Path(root_env.get("CREWAI_STUDIO_DIR", REPO_ROOT / ".agent-projects" / "CrewAI-Studio"))
-    studio_env = load_env_file(crewai_studio_dir / ".env")
-    container_name = studio_env.get("CREWAI_STUDIO_WEB_CONTAINER") or root_env.get("CREWAI_STUDIO_WEB_CONTAINER") or DEFAULT_WEB_CONTAINER
-
+    crewai_venv_dir = Path(root_env.get("CREWAI_VENV_DIR", str(DEFAULT_CREWAI_VENV_DIR))).expanduser()
     return {
-        "crewai_studio_dir": str(crewai_studio_dir),
-        "crewai_studio_web_container": container_name,
+        "crewai_venv_dir": str(crewai_venv_dir),
+        "crewai_python": str(crewai_venv_dir / "bin" / "python"),
     }
 
 
@@ -246,31 +243,26 @@ def tail_lines(path: Path, line_count: int) -> list[str]:
         return list(deque((line.rstrip("\n") for line in handle), maxlen=capped))
 
 
-def get_container_status(container_name: str) -> dict[str, Any]:
-    """Inspect the configured CrewAI Studio web container."""
-    inspect_result = run_command(["docker", "inspect", "-f", "{{.State.Running}}", container_name], timeout_seconds=20)
-    if not inspect_result["success"]:
+def get_runtime_status(python_executable: str) -> dict[str, Any]:
+    """Inspect the direct CrewAI Python runtime used by the tracked host lane."""
+    python_path = Path(python_executable)
+    if not python_path.exists():
         return {
+            "ready": False,
             "exists": False,
-            "running": False,
-            "error": inspect_result["stderr"] or inspect_result["stdout"] or inspect_result["error"],
-            "active_project_processes": [],
+            "python": str(python_path),
+            "version": "",
+            "error": "Direct CrewAI runtime is missing. Run scripts/crewai_bootstrap.sh first.",
         }
 
-    running = inspect_result["stdout"].strip().lower() == "true"
-    active_processes: list[str] = []
-    if running:
-        process_result = run_command(["docker", "exec", container_name, "ps", "-eo", "pid,args"], timeout_seconds=20)
-        if process_result["success"]:
-            for line in process_result["stdout"].splitlines():
-                if "kyber-main-quest-project/crew.py" in line:
-                    active_processes.append(line.strip())
-
+    version_result = run_command([str(python_path), "--version"], timeout_seconds=20)
+    version_output = (version_result["stdout"] or version_result["stderr"]).strip()
     return {
+        "ready": version_result["success"],
         "exists": True,
-        "running": running,
-        "error": "",
-        "active_project_processes": active_processes,
+        "python": str(python_path),
+        "version": version_output,
+        "error": version_result["error"] if not version_result["success"] else "",
     }
 
 
@@ -475,7 +467,7 @@ def run_kyber_crewai_dry_run(project_id: str = DEFAULT_PROJECT_ID, timeout_secon
 
 
 @mcp.tool(name="get_kyber_crewai_run_status",
-          description="Inspect CrewAI Studio container health, active Kyber project processes, and live-log metadata.")
+          description="Inspect direct CrewAI runtime readiness, tracked run status, and live-log metadata.")
 def get_kyber_crewai_run_status(project_id: str = DEFAULT_PROJECT_ID) -> str:
     """Return live CrewAI run status for a tracked Kyber project."""
     try:
@@ -488,17 +480,14 @@ def get_kyber_crewai_run_status(project_id: str = DEFAULT_PROJECT_ID) -> str:
         })
 
     runtime = load_runtime_settings()
-    container_status = get_container_status(runtime["crewai_studio_web_container"])
+    runtime_status = get_runtime_status(runtime["crewai_python"])
     controller_status = run_control_command(project_id=project_id, action="status", timeout_seconds=60)
     log_exists = LIVE_LOG_PATH.exists()
     return json_response({
         "success": True,
         "project_id": project_id,
         "crew_name": project_summary["crew"].get("name", project_id),
-        "container": {
-            "name": runtime["crewai_studio_web_container"],
-            **container_status,
-        },
+        "runtime": runtime_status,
         "log": {
             "path": str(LIVE_LOG_PATH),
             "exists": log_exists,
@@ -691,8 +680,8 @@ def list_server_tools() -> str:
         },
         {
             "name": "get_kyber_crewai_run_status",
-            "description": "Inspect CrewAI Studio container state and live-run metadata for Kyber projects.",
-            "purpose": "Shows whether the web container is up, whether a Kyber crew process appears active, and whether the live log exists."
+            "description": "Inspect the direct CrewAI runtime state and live-run metadata for Kyber projects.",
+            "purpose": "Shows whether the host CrewAI runtime is ready, whether a Kyber crew process appears active, and whether the live log exists."
         },
         {
             "name": "start_kyber_crewai_live_run",

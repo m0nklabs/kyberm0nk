@@ -8,8 +8,8 @@ tasks:
       {operator_chat_guidance}, {repo_write_mode}, and {github_target_branch}.
       Convert it into a short NewNexus Unreal
       playable-slice brief. If project_path is empty, assume the GitHub repo
-      m0nklabs/NewNexus and the local workspace .agent-projects/NewNexus / Agent
-      Zero path /a0/usr/projects/newnexus. Identify unclear requirements, but
+      m0nklabs/NewNexus and the local workspace ~/NewNexus. Identify unclear
+      requirements, but
       continue with reasonable Unreal-specific assumptions when safe. Treat
       repo_write_mode=disabled as a hard non-destructive constraint.
     expected_output: >

@@ -8,8 +8,8 @@ printf '%s\n' \
   "Workers must generate the direct command needed for the current task." \
   "" \
   "Use instead:" \
-  "  1. Work in /a0/usr/projects/newnexus inside the sandbox." \
-  "  2. Commit/push from the sandbox when validation needs the Windows checkout." \
+  "  1. Work in /home/flip/NewNexus on the host runtime." \
+  "  2. Commit/push from the host runtime when validation needs the Windows checkout." \
   "  3. Run direct Windows commands through ssh unreal-windows." \
   "" \
   "Examples to adapt, not copy blindly:" \

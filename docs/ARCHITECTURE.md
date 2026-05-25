@@ -108,4 +108,4 @@ The benchmark suite and trend renderer in `scripts/` provide the evidence trail 
 - KyberM0nk does not replace Guardian.
 - KyberM0nk does not download or manage GGUF model files.
 - KyberM0nk does not start direct `llama-server` processes.
-- KyberM0nk does not replace project-specific workspaces.
+- KyberM0nk does not replace project-specific workspaces; it coordinates frameworks around them. See [WORKSPACE_POLICY.md](WORKSPACE_POLICY.md).

@@ -1,6 +1,6 @@
 # Blueprint: Hybrid CrewAI Game-Development Crew
 
-This blueprint defines the CrewAI-Studio manager crew used by KyberM0nk's main quest: visible game-development orchestration with cheap local Guardian workers and narrow OpenRouter escalation.
+This blueprint defines the direct CrewAI manager crew used by KyberM0nk's main quest: visible game-development orchestration with cheap local Guardian workers and narrow OpenRouter escalation.
 
 ## Strategy
 
@@ -30,15 +30,15 @@ The manager owns planning, delegation, escalation, and operator-facing summaries
 - Escalate immediately for high-risk architecture changes, destructive operations, hard engine/build failures, or cases where repeated local retries would waste more time than a stronger model costs.
 - Keep escalation prompts narrow and include exact failed attempts.
 
-## Studio Setup
+## Direct Runtime Setup
 
 Use the tracked Kyber seed instead of manually recreating the crew:
 
 ```bash
-scripts/crewai_studio_bootstrap.sh
-scripts/crewai_studio_seed_main_quest.sh
+scripts/crewai_bootstrap.sh
+scripts/crewai_main_quest_dry_run.sh
 ```
 
-Then import `.agent-projects/CrewAI-Studio/kyber-imports/main_quest_studio_import.json` through CrewAI-Studio's Import/Export page.
+The active Kyber path is direct host-native CrewAI. Legacy Studio wrappers remain only for compatibility and do not define the supported runtime anymore.
 
 See [MAIN_QUEST_PROJECT_MANAGER.md](MAIN_QUEST_PROJECT_MANAGER.md) for the operational workflow.

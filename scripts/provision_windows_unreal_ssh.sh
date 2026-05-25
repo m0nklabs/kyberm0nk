@@ -2,6 +2,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+source ./scripts/agent_zero_env.sh
 
 key_path="${WINDOWS_UNREAL_SSH_KEY_PATH:-/home/flip/.ssh/kyberm0nk_windows_unreal_ed25519}"
 config_path="configs/ssh/windows-unreal.config"
@@ -12,32 +13,21 @@ if [[ ! -r "${key_path}" ]]; then
 fi
 
 if [[ ! -r "${config_path}" ]]; then
-  echo "[windows-unreal] missing sandbox ssh config: ${config_path}" >&2
+  echo "[windows-unreal] missing tracked ssh config: ${config_path}" >&2
   exit 1
 fi
 
-container_id="$(docker compose ps -q sandbox)"
+ensure_agent_zero_root
+ensure_agent_zero_runtime_dirs
 
-if [[ -z "${container_id}" ]]; then
-  echo "[windows-unreal] sandbox container not found; creating without rebuild..."
-  docker compose up -d --no-build sandbox
-  container_id="$(docker compose ps -q sandbox)"
-fi
+runtime_key_path="${AGENT_ZERO_RUNTIME_SECRETS}/windows_unreal_ed25519"
+runtime_config_path="${AGENT_ZERO_RUNTIME_SSH_DIR}/config"
 
-if [[ -z "${container_id}" ]]; then
-  echo "[windows-unreal] sandbox container is unavailable" >&2
-  exit 1
-fi
+echo "[windows-unreal] provisioning SSH config/key into host Agent Zero runtime..."
+cp "${key_path}" "${runtime_key_path}"
+chmod 600 "${runtime_key_path}"
+sed "s#/run/kyberm0nk/secrets/windows_unreal_ed25519#${runtime_key_path}#g" "${config_path}" > "${runtime_config_path}"
+chmod 600 "${runtime_config_path}"
+command -v ssh >/dev/null 2>&1
 
-if [[ "$(docker inspect --format '{{.State.Running}}' "${container_id}")" != "true" ]]; then
-  echo "[windows-unreal] starting existing sandbox container..."
-  docker start "${container_id}" >/dev/null
-fi
-
-echo "[windows-unreal] provisioning SSH config/key into sandbox ${container_id:0:12}..."
-docker compose exec -T sandbox sh -lc 'mkdir -p /root/.ssh /run/kyberm0nk/secrets && chmod 700 /root/.ssh'
-docker cp "${config_path}" "${container_id}:/root/.ssh/config"
-docker cp "${key_path}" "${container_id}:/run/kyberm0nk/secrets/windows_unreal_ed25519"
-docker compose exec -T sandbox sh -lc 'chown root:root /root/.ssh/config /run/kyberm0nk/secrets/windows_unreal_ed25519 && chmod 600 /root/.ssh/config /run/kyberm0nk/secrets/windows_unreal_ed25519 && ssh -V >/dev/null'
-
-echo "[windows-unreal] sandbox SSH material is ready"
+echo "[windows-unreal] host Agent Zero SSH material is ready"

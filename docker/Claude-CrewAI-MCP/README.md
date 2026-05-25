@@ -9,7 +9,7 @@ In upstream form this server is mostly a CrewAI rulebook. In the KyberM0nk vendo
 - starting and stopping the tracked background run
 - reading and updating persisted operator inputs
 - restarting the tracked run with updated guidance
-- checking CrewAI-Studio/container status
+- checking direct CrewAI runtime and tracked run status
 - previewing the live CrewAI log
 
 The Kyber extension also carries two safety improvements for live NewNexus runs:

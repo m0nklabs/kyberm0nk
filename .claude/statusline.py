@@ -150,6 +150,8 @@ def build_bar(used_percentage: int) -> str:
 
 def pick_status(input_tokens: int, context_window_size: int) -> tuple[str, str]:
     """Return the status label and ANSI color for the current context load."""
+    if context_window_size <= 0:
+        return "OK", ANSI_GREEN
     compact_threshold = warning_threshold(context_window_size)
     if input_tokens >= compact_threshold:
         return "COMPACT SOON", ANSI_RED
