@@ -124,5 +124,6 @@
 - [x] Serialize Guardian-backed CrewAI kickoff behind Guardian idle status and surface OpenRouter credit warnings before cloud-backed live runs.
 - [x] Switch the main quest's default OpenRouter route to MoniFuse top20 value-ranked models instead of premium-priced defaults.
 - [x] Allow Claude to assemble or revise a CrewAI team through the CrewAI MCP while constraining all OpenRouter picks to the MoniFuse top20 value pool.
+- [x] Document the Kyber operator boundary: manage agent frameworks themselves, especially Hermes, and avoid doing the framework's downstream domain work by hand.
 - [x] Add direct CrewAI YAML passthrough for provider-specific LLM request options so OpenRouter GPT-5.4 can be requested with `reasoning.effort=xhigh`.
 - [x] Harden the CrewAI live watcher so raw log content is escaped safely and the page hooks into new live lines without replaying stale historical errors.

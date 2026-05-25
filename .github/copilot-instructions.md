@@ -16,6 +16,13 @@ KyberM0nk is a local agentic coding cockpit. It coordinates coding tools around 
 - Do not mount the Docker socket unless a task explicitly requires it and the risk is documented.
 - Project documentation, code comments, and commits must be in English.
 
+
+## Framework Stewardship
+
+- KyberM0nk exists to manage agent frameworks themselves: runtime roots, wrappers, prompts, tool policy, schedulers, MCP wiring, safety rails, observability, and autonomy settings.
+- Do not use KyberM0nk sessions to do the downstream domain work of those frameworks by hand. In particular, when working on Hermes from Kyber, focus on making Hermes more autonomous and reliable rather than manually doing Hermes' repo triage, review, or operating work.
+- Validation is allowed: run bounded framework-level tests, dry-runs, and scheduler executions to confirm Hermes behavior. But after the framework path is healthy, let Hermes do its own recurring work.
+- When a change drifts from framework management into application/domain execution, stop and move that work back into the framework's own autonomous loop, prompt, skill, cron, kanban, or runtime policy.
 ## Repository Hygiene
 
 - Root should stay clean: README, CHANGELOG, standard config/manifests only.

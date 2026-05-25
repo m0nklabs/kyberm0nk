@@ -1,5 +1,11 @@
 # Changelog
 
+
+## 2026-05-25
+
+- **Framework stewardship boundary:**
+  - Documented the Kyber operator boundary explicitly in project instructions: Kyber sessions should manage agent frameworks themselves, especially Hermes, instead of manually doing the frameworks' downstream repo or operating work.
+  - Clarified that bounded validation runs are allowed, but the steady-state goal is to push recurring work back into Hermes' own prompts, cron jobs, kanban flow, skills, and runtime policy.
 ## 2026-05-19
 
 - **VibeUE GitHub Copilot bridge:**
