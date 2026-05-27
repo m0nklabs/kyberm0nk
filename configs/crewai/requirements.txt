@@ -2,3 +2,5 @@ crewai==1.5.0
 requests>=2.32,<3
 PyYAML>=6.0,<7
 pydantic>=2.12,<3
+fastapi>=0.115,<1
+uvicorn>=0.32,<1

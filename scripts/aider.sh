@@ -25,8 +25,12 @@ if [[ ! -x "${AIDER_BIN}" ]]; then
     echo "❌ ERROR: aider binary missing at ${AIDER_BIN}"; exit 1
 fi
 
+if [[ -z "${AIDER_GUARDIAN_API_KEY:-}" ]]; then
+    echo "❌ ERROR: AIDER_GUARDIAN_API_KEY missing in $DIR/.env"; exit 1
+fi
+
 export OPENAI_API_BASE="$(normalize_api_base "${GUARDIAN_BASE_URL}")"
-export OPENAI_API_KEY="${GUARDIAN_API_KEY}"
+export OPENAI_API_KEY="${AIDER_GUARDIAN_API_KEY}"
 
 AIDER_MODEL="${AIDER_MODEL:-openai/${DEFAULT_MODEL}}"
 

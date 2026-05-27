@@ -204,7 +204,7 @@ def fetch_guardian_runtime_status(llm_usage: dict[str, Any]) -> dict[str, Any]:
     if not api_base:
         return {"success": False, "status": "unavailable", "message": "Guardian API base is not configured."}
 
-    api_key_env = provider_settings.get("api_key_env", "GUARDIAN_API_KEY")
+    api_key_env = provider_settings.get("api_key_env", "CREWAI_GUARDIAN_API_KEY")
     api_key = resolve_runtime_secret(controller_env, api_key_env)
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
     status_url = guardian_status_url(api_base)

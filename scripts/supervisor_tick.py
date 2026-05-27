@@ -330,7 +330,7 @@ def main() -> int:
     else:
         api_base = args.api_base or env.get("GUARDIAN_BASE_URL") or os.environ.get("GUARDIAN_BASE_URL") or DEFAULT_API_BASE
         api_base = normalize_api_base(api_base)
-        api_key = args.api_key or env.get("GUARDIAN_API_KEY") or os.environ.get("GUARDIAN_API_KEY") or "local-dev"
+        api_key = args.api_key or env.get("KYBERM0NK_GUARDIAN_API_KEY") or os.environ.get("KYBERM0NK_GUARDIAN_API_KEY") or "local-dev"
         model = args.model or env.get("SUPERVISOR_MODEL") or os.environ.get("SUPERVISOR_MODEL") or env.get("DEFAULT_MODEL") or os.environ.get("DEFAULT_MODEL") or DEFAULT_MODEL
         try:
             decision = guardian_decision(summary, api_base, api_key, model)

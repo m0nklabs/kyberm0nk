@@ -55,7 +55,7 @@ providers:
   guardian:
     studio_provider: Guardian
     api_base: http://host.docker.internal:11434/v1
-    api_key_env: GUARDIAN_API_KEY
+    api_key_env: CREWAI_GUARDIAN_API_KEY
     use_for:
       - routine_research
       - routine_code_generation

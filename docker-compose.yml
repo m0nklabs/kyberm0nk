@@ -27,7 +27,7 @@ services:
       dockerfile: docker/sandbox/Dockerfile
     environment:
       - OPENAI_API_BASE=${GUARDIAN_BASE_URL}
-      - OPENAI_API_KEY=${GUARDIAN_API_KEY}
+      - OPENAI_API_KEY=${AIDER_GUARDIAN_API_KEY}
       - AIDER_MODEL=openai/${DEFAULT_MODEL}
       - GITHUB_TOKEN=${GITHUB_TOKEN:-}
       - SERPER_API_KEY=${SERPER_API_KEY:-}
@@ -37,7 +37,7 @@ services:
       - WINDOWS_UNREAL_SSH_HOST=${WINDOWS_UNREAL_SSH_HOST:-192.168.1.245}
       - WINDOWS_UNREAL_SSH_USER=${WINDOWS_UNREAL_SSH_USER:-ue_agent}
       # Agent Zero: route the generic "other" OpenAI-compatible provider to Guardian
-      - OTHER_API_KEY=${GUARDIAN_API_KEY}
+      - OTHER_API_KEY=${AGENT_ZERO_GUARDIAN_API_KEY}
       # Agent Zero internal overrides (Knowledge base skip)
       - A0_SET_agent_knowledge_subdir=disabled
       - WEB_UI_HOST=0.0.0.0

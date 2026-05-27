@@ -23,7 +23,6 @@ providers:
     default_api_base: https://openrouter.ai/api/v1
   guardian:
     sdk_provider: openai
-    api_key_env: GUARDIAN_API_KEY
+    api_key_env: CREWAI_GUARDIAN_API_KEY
     api_base_env: GUARDIAN_API_BASE
-    default_api_key: sk-guardian-local
     default_api_base: http://127.0.0.1:11434/v1

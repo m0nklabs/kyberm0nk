@@ -10,6 +10,17 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 source ./scripts/agent_zero_env.sh
 
+foreground_mode=0
+if [[ "${1:-}" == "--foreground" ]]; then
+    foreground_mode=1
+    shift
+fi
+
+if [[ "$#" -gt 0 ]]; then
+    echo "usage: $0 [--foreground]" >&2
+    exit 2
+fi
+
 UI_PORT="${AGENT_ZERO_PORT:-50001}"
 runtime_token_path="${AGENT_ZERO_RUNTIME_SECRETS}/github_token"
 ssh_key_path="${WINDOWS_UNREAL_SSH_KEY_PATH:-/home/flip/.ssh/kyberm0nk_windows_unreal_ed25519}"
@@ -42,7 +53,7 @@ if [[ -f ./configs/agent-zero/patches/vision_load.py ]]; then
     cp ./configs/agent-zero/patches/vision_load.py "${AGENT_ZERO_ROOT}/tools/vision_load.py"
 fi
 
-if curl -sSf -m 2 "http://127.0.0.1:${UI_PORT}/api/health" >/dev/null 2>&1; then
+if [[ "${foreground_mode}" -ne 1 ]] && curl -sSf -m 2 "http://127.0.0.1:${UI_PORT}/api/health" >/dev/null 2>&1; then
     echo "[agent-zero] already healthy at http://127.0.0.1:${UI_PORT}"
     exit 0
 fi
@@ -73,6 +84,18 @@ if [[ -r "${ssh_key_path}" ]]; then
     ./scripts/provision_windows_unreal_ssh.sh
 else
     echo "[agent-zero] Windows Unreal SSH key not found at ${ssh_key_path}; skipping SSH provisioning"
+fi
+
+if [[ "${foreground_mode}" -eq 1 ]]; then
+    echo "[agent-zero] starting run_ui.py in foreground..."
+    mkdir -p "${log_dir}"
+    cd "${AGENT_ZERO_ROOT}"
+    exec env \
+        HOME="${AGENT_ZERO_RUNTIME_HOME}" \
+        PATH="${AGENT_ZERO_BIN_DIR}:$PATH" \
+        PYTHONPATH="${AGENT_ZERO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \
+        KYBERM0NK_GITHUB_TOKEN_FILE="${runtime_token_path}" \
+        "${AGENT_ZERO_PYTHON}" run_ui.py --host 0.0.0.0 --port "${UI_PORT}"
 fi
 
 echo "[agent-zero] checking if Agent Zero is already running..."

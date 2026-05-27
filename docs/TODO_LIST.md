@@ -1,5 +1,17 @@
 # TODO List
 
+## 2026-05-27 MoniFuse Service Registration
+
+- [x] Put Agent Zero Web UI under a tracked `systemd --user` unit.
+- [x] Put the CrewAI live log watcher under a tracked `systemd --user` unit.
+- [x] Add the new Agent Zero and CrewAI watcher services to MoniFuse's Kyber registry surface.
+
+## 2026-05-27 Guardian Key Attribution Cleanup
+
+- [x] Split Kyber maintenance scripts onto `KYBERM0NK_GUARDIAN_API_KEY`.
+- [x] Give CrewAI, Aider, OpenCode, and Agent Zero dedicated Guardian keys.
+- [x] Remove the generic `GUARDIAN_API_KEY` dependency from the tracked Kyber wrappers and templates.
+
 ## Phase 0 - Workspace Foundation
 
 - [x] Choose project name: KyberM0nk.
@@ -78,6 +90,19 @@
 
 - [x] Add a reusable Guardian context benchmark script.
 - [x] Record GPU utilization, power, memory, request timing, and timeout status.
+
+## Phase 8b - Hermes Framework Autonomy
+
+- [x] Add a no-agent framework surface watch for the Kyber-managed agent stack.
+- [x] Add a deterministic no-agent innovation feed that proposes missing framework capability classes to the strategic autonomy lane.
+- [x] Add a no-agent Hermes cron health watch that only emits on baseline alert, state change, or recovery.
+- [x] Add an `autonomy-governor` skill plus a scheduled framework-only review loop.
+- [x] Pin the active governance loops to the lightweight cloud review route and narrow `terminal + session_search` toolsets where needed.
+- [x] Add a route-level inference canary for Guardian so Kyber watches actual model-serving health, not only UI or wrapper reachability.
+- [x] Add a `framework-supervisor` skill plus a scheduled runtime-friction review loop for Hermes itself.
+- [x] Split Hermes governance into a strategic autonomy lane and an operational supervisor lane to reduce duplicate recommendations.
+- [x] Link the two Hermes governance lanes through native cron output chaining to reduce repeated recommendations further.
+- [x] Surface live Hermes governance loops inside MoniFuse so framework development signals are visible outside Telegram.
 - [x] Write benchmark outputs to ignored `logs/guardian-context-benchmarks/` files.
 - [x] Document smoke, ramp, Agent Zero, and full-context benchmark presets.
 - [x] Add matrix benchmarking across input sizes, completion caps, task modes, and thinking modes.

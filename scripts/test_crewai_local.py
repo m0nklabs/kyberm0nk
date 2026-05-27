@@ -3,8 +3,11 @@ from crewai import Agent, Task, Crew, Process, LLM
 
 # Configure LLM to point exactly to the host's 11434 Guardian proxy.
 # We're running on host directly so localhost:11434 works.
-GUARDIAN_API_KEY = os.environ.get("GUARDIAN_API_KEY", "kyberm0nk_2398a369e3e6ad0704d44ba85ea59ba7")
+GUARDIAN_API_KEY = os.environ.get("CREWAI_GUARDIAN_API_KEY", "")
 GUARDIAN_BASE_URL = os.environ.get("GUARDIAN_BASE_URL", "http://localhost:11434/v1")
+
+if not GUARDIAN_API_KEY:
+    raise RuntimeError("CREWAI_GUARDIAN_API_KEY must be set for CrewAI Guardian tests")
 
 # MUST use an uncensored base model without reasoning to prevent prefill 400 errors from Guardian/llama.cpp
 llm = LLM(

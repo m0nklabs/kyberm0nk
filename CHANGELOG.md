@@ -1,6 +1,33 @@
 # Changelog
 
+## 2026-05-27
+
+- **Host-managed framework services:**
+  - Added tracked user-service definitions for Agent Zero Web UI and the CrewAI live log watcher so both surfaces can run under `systemd --user` instead of ad-hoc background shells.
+  - Added a foreground mode to `scripts/agent_zero_up.sh` so the Agent Zero unit can supervise the real `run_ui.py` process while keeping the manual background launcher intact.
+  - Added the CrewAI watcher runtime dependencies to the tracked `configs/crewai/requirements.txt` contract so future bootstrap runs install the FastAPI/Uvicorn stack needed for port `8509`.
+
+- **Dedicated Guardian keys per Kyber framework:**
+  - Split Kyber's shared Guardian credential into dedicated runtime keys for Aider, OpenCode, CrewAI, Agent Zero, and Kyber maintenance scripts.
+  - Rewired the host wrappers, Docker sandbox env, CrewAI model policy, and live `.env` template away from the generic `GUARDIAN_API_KEY` variable.
+  - Reserved a dedicated `langgraph-lab` Guardian key for future local LangGraph experiments so workspace attribution stays app-scoped.
+
 ## 2026-05-25
+
+- **Hermes framework autonomy hardening:**
+  - Added a new no-agent `Hermes Cron Health Watch` loop that reads the live Hermes cron registry, detects failing or overdue jobs, and only emits on baseline alert, state change, or recovery.
+  - Added a local `autonomy-governor` skill plus a scheduled `Hermes Autonomy Governor` loop focused on framework-only autonomy gaps across Hermes, `~/.hermes`, and Kyber-managed framework surfaces.
+  - Added a low-frequency no-agent `Guardian Inference Canary` loop that authenticates against Guardian, reads the current runtime model from `/api/status`, and probes real `/v1/chat/completions` serving health without forcing a different model alias.
+  - Added a local `framework-supervisor` skill plus a scheduled `Hermes Framework Supervisor` loop focused on recurring cron failures, empty-response retries, repeated operator nudges, and missing runtime guardrails inside Hermes itself.
+  - Split the two framework governance lanes more explicitly so `Hermes Autonomy Governor` now owns strategic autonomy design while `Hermes Framework Supervisor` stays on repeated runtime friction and operational hardening.
+  - Added a new no-agent `Kyber Framework Innovation Feed` loop that deterministically scans the live framework control plane for missing capability classes and seeds the strategic autonomy lane with bounded innovation candidates.
+  - Linked the two governance lanes through Hermes' native `context_from` output chaining so strategy and operations can see each other's last conclusion instead of echoing duplicate recommendations.
+  - Wired the new innovation feeder into `Hermes Autonomy Governor` so strategic reviews now consume deterministic capability-candidate signals instead of inventing novelty from scratch.
+  - Tilted the autonomy-governor lane toward capability expansion and innovative framework development so the machine keeps evolving instead of only preserving the current surface set.
+  - Re-pinned the existing `CryptoTrader Goal Governor` job to the lightweight `openrouter-full` / `google/gemini-2.5-flash-lite` review route and narrow `terminal + session_search` toolsets to avoid local Guardian flake risk in governance loops.
+  - Documented the operational cron limitation that `hermes cron create` still cannot set `provider`, `model`, or `enabled_toolsets`, so live governance jobs must be re-read after post-create pinning.
+  - Hardened the new framework-supervisor loop to stay within `terminal + session_search` after its first live run tried the unavailable `read_file` tool.
+  - Added MoniFuse visibility for live Hermes governance loops so the control plane now shows strategy, runtime-hardening, watchdog, and Guardian serving signals in one place.
 
 - **Framework stewardship boundary:**
   - Documented the Kyber operator boundary explicitly in project instructions: Kyber sessions should manage agent frameworks themselves, especially Hermes, instead of manually doing the frameworks' downstream repo or operating work.

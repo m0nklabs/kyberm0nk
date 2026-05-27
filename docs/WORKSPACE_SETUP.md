@@ -51,7 +51,11 @@ Important variables:
 | Variable | Purpose |
 |----------|---------|
 | `GUARDIAN_BASE_URL` | OpenAI-compatible Guardian endpoint |
-| `GUARDIAN_API_KEY` | Bearer token for Guardian |
+| `KYBERM0NK_GUARDIAN_API_KEY` | Kyber maintenance key for health checks, supervisor loops, and benchmarks |
+| `AIDER_GUARDIAN_API_KEY` | Dedicated Guardian key for Aider |
+| `OPENCODE_GUARDIAN_API_KEY` | Dedicated Guardian key for OpenCode |
+| `CREWAI_GUARDIAN_API_KEY` | Dedicated Guardian key for CrewAI |
+| `AGENT_ZERO_GUARDIAN_API_KEY` | Dedicated Guardian key for Agent Zero |
 | `DEFAULT_MODEL` | Default Guardian model alias |
 | `ACTIVE_PROJECT` | Project mounted read-write |
 | `REFERENCE_PROJECTS` | Comma-separated reference paths used by wrappers and helper tooling |

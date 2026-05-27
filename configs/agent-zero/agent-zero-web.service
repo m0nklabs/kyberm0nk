@@ -1,0 +1,17 @@
+[Unit]
+Description=KyberM0nk Agent Zero Web UI
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/flip/kyberm0nk
+ExecStart=/usr/bin/env bash /home/flip/kyberm0nk/scripts/agent_zero_up.sh --foreground
+ExecStop=/usr/bin/env bash /home/flip/kyberm0nk/scripts/agent_zero_down.sh
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

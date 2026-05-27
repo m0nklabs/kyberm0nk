@@ -12,7 +12,7 @@ GUARDIAN_PORT=${GUARDIAN_PORT:-11434}
 GUARDIAN_HOST_URL="http://127.0.0.1:${GUARDIAN_PORT}/v1/models"
 # Force internal docker url just for the network test from inside a container
 GUARDIAN_DOCKER_URL="http://host.docker.internal:${GUARDIAN_PORT}/v1/models"
-AUTH_HEADER="Authorization: Bearer ${GUARDIAN_API_KEY:-local-dev}"
+AUTH_HEADER="Authorization: Bearer ${KYBERM0NK_GUARDIAN_API_KEY:-local-dev}"
 
 echo "Checking Guardian host connectivity at ${GUARDIAN_HOST_URL}..."
 if curl -H "${AUTH_HEADER}" -s -f -o /dev/null "${GUARDIAN_HOST_URL}"; then

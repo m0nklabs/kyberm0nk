@@ -31,6 +31,10 @@ OPENCODE_MAX_OUTPUT_CHARS="${OPENCODE_MAX_OUTPUT_CHARS:-20000}"
 SYSTEM_MESSAGE="$(<"$DIR/configs/opencode/system_message.txt")"
 GUARDIAN_API_BASE="$(normalize_api_base "${GUARDIAN_BASE_URL}")"
 
+if [[ -z "${OPENCODE_GUARDIAN_API_KEY:-}" ]]; then
+    echo "❌ ERROR: OPENCODE_GUARDIAN_API_KEY missing in $DIR/.env"; exit 1
+fi
+
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 LOG_FILE="$DIR/logs/opencode/opencode_$TIMESTAMP.log"
 mkdir -p "$(dirname "$LOG_FILE")"
@@ -44,7 +48,7 @@ cd "$ACTIVE_PROJECT"
 "${INTERPRETER_BIN}" \
     --model "openai/${DEFAULT_MODEL}" \
     --api_base "${GUARDIAN_API_BASE}" \
-    --api_key "${GUARDIAN_API_KEY}" \
+    --api_key "${OPENCODE_GUARDIAN_API_KEY}" \
     --context_window "${OPENCODE_CONTEXT_WINDOW}" \
     --max_tokens "${OPENCODE_MAX_TOKENS}" \
     --temperature "${OPENCODE_TEMPERATURE}" \

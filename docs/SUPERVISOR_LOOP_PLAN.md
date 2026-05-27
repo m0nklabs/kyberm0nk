@@ -179,7 +179,7 @@ OpenHands SDK spike on 2026-05-09:
 
 - Cloned the standalone SDK source into ignored local evaluation path `tmp/framework-evals/software-agent-sdk` after the main OpenHands monorepo proved to consume the SDK as a dependency rather than vendoring its source.
 - The SDK workspace contains `openhands-sdk`, `openhands-tools`, `openhands-workspace`, and `openhands-agent-server`, which matches the shape Kyber needs for local workers plus optional remote sandboxes.
-- The SDK `LLM` class routes through LiteLLM and accepts `model`, `api_key`, and `base_url`; Guardian works with `model="openai/gemma4-26b-agent"`, `base_url="http://127.0.0.1:11434/v1"`, and the local `GUARDIAN_API_KEY` loaded from `.env`.
+- The SDK `LLM` class routes through LiteLLM and accepts `model`, `api_key`, and `base_url`; Guardian works with `model="openai/gemma4-26b-agent"`, `base_url="http://127.0.0.1:11434/v1"`, and the local `KYBERM0NK_GUARDIAN_API_KEY` loaded from `.env`.
 - Focused LLM smoke passed through Guardian: `LLM.completion(...)` returned `SDK_OK`.
 - Standalone local agent smoke passed in a disposable scratch workspace under `tmp/framework-evals/openhands-sdk-smoke`: the OpenHands agent created `MARKER.txt` with exact content `SDK_CONVERSATION_OK` using the `file_editor` tool.
 - Non-native tool-calling works against the local Gemma4 route, but the first agent attempt emitted a malformed terminal call missing `command`; the SDK fed the validation error back and the agent recovered on the next iterations. This is usable, but it confirms Kyber still needs supervisor checks around tool-call quality and repeated malformed actions.

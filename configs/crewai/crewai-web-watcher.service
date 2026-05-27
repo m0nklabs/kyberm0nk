@@ -1,0 +1,15 @@
+[Unit]
+Description=KyberM0nk CrewAI Live Log Watcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/flip/kyberm0nk
+ExecStart=/usr/bin/env bash /home/flip/kyberm0nk/scripts/crewai_web_watcher_up.sh
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+
+[Install]
+WantedBy=default.target

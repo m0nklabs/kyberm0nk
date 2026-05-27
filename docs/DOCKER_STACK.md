@@ -12,7 +12,7 @@ Required environment:
 
 ```text
 OPENAI_API_BASE=${GUARDIAN_BASE_URL}
-OPENAI_API_KEY=${GUARDIAN_API_KEY}
+OPENAI_API_KEY=${AIDER_GUARDIAN_API_KEY}
 AIDER_MODEL=${DEFAULT_MODEL}
 ```
 
@@ -33,6 +33,12 @@ Mounts should match Aider, but reference repositories may be more important for 
 ### agent-zero
 
 Purpose: sandboxed system and script tasks.
+
+Required environment:
+
+```text
+OTHER_API_KEY=${AGENT_ZERO_GUARDIAN_API_KEY}
+```
 
 Agent Zero should get the narrowest mount set possible for each task.
 

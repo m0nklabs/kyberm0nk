@@ -10,7 +10,7 @@ Run from the KyberM0nk repository root:
 python3 scripts/benchmark_guardian_context.py --preset smoke
 ```
 
-The script uses only the Python standard library. It reads `GUARDIAN_API_KEY` and `DEFAULT_MODEL` from `.env`, calls Guardian's OpenAI-compatible `/v1/chat/completions` endpoint, samples `nvidia-smi`, and writes results to `logs/guardian-context-benchmarks/`.
+The script uses only the Python standard library. It reads `KYBERM0NK_GUARDIAN_API_KEY` and `DEFAULT_MODEL` from `.env`, calls Guardian's OpenAI-compatible `/v1/chat/completions` endpoint, samples `nvidia-smi`, and writes results to `logs/guardian-context-benchmarks/`.
 
 Each target context size uses deterministic but size-specific synthetic text. That avoids accidentally benchmarking a warm prefix/KV cache instead of prompt-processing cost.
 

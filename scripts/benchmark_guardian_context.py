@@ -815,7 +815,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default=env.get("GUARDIAN_HOST_BASE_URL", DEFAULT_BASE_URL))
     parser.add_argument("--model", default=env.get("DEFAULT_MODEL", DEFAULT_MODEL))
-    parser.add_argument("--api-key", default=env.get("GUARDIAN_API_KEY") or os.environ.get("GUARDIAN_API_KEY"))
+    parser.add_argument("--api-key", default=env.get("KYBERM0NK_GUARDIAN_API_KEY") or os.environ.get("KYBERM0NK_GUARDIAN_API_KEY"))
     parser.add_argument("--preset", choices=sorted(PRESETS), default="ramp")
     parser.add_argument("--sizes", help="Comma-separated target context sizes, e.g. 1024,2048,4096")
     parser.add_argument("--task", choices=TASKS, default="marker")
@@ -878,7 +878,7 @@ def main() -> int:
     parser = build_arg_parser()
     args = parser.parse_args()
     if not args.api_key:
-        parser.error("GUARDIAN_API_KEY is required in .env or via --api-key")
+        parser.error("KYBERM0NK_GUARDIAN_API_KEY is required in .env or via --api-key")
 
     try:
         sizes = parse_sizes(args.sizes, args.preset)
