@@ -1,5 +1,19 @@
 # TODO List
 
+## 2026-05-28 Automated GitHub Issue Resolution
+
+- [x] Add a barebones Hermes Gateway issue-resolution lane.
+- [x] Add a manual `/issue` Telegram trigger for GitHub issues.
+- [x] Add GitHub `issues` webhook conversion into the same `/issue` lane.
+- [x] Split Aider role configuration between Guardian local coder and OpenRouter cloud reviewer.
+- [x] Detect Master Epic issues via `master-plan` label or `# Master Project Plan` body heading.
+- [x] Decompose Master Epics through Guardian and create referenced sub-issues.
+- [x] Add persistent issue-run state with gateway startup resume.
+- [x] Add strict single-flight FIFO execution for the local Aider/Guardian coder lane.
+- [ ] Add duplicate suppression for crash windows between GitHub sub-issue creation and SQLite persistence.
+- [ ] Add per-repo allowlists and cancellation controls.
+- [ ] Expand reviewer output into multiple anchored inline comments.
+
 ## 2026-05-27 MoniFuse Service Registration
 
 - [x] Put Agent Zero Web UI under a tracked `systemd --user` unit.

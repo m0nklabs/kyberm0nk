@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-05-28
+
+- **Automated GitHub issue resolution skeleton:**
+  - Added the first Hermes Gateway `/issue` automation lane for GitHub issue resolution.
+  - Wired local Aider coder runs to Guardian and cloud Aider reviewer runs to OpenRouter `deepseek/deepseek-v4-flash`.
+  - Added GitHub PR creation and reviewer feedback posting as the barebones end-to-end path.
+  - Documented manual Telegram and GitHub webhook triggers in `docs/GITHUB_ISSUE_RESOLUTION.md`.
+- **Master Epic orchestration and queue persistence:**
+  - Upgraded the Hermes `/issue` lane with Master Epic detection via the `master-plan` label or a `# Master Project Plan` body heading.
+  - Added Guardian-backed decomposition from a master plan into ordered GitHub sub-issues that reference the master issue.
+  - Added a SQLite-backed FIFO issue queue at `~/.hermes/issue_resolution.db` with gateway-startup resume for interrupted runs.
+  - Added strict single-flight local coder execution so only one Guardian/Aider task can occupy the local VRAM lane at a time.
+
 ## 2026-05-27
 
 - **Host-managed framework services:**
