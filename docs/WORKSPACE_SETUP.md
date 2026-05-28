@@ -6,9 +6,15 @@
 /home/flip/kyberm0nk
 ```
 
-## VS Code Workspace
+## Optional Editor Workspace
 
-Open the project as its own workspace, not from the home directory workspace.
+Editors are optional. KyberM0nk, Hermes Gateway, and the `/issue` lane run
+headlessly from host services, CLI commands, Telegram, webhooks, cron jobs, and
+persisted SQLite state. No active editor session or editor plugin is required
+for runtime behavior.
+
+When using an editor for manual inspection, open the project root directly
+instead of editing from a broad home-directory view.
 
 Recommended workspace file:
 
@@ -28,9 +34,10 @@ It should include only:
 }
 ```
 
-## Workspace-First Rule
+## Project-Root-First Rule
 
-Treat every agentic framework the way VS Code treats a workspace: bind it to one explicit project root instead of letting it drift across the home directory or a hidden copy.
+Bind every agentic framework to one explicit project root instead of letting it
+drift across the home directory or a hidden copy.
 
 - Kyber is the control workspace.
 - The repo being edited is the source workspace.
@@ -40,7 +47,7 @@ See [WORKSPACE_POLICY.md](WORKSPACE_POLICY.md) for the detailed rule and per-fra
 
 See [WORKSPACE_INVENTORY.md](WORKSPACE_INVENTORY.md) for the current distinction between real repo checkouts, runtime roots, and local lab directories in this workspace.
 
-The shared multi-root `kyberm0nk.code-workspace` should point at the real framework checkouts `~/aider`, `~/crewAI`, `~/opencode`, and `~/langgraph` instead of the old runtime/lab paths `~/crewai`, `~/.opencode`, and `~/langgraph-lab`.
+The optional multi-root `kyberm0nk.code-workspace` should point at the real framework checkouts `~/aider`, `~/crewAI`, `~/opencode`, and `~/langgraph` instead of the old runtime/lab paths `~/crewai`, `~/.opencode`, and `~/langgraph-lab`.
 
 ## Environment
 
@@ -76,14 +83,13 @@ The `NewNexus` Agent Zero project is restored from `configs/agent-zero/projects/
 
 ## First Implementation Steps
 
-1. Open the new workspace.
-2. Verify Guardian health from the host.
-3. Clone or refresh upstream framework repos under their real names such as `~/aider`, `~/crewAI`, `~/opencode`, and `~/langgraph`.
-4. Bootstrap Aider into `~/aider` and the remaining host worker runtimes with `scripts/bootstrap_host_workers.sh`.
-5. Bootstrap Superset into `~/superset` and login on the host.
-6. Bootstrap Agent Zero into `~/agentzero` and validate `scripts/agent_zero_up.sh`.
-7. Bootstrap direct CrewAI into `~/crewai`.
-8. Configure Continue separately in VS Code.
+1. Verify Guardian health from the host.
+2. Clone or refresh upstream framework repos under their real names such as `~/aider`, `~/crewAI`, `~/opencode`, and `~/langgraph`.
+3. Bootstrap Aider into `~/aider` and the remaining host worker runtimes with `scripts/bootstrap_host_workers.sh`.
+4. Bootstrap Superset into `~/superset` and login on the host.
+5. Bootstrap Agent Zero into `~/agentzero` and validate `scripts/agent_zero_up.sh`.
+6. Bootstrap direct CrewAI into `~/crewai`.
+7. Optionally configure editor-side clients such as Continue for manual assistance.
 
 ## Success Criteria
 

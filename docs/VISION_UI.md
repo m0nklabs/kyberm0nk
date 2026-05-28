@@ -112,7 +112,7 @@ goal received
 - No multi-user auth. Single-operator local tool.
 - No remote access. localhost only.
 - No model training or fine-tuning controls.
-- No replacement for Continue / VS Code editing.
+- No replacement for optional editor-side manual editing.
 - No production-grade scheduler. One job at a time is enough to start.
 
 ## Success Criteria for v1

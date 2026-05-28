@@ -2,20 +2,23 @@
 
 ## Summary
 
-KyberM0nk is a local agentic coding cockpit. It separates inference infrastructure from tool orchestration.
+KyberM0nk is a headless local agentic automation layer. It separates inference
+infrastructure from tool orchestration and runs through host services, CLI
+workers, Telegram commands, webhooks, cron jobs, and persisted state.
 
 ```text
 +------------------------------+
-| VS Code / Terminal Operator  |
+| Operator Events              |
+| CLI / Telegram / Webhooks    |
 +---------------+--------------+
                 |
                 v
 +------------------------------+
-| KyberM0nk Workspace          |
+| KyberM0nk Control Plane      |
 | - docs                       |
 | - configs                    |
 | - scripts                    |
-| - Docker Compose stack       |
+| - host services              |
 +---+------------+-------------+
     |            |
     |            +------------------+
@@ -52,7 +55,8 @@ KyberM0nk is a local agentic coding cockpit. It separates inference infrastructu
 - `llama-server`
 - GGUF model files
 - GPU allocation and tensor split policy
-- VS Code Continue extension
+- Hermes Gateway daemon and persisted automation state
+- Optional editor clients, which are not required for runtime behavior
 
 ### Inside Docker
 

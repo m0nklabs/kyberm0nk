@@ -1,35 +1,52 @@
-# Roadmap & Vision: The Local Agentic Coding Cockpit
+# Roadmap & Vision: The Headless Agentic Automation Layer
 
-## The Core Hierarchy (Strategic to Operational)
+KyberM0nk is a server-side control plane for local agentic coding frameworks. It
+runs on bare-metal host resources, coordinates headless daemons and CLI workers,
+and reacts to explicit events such as CLI commands, Telegram messages, webhooks,
+cron ticks, and systemd service state. Editors can be used to write or inspect
+code, but they are not part of the runtime architecture and are not required for
+Hermes automation.
 
-The KyberM0nk stack maps directly to specific roles to form a cohesive, self-contained AI coding cockpit.
+## Current Committed Stack
 
-### 1. The Motor (Inference Backend)
+KyberM0nk's committed runtime stack is deliberately small. Today the project is
+only built around Hermes, Aider, and Guardian. Other agentic frameworks are
+candidates for evaluation, not architecture commitments.
+
+### 1. Guardian
 - **Tool**: `llama.cpp` (GGUF) via Guardian.
-- **Role**: The brain driving all other tools.
+- **Role**: Local OpenAI-compatible inference broker and model lifecycle guard.
 - **Setup**: Runs purely on the host (outside Docker). Configured to offload to GPU (`-ngl 99` for 35B models on 28GB VRAM). Uses the `qwen3-35b-uncensored` alias as the baseline.
 
-### 2. The Primary Operator (Host-Native)
-- **Tool**: Claude Code via the dedicated `claudecode` repo and `claude-local` launcher.
-- **Role**: Main goto tool for high-trust coding work, architecture decisions, repo review, and orchestration entry.
-- **Setup**: Runs purely on the host against Guardian. It is not part of the Docker sandbox.
+### 2. Hermes Gateway
+- **Tool**: Hermes Gateway.
+- **Role**: Headless event bus and durable automation daemon for CLI, Telegram,
+  webhook, cron, and queue-backed workflows.
+- **Setup**: Runs server-side and persists runtime state under `~/.hermes`.
 
-### 3. The Secondary Local Generalist
-- **Tool**: OpenCode.
-- **Role**: Assists with broader local planning and routine throughput behind the main Claude lane.
-
-### 4. The Executioner / Special Ops (Sandbox)
-- **Tool**: Agent Zero.
-- **Role**: Handles the dirty, system-level work. Stands parallel to OpenCode. Executes heavy scripts, complex installations, and environment debugging.
-- **Safety**: Locked inside Docker with strictly mapped read-write targets and read-only reference mounts.
-
-### 5. The Master Carpenter (Scalpel)
+### 3. Aider
 - **Tool**: Aider.
-- **Role**: Extremely fast, precise code editor. Driven from the terminal while OpenCode sets the big picture. Highly token-efficient, performing surgical strikes on specific files.
+- **Role**: Focused headless code-change worker for the local implementation
+  lane.
+- **Setup**: Driven directly or by Hermes `/issue` jobs through Guardian.
 
-### 6. The IDE-Glasses (Assistant)
-- **Tool**: Continue (VS Code / JetBrains extension).
-- **Role**: Direct line of sight into the code. Provides inline autocomplete and chat context. Does not perform massive autonomous structural changes, but accelerates manual typing and offers a window into the local proxy.
+## Candidate Frameworks
+
+The following tools are not part of the committed runtime architecture yet. They
+may be evaluated later, but the roadmap must not assume they will be adopted.
+
+| Candidate | Possible evaluation question |
+| --- | --- |
+| OpenCode | Does it add enough planning throughput beyond Hermes + Aider to justify another runtime? |
+| Agent Zero | Does it provide a safe, reliable sandbox lane for system-level tasks without creating maintenance drag? |
+| CrewAI | Does a multi-role crew add value for project-management workflows after Hermes `/issue` matures? |
+| Superset | Does a richer workspace/review UI become necessary for parallel agent operations? |
+| LangGraph | Does the supervisor loop outgrow a simple queue/state machine? |
+| Continue or other editor clients | Does optional manual inline assistance help operators without becoming a runtime dependency? |
+
+Adoption requires an explicit decision record with evidence, validation results,
+operational cost, and rollback path. Until then, candidate frameworks stay out of
+the core stack narrative.
 
 ---
 
@@ -39,49 +56,80 @@ The KyberM0nk stack maps directly to specific roles to form a cohesive, self-con
 - [x] Clean repository and workspace creation.
 - [x] Documentation skeleton, security rules, architectural boundaries.
 
-### Phase 1, 2 & 3 - Setup & Observability (✅ DONE)
+### Phase 1, 2 & 3 - Active Stack Setup & Observability (✅ DONE)
 - [x] Guardian host & container health checks.
-- [x] Dockerfile construction for Aider, OpenCode, and Agent Zero.
+- [x] Aider wrapper/runtime validation against Guardian.
 - [x] Shell wrappers with safety, mount validation, and ISO 8601 logging.
 
-### Phase 4 - Aider Smoke-Test (The Scalpel First)
-- Goal: Prove the "Master Carpenter" works flawlessly with Guardian.
+### Phase 4 - Aider Smoke-Test
+- Goal: Prove Aider works reliably with Guardian before adding more moving parts.
 - Deliverables: Send first prompt via Aider to edit a local file. Confirm token efficiency and editing workflow against the deep model.
 
-### Phase 5 - OpenCode Orchestration (The General)
-- Goal: Setup the autonomous planner.
-- Deliverables: Configure OpenCode, verify planning capabilities, verify its capability to read the repo context and generate actionable sub-tasks.
+### Phase 5 - Candidate Framework Evaluation Gate
+- Goal: Decide whether any extra framework is justified after Hermes + Aider
+	have hit a real limitation.
+- Deliverables: For each candidate, document the problem it solves, a bounded
+	smoke test, operating cost, failure modes, and a keep/drop decision. No
+	candidate gets a permanent role from roadmap language alone.
 
-### Phase 6 - Agent Zero Sandbox (Special Ops)
-- Goal: Secure execution of complex tasks.
-- Deliverables: Finalize strict mount mappings (read-write active, read-only reference), verify external script execution limitations, evaluate Docker socket safety.
+### Phase 6 - Optional Sandbox Evaluation
+- Goal: Evaluate whether a separate sandbox worker is necessary.
+- Deliverables: Only if a concrete need appears, test strict mount mappings,
+	external script limits, and Docker socket safety. Drop this phase if Aider and
+	Hermes cover the workload cleanly.
 
-### Phase 7 - Continue IDE Integration (The Glasses)
-- Goal: Tie the proxy directly into VS Code.
-- Deliverables: Set up `config.json` for Continue, hooking `autocomplete` and `chat` models strictly into the `127.0.0.1:11434/v1` Guardian proxy.
+### Phase 7 - Deferred Operator Client Evaluation
+- Goal: Only evaluate optional manual operator clients if the active
+	Hermes/Aider/Guardian lane exposes a real usability gap.
+- Deliverables: No committed runtime deliverable. Any future client must remain
+	outside the headless runtime path and must not become required for CLI,
+	Telegram, webhook, cron, or `/issue` execution.
 
 ### Phase 8 - E2E Orchestration & Polish
-- Goal: Seamless handoffs (e.g. OpenCode plans -> User guides Aider for quick edits -> Agent Zero runs the build).
+- Goal: Seamless headless issue-to-PR flow through Hermes, Aider, and Guardian.
+- Deliverables: Keep the `/issue` lane understandable, observable, resumable,
+  and easy to operate without requiring extra frameworks.
 
 ### Phase 9 - Evidence-Based Model Tuning
-- Goal: Keep local agents close to Copilot-style working patterns: broad available context, targeted retrieval, bounded output, and staged summaries.
+- Goal: Keep the active Hermes/Aider/Guardian lane close to Copilot-style
+  working patterns: broad available context, targeted retrieval, bounded output,
+  and staged summaries.
 - Deliverables:
 	- Maintain Guardian context benchmark scripts and trend reports.
 	- Use decision-order benchmarks for fast ballpark tuning before exhaustive matrices.
-	- Keep OpenCode and Agent Zero defaults aligned with the latest stable benchmark evidence.
+	- Tune only active production lanes by default. Candidate-framework tuning waits until adoption is explicitly approved.
 	- Avoid defaulting agent tools to maximum context plus maximum output unless an explicit deep benchmark or stress test requires it.
 
-### Phase 10 - Supervisor Loop and Framework Reuse
-- Goal: Reduce expensive cloud-agent usage by letting local agents do routine implementation work under a lightweight critic/supervisor loop.
+### Phase 10 - Supervisor Loop
+- Goal: Reduce expensive cloud-agent usage by letting the active local lane do
+  routine implementation work under a lightweight critic/supervisor loop.
 - Direction:
-	- Reuse an existing session/worktree orchestrator instead of rebuilding the cockpit from scratch.
-	- Keep Claude Code as the main host-native operator lane, with its own tracked server setup under `~/claudecode/`.
-	- Evaluate Claude Squad for the fast tmux/worktree TUI path.
-	- Evaluate Superset for richer parallel-agent workspaces, review UI, and agent-agnostic orchestration.
-	- Use OpenHands Software Agent SDK as a likely second worker path for programmable local coding loops; keep Agent Zero for sandbox/operator work until OpenHands remote workspace behavior is proven.
-	- Keep Agent Zero as a sandbox/operator path, not the primary coding-agent default, unless future validation reverses the current evidence.
-	- Use LangGraph supervisor patterns only if the local decision loop outgrows a simple structured script.
+	- Treat Hermes Gateway as the durable automation substrate for recurring work, webhook-driven actions, and queue-backed execution lanes.
+	- Keep Aider as the active local code-change worker until evidence shows it is insufficient.
+	- Evaluate extra orchestrators only after the simple Hermes state machine cannot cover the need.
+	- Evaluate graph-based supervisor patterns only if the decision loop outgrows a simple structured script.
 - Deliverables:
 	- Keep `docs/SUPERVISOR_LOOP_PLAN.md` as the active design note.
 	- Add a minimal supervisor tick that reads worker state, git state, validation state, and emits `continue`, `nudge`, `stop`, or `escalate`.
 	- Reserve cloud review for repeated failures, risky diffs, architecture decisions, and pre-commit checkpoints.
+
+### Phase 10a - Hermes Persistent Issue Resolution Lane (Production Ready / Implemented)
+- Status: Production Ready / Implemented / Validated.
+- Goal: Convert GitHub issues and Master Epics into a durable, queue-backed,
+  headless automation lane that can survive gateway restarts and control local
+  Guardian/Aider capacity.
+- Implemented capabilities:
+	- Hermes Gateway `/issue` command registered through the central slash-command registry.
+	- GitHub `issues` webhook automation path that converts eligible payloads into `/issue` requests.
+	- SQLite state database at `~/.hermes/issue_resolution.db` with `queued`, `running`, `expanded`, `completed`, and `failed` run states.
+	- Strict FIFO single-flight local coder execution so only one Aider/Guardian job uses local inference capacity at a time.
+	- Gateway startup resume that returns interrupted `running` rows to `queued` and restarts pending work.
+	- Master Epic detection through the `master-plan` label or `# Master Project Plan` body heading.
+	- Guardian-backed decomposition of Master Epics into ordered atomic tasks and automatic GitHub sub-issue creation.
+	- OpenRouter cloud reviewer path using `deepseek/deepseek-v4-flash` after PR creation.
+- Ecosystem role:
+	- Hermes now acts as KyberM0nk's durable, event-driven execution bus for GitHub issue automation, while Guardian remains the local inference backend and Aider remains the active local code-change worker.
+	- The lane gives Kyber a practical bridge from project-management artifacts to autonomous local implementation without requiring always-on cloud coding agents, active editors, or GUI sessions.
+- Remaining hardening:
+	- Add per-repo allowlists, cancellation controls, and richer retry policy.
+	- Prevent duplicate sub-issue creation when a Master Plan references an already existing GitHub issue such as `#182`.

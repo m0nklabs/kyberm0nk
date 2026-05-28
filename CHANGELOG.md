@@ -1,17 +1,46 @@
 # Changelog
 
-## 2026-05-28
+## 2026-05-28 - Persistent Issue Resolution Lane
 
-- **Automated GitHub issue resolution skeleton:**
-  - Added the first Hermes Gateway `/issue` automation lane for GitHub issue resolution.
-  - Wired local Aider coder runs to Guardian and cloud Aider reviewer runs to OpenRouter `deepseek/deepseek-v4-flash`.
-  - Added GitHub PR creation and reviewer feedback posting as the barebones end-to-end path.
-  - Documented manual Telegram and GitHub webhook triggers in `docs/GITHUB_ISSUE_RESOLUTION.md`.
-- **Master Epic orchestration and queue persistence:**
-  - Upgraded the Hermes `/issue` lane with Master Epic detection via the `master-plan` label or a `# Master Project Plan` body heading.
-  - Added Guardian-backed decomposition from a master plan into ordered GitHub sub-issues that reference the master issue.
-  - Added a SQLite-backed FIFO issue queue at `~/.hermes/issue_resolution.db` with gateway-startup resume for interrupted runs.
-  - Added strict single-flight local coder execution so only one Guardian/Aider task can occupy the local VRAM lane at a time.
+### Added
+
+- Added the first production-ready Hermes Gateway `/issue` automation lane for GitHub issue resolution.
+- Added a headless, server-side event-driven execution model for `/issue` that works from CLI, Telegram, and webhook triggers without requiring an active editor or GUI session.
+- Added SQLite-backed issue-run persistence at `~/.hermes/issue_resolution.db` with `issue_runs` and `master_subissues` tables.
+- Added strict FIFO single-flight execution for the local Aider/Guardian coder lane.
+- Added Master Epic detection via the `master-plan` label or a `# Master Project Plan` issue body heading.
+- Added Guardian-backed Master Epic decomposition into ordered atomic tasks.
+- Added automatic GitHub sub-issue creation with `Part of Master Issue #X` references.
+- Added gateway startup resume logic that resets interrupted `running` rows back to `queued` and restarts queued work.
+- Added the GitHub `issues` webhook automation route that converts webhook payloads into the same `/issue` lane while ignoring pull-request-shaped issue events.
+- Added focused tests for command parsing, Aider invocation roles, Master Epic detection, decomposition parsing, SQLite FIFO state, and sub-issue expansion.
+
+### Changed
+
+- Changed `/issue` handling from direct background execution to persistent queue submission through `submit_issue_resolution()`.
+- Changed project positioning for this lane from editor-assisted workflow to standalone Hermes Gateway daemon automation.
+- Changed the Kyber roadmap to define only Hermes, Aider, and Guardian as the committed runtime stack; OpenCode, Agent Zero, CrewAI, Superset, LangGraph, and editor clients are now documented as evaluation candidates only.
+- Changed local coder execution to occupy only one Guardian/Aider slot at a time, preventing parallel local VRAM contention.
+- Changed issue-run completion tracking so normal and sub-issue runs store PR metadata after PR creation or discovery.
+- Changed Master Epic execution to enter an intermediate `expanded` state until all child sub-issue runs complete.
+- Kept the cloud reviewer path on OpenRouter using `deepseek/deepseek-v4-flash` with prompt caching and no auto-commits.
+
+### Fixed
+
+- Fixed restart behavior for interrupted local coder runs by restoring `running` rows to `queued` on Hermes Gateway startup.
+- Fixed duplicate active submissions for the same repo and issue by reusing incomplete `queued`, `running`, or `expanded` rows.
+- Fixed operational visibility by documenting SQLite inspection queries and the exact Master Epic trigger contract.
+- Fixed architecture documentation that could imply an active VS Code/editor session is required for Hermes automation.
+
+### Validation
+
+- Focused Hermes gateway regression set passed: 121 tests passed, 0 failed.
+- Validated files include the issue-resolution lane, gateway command help, webhook adapter, and command bypass behavior.
+
+### Commits
+
+- `12a3fdfc7 feat(gateway): add persistent issue resolution queue`
+- `4670f74 docs(issue-resolution): document master epic queue`
 
 ## 2026-05-27
 

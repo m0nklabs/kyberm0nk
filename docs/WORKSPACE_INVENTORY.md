@@ -50,4 +50,4 @@ The rule is simple: do not describe a path as a repository checkout unless a rea
 - `~/aider` still doubles as a runtime root because its active `.venv` stays inside the checkout.
 - `~/crewai` and `~/.opencode` are runtime/install trees, not source repos.
 - `~/langgraph-lab` is currently just a local lab directory.
-- `~/NewNexus` remains the canonical source workspace for the current game-development path even though it is not one of the top-level workspace folders in this VS Code session.
+- `~/NewNexus` remains the canonical source workspace for the current game-development path. Editor session membership does not determine runtime ownership.

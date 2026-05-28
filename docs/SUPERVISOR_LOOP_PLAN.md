@@ -31,7 +31,7 @@ CrewAI, AutoGen, and smolagents remain secondary research targets. They are usef
 ## MVP Architecture
 
 ```text
-Operator / VS Code
+Operator event source
         |
         v
 Kyber Supervisor Tick
@@ -52,7 +52,7 @@ Decision: continue | nudge | stop | escalate
         +--> escalate: ask cloud/Copilot-level reviewer only at checkpoints
 ```
 
-The first implementation should be a narrow supervisor tick, not a daemon. It should inspect one active worker context and make one bounded decision.
+The first implementation should be a narrow supervisor tick, not a GUI-bound workflow. It should inspect one active worker context and make one bounded decision from server-side state.
 
 ## Decision Schema
 

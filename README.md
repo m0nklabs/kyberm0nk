@@ -2,7 +2,7 @@
 
 Local agentic coding cockpit powered by Guardian.
 
-KyberM0nk is the control workspace for a local coding-agent stack. It coordinates host-native coding frameworks and supporting extras around the existing Guardian proxy and llama.cpp backend, without owning model files or starting standalone inference servers.
+KyberM0nk is the headless server-side control plane for a local coding-agent stack. It coordinates host-native coding frameworks and supporting extras around the existing Guardian proxy and llama.cpp backend, without owning model files or starting standalone inference servers.
 
 Claude Code is now treated as the primary host-native operator tool on this server, with its tracked home under `/home/flip/claudecode`. Kyber remains the broader lab for local supporting workers, orchestration, and sandboxed tooling.
 
@@ -11,12 +11,14 @@ Claude Code is now treated as the primary host-native operator tool on this serv
 - Claude Code stays host-native and out of Docker.
 - Guardian and `llama-server` stay outside Docker.
 - Active Kyber-managed frameworks run host-native under dedicated home paths, with upstream source checkouts kept on their real repo names such as `~/aider`, `~/crewAI`, `~/opencode`, `~/langgraph`, `~/superset`, and `~/agentzero`.
-- Workspace-first is the guiding rule: every framework should attach to one explicit project workspace, analogous to a VS Code workspace, even if the framework stores its own metadata differently.
+- Workspace-first is the guiding rule: every framework should attach to one explicit project root, even if the framework stores its own metadata elsewhere.
 - Source checkouts and runtime/install paths are separate concerns: `~/crewAI`, `~/opencode`, and `~/langgraph` are upstream repos, while `~/crewai`, `~/venvs/kyber-workers`, and `~/.opencode` remain runtime/install paths. See [docs/WORKSPACE_INVENTORY.md](docs/WORKSPACE_INVENTORY.md).
 - Docker is optional for mature, shareable deployment targets, not the active Kyber development layer.
-- Continue stays in the IDE as an extension, configured against Guardian.
+- Editor-side clients such as Continue are optional operator conveniences outside the runtime path.
 - Active projects are selected explicitly for host-side worker execution.
 - Reference repositories stay host-visible and should remain read-only by convention unless the operator chooses otherwise.
+
+Kyber and Hermes do not require an active editor session, editor plugin, browser UI, or desktop GUI. Runtime work is driven by CLI commands, Telegram, webhooks, cron jobs, systemd services, and persisted local state.
 
 ## Current Stack
 
@@ -25,7 +27,7 @@ Claude Code is now treated as the primary host-native operator tool on this serv
 | Primary operator | Claude Code | Main goto tool for high-trust repo work, review, and orchestration entry |
 | Strategist | OpenCode | Host-native planning and execution worker via `~/venvs/kyber-workers` |
 | Scalpel | Aider | Host-native focused code-edit worker under `~/aider` |
-| Lens | Continue | IDE chat and inline assistance against local Guardian models |
+| Optional editor client | Continue | Manual inline assistance against local Guardian models; not part of daemon execution |
 | Operator | Agent Zero | Host-native operator runtime under `~/agentzero` with isolated runtime home/secrets |
 | Gatekeeper | Guardian | OpenAI-compatible broker for local models |
 | Engine | llama.cpp | GPU inference backend managed by Guardian |

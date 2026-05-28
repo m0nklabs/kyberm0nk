@@ -1,6 +1,7 @@
 # Tool Roles
 
-KyberM0nk is not a single autonomous agent. It is a control surface for a small set of specialized tools.
+KyberM0nk is not a single autonomous agent. It is a headless control surface for
+a small set of specialized tools and daemon-triggered automation lanes.
 
 ## Strategist - OpenCode
 
@@ -18,7 +19,7 @@ Do not use it for small surgical edits when Aider can do the job faster.
 
 ## Scalpel - Aider
 
-Aider is the focused code-editing tool.
+Aider is the focused headless code-editing worker.
 
 Host runtime: `~/aider`
 
@@ -31,18 +32,33 @@ Use it for:
 
 Aider should operate inside one active project mounted read-write.
 
-## Lens - Continue
+## Optional Editor Client - Continue
 
-Continue is the IDE assistance layer.
+Continue is optional manual assistance outside the runtime path.
 
 Use it for:
 
 - inline code suggestions
-- local chat inside VS Code
+- local editor-side chat
 - quick explanations
 - developer-in-the-loop editing
 
-Continue is configured outside Docker as a VS Code extension, pointed at Guardian.
+Continue is not required for Hermes Gateway, `/issue`, cron, Telegram, webhook,
+or daemon execution. Configure it separately when an operator wants editor-side
+assistance pointed at Guardian.
+
+## Event Bus - Hermes Gateway
+
+Hermes Gateway is the durable event-driven automation layer.
+
+Use it for:
+
+- Telegram and webhook command intake
+- cron and background jobs
+- persisted stateful lanes such as `/issue`
+- queue-backed execution that can recover after process restarts
+
+Hermes runs headlessly and owns its own runtime state under `~/.hermes`.
 
 ## Operator - Agent Zero
 

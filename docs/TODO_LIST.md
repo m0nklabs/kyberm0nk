@@ -10,9 +10,17 @@
 - [x] Decompose Master Epics through Guardian and create referenced sub-issues.
 - [x] Add persistent issue-run state with gateway startup resume.
 - [x] Add strict single-flight FIFO execution for the local Aider/Guardian coder lane.
+- [x] Reset interrupted `running` rows to `queued` on Hermes Gateway startup.
+- [x] Persist Master Epic child mappings in SQLite for operator inspection.
+- [x] Reframe `/issue` documentation as a headless Hermes Gateway daemon lane rather than an editor-driven workflow.
+- [x] Reframe the Kyber roadmap so only Hermes, Aider, and Guardian are committed runtime components; all other agentic frameworks are evaluation candidates.
 - [ ] Add duplicate suppression for crash windows between GitHub sub-issue creation and SQLite persistence.
 - [ ] Add per-repo allowlists and cancellation controls.
 - [ ] Expand reviewer output into multiple anchored inline comments.
+
+## Hermes Enhancement Backlog
+
+- [ ] Critical: Edge-case handling in Guardian parser: Voorkom duplicatie van issues wanneer een Master Plan verwijst naar reeds bestaande issue-referenties (zoals `#182`), in plaats van blind nieuwe sub-issues aan te maken.
 
 ## 2026-05-27 MoniFuse Service Registration
 
@@ -32,9 +40,9 @@
 - [x] Create documentation-first repository skeleton.
 - [x] Create private GitHub repository under `m0nklabs`.
 - [x] Push initial skeleton to GitHub.
-- [x] Create local VS Code workspace file at `/home/flip/kyberm0nk.code-workspace`.
+- [x] Create optional editor workspace convenience file at `/home/flip/kyberm0nk.code-workspace`.
 - [x] Add agent handoff prompt for the next workspace session.
-- [x] Open KyberM0nk in its own VS Code workspace.
+- [x] Verify KyberM0nk can be opened from its own project root without relying on the home-directory workspace.
 
 ## Phase 1 - Tool Discovery
 
@@ -94,11 +102,11 @@
 - [x] Restore tracked projects and runtime helpers into the host runtime tree.
 - [x] Validate `scripts/agent_zero_up.sh` serves health on `http://127.0.0.1:50001/api/health`.
 
-## Phase 7 - Continue IDE Integration (The Glasses)
+## Phase 7 - Optional Editor Client Integration
 
 - [x] Generate standard `config.json` (or `.yaml`) payload for Continue linking to Guardian.
 - [x] Place `config.yaml` in `configs/continue/` as a template for easy copying to `~/.continue/`.
-- [x] Verify autocomplete model routes to local endpoint.
+- [x] Verify optional editor autocomplete model routes to the local endpoint.
 
 ## Phase 8 - Guardian Context Benchmarking
 

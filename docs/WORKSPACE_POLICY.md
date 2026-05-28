@@ -1,6 +1,9 @@
 # Workspace Policy
 
-Kyber treats agentic frameworks the same way VS Code treats a workspace: every framework should attach to one explicit project workspace instead of drifting across the home directory, hidden mirrors, or ad-hoc copies.
+Kyber treats every agentic framework as a server-side worker with one explicit
+project root. Frameworks must attach to a real project checkout or explicit
+worktree instead of drifting across the home directory, hidden mirrors, or
+ad-hoc copies.
 
 ## Guiding Rule
 
@@ -12,16 +15,19 @@ Kyber treats agentic frameworks the same way VS Code treats a workspace: every f
 
 ## Core Terms
 
-- Control workspace: the Kyber repo and its VS Code workspace, used to coordinate frameworks and policy.
+- Control workspace: the Kyber repo, used to coordinate frameworks and policy.
 - Source workspace: the real project checkout that agents read and edit.
 - Framework metadata: tool-owned state such as project manifests, sessions, caches, or prompts that can live outside the source workspace as long as they point back to it.
 - Runtime root: an installed tool home or virtualenv location, not automatically the upstream source repo.
 
 ## Framework Mapping
 
-### VS Code
+### Optional editor clients
 
-VS Code uses a folder or `.code-workspace` file. This is the model Kyber follows conceptually: open one explicit project workspace instead of the whole home directory.
+Editors may open a folder or `.code-workspace` file for human convenience, but
+that is not the model Hermes or Kyber use at runtime. Runtime ownership is based
+on explicit project roots, process working directories, config paths, worktrees,
+and persisted framework state.
 
 ### Claude Code, Aider, and OpenCode
 
