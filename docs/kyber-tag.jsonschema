@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://m0nklabs.github.io/kyberm0nk/docs/kyber-tag.jsonschema",
+  "title": "Kyber PR Routing Tag",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "next_action",
+    "state",
+    "checks",
+    "artifact_refs",
+    "reviewer",
+    "confidence"
+  ],
+  "properties": {
+    "next_action": {
+      "type": "string",
+      "enum": [
+        "coding_subagent",
+        "ready_for_merge",
+        "rerun_reviewer"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "review_findings",
+        "review_clean",
+        "review_inconclusive"
+      ]
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "docs_build",
+        "links",
+        "linter"
+      ],
+      "properties": {
+        "docs_build": { "type": "boolean" },
+        "links": { "type": "boolean" },
+        "linter": { "type": "boolean" }
+      }
+    },
+    "artifact_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "examples": [
+    {
+      "next_action": "ready_for_merge",
+      "state": "review_clean",
+      "checks": {
+        "docs_build": true,
+        "links": true,
+        "linter": true
+      },
+      "artifact_refs": [],
+      "reviewer": "doc-agent",
+      "confidence": 0.95
+    }
+  ]
+}

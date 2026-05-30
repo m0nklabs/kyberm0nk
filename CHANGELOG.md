@@ -2,10 +2,22 @@
 
 ## 2026-05-30
 
+- **Root hygiene cleanup:**
+  - Removed obsolete one-off patch/fix scripts and stale local history artifacts from the repository root.
+  - Removed old Windows Unreal helper leftovers that were no longer referenced by the active Kyber runtime or docs.
+  - Added `.gitignore` guards so deleted root clutter does not drift back into the tracked repo surface.
 - **Tiered Aider PR review policy (no GH Copilot in PR/issue handling):**
   - Documented the canonical PR review loop as Tier1 Aider reviewer -> Tier2 Aider reviewer -> tag-driven PR manager routing.
   - Documented that PR/issue handling lanes must not rely on `@copilot` mentions for review or coding execution.
   - Standardized PR-manager next-step routing keys: `review_findings` -> `coding_subagent`, `review_clean` -> `ready_for_merge`, and `review_inconclusive` -> `rerun_reviewer`.
+- **Documentation audit baseline:**
+  - Updated README, architecture, issue-resolution docs, roadmap, and scripts docs to reflect the current Hermes + Aider + SQLite queue + tiered review workflow.
+  - Added a machine-readable `kyber-tag` schema, a structured docs audit report, and explicit contributing guidance for docs PRs.
+  - Archived obsolete research docs under `archive/research/2026-05-30/` instead of deleting them.
+- **Documentation contract closure:**
+  - Added `docs/index.md` as docs landing page and fixed workspace-path mismatches in setup/TODO docs.
+  - Added machine-parseable inventory deliverables `docs/audit-inventory.csv` and `docs/audit-inventory.json`.
+  - Added quickstart smoke helper `scripts/test_quickstart.sh` and extended docs validation expectations.
 
 ## 2026-05-28 - Persistent Issue Resolution Lane
 

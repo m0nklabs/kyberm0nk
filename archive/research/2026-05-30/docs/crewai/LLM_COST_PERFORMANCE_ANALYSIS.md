@@ -1,3 +1,9 @@
+# Archived Research Note
+
+Archived: 2026-05-30
+Reason: This model-cost analysis is a historical research artifact and not part of the current implementation contract or operator quickstart.
+Disposition: Kept for reference only; active runtime policy now lives in the current Kyber docs and model-policy files.
+
 # Uitgebreide LLM Prijs/Kwaliteit Analyse (Live OpenRouter + LLM-Stats)
 
 > **Tip:** Open `LLM_COST_PERFORMANCE_ANALYSIS.html` in je browser voor een **volledig interactief en sorteerbaar** overzicht!

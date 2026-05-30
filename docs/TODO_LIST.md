@@ -1,5 +1,11 @@
 # TODO List
 
+## 2026-05-30 Root Hygiene Cleanup
+
+- [x] Remove obsolete root-level one-off patch/fix scripts and stale local helper leftovers.
+- [x] Keep only front-door or still-documented root artifacts in the tracked repo surface.
+- [x] Add ignore guards for local history and ad-hoc root scratch files.
+
 ## 2026-05-28 Automated GitHub Issue Resolution
 
 - [x] Add a barebones Hermes Gateway issue-resolution lane.
@@ -40,7 +46,7 @@
 - [x] Create documentation-first repository skeleton.
 - [x] Create private GitHub repository under `m0nklabs`.
 - [x] Push initial skeleton to GitHub.
-- [x] Create optional editor workspace convenience file at `/home/flip/kyberm0nk.code-workspace`.
+- [x] Create optional editor workspace convenience file at `/home/flip/kyberm0nk/kyberm0nk.code-workspace`.
 - [x] Add agent handoff prompt for the next workspace session.
 - [x] Verify KyberM0nk can be opened from its own project root without relying on the home-directory workspace.
 

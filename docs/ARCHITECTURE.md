@@ -2,9 +2,14 @@
 
 ## Summary
 
-KyberM0nk is a headless local agentic automation layer. It separates inference
-infrastructure from tool orchestration and runs through host services, CLI
-workers, Telegram commands, webhooks, cron jobs, and persisted state.
+KyberM0nk is a headless, host-native automation control plane. The active
+production path is Hermes for durable orchestration, Aider for code changes,
+Guardian for local model brokering, and a PR-manager loop driven by
+machine-readable `kyber-tag` review comments.
+
+OpenCode and Agent Zero are available as optional host-native frameworks for
+future or operator-invoked lanes, but they are not part of the default active
+queue-to-merge flow.
 
 ```text
 +------------------------------+
@@ -13,58 +18,113 @@ workers, Telegram commands, webhooks, cron jobs, and persisted state.
 +---------------+--------------+
                 |
                 v
-+------------------------------+
-| KyberM0nk Control Plane      |
-| - docs                       |
-| - configs                    |
-| - scripts                    |
-| - host services              |
-+---+------------+-------------+
-    |            |
-    |            +------------------+
-    v                               v
-+-----------+                +-------------+
-| OpenCode  |                | Agent Zero  |
-+-----------+                +-------------+
-    |                               |
-    v                               v
-+-----------+                +-------------+
-| Aider     |                | Tool shell  |
-+-----------+                +-------------+
-    |
-    v
-+------------------------------+
-| Guardian proxy                |
-| http://host.docker.internal   |
-| :11434/v1                     |
-+------------------------------+
-                |
-                v
-+------------------------------+
-| llama.cpp backend             |
-| 127.0.0.1:11440               |
-| Managed by Guardian only      |
-+------------------------------+
++-----------------------------------+
+| KyberM0nk Control Plane           |
+| - docs                            |
+| - configs                         |
+| - scripts                         |
+| - host services                   |
++----------------+------------------+
+                 |
+                 v
++-----------------------------------+
+| Hermes Gateway                    |
+| - CLI / Telegram / webhook        |
+| - cron                            |
+| - SQLite queue                    |
+| - PR manager                      |
++----------------+------------------+
+                 |
+                 v
++-----------------------------------+
+| Aider local coder                 |
+| - single-flight lease             |
+| - active project worktree         |
++----------------+------------------+
+                 |
+                 v
++-----------------------------------+
+| Validation + Review               |
+| - local checks                    |
+| - tier1 reviewer                  |
+| - tier2 reviewer                  |
+| - kyber-tag routing               |
++----------------+------------------+
+                 |
+                 v
++-----------------------------------+
+| Guardian proxy                    |
+| http://127.0.0.1:11434/v1         |
++----------------+------------------+
+                 |
+                 v
++-----------------------------------+
+| llama.cpp backend                 |
+| 127.0.0.1:11440                   |
+| Managed by Guardian only          |
++-----------------------------------+
 ```
+
+## Active Workflow
+
+```mermaid
+flowchart TD
+    A[Issue or operator request] --> B[Hermes enqueue_run]
+    B --> C[SQLite queued]
+    C --> D[Single-flight claim]
+    D --> E[Aider implementation]
+    E --> F[Local validation]
+    F --> G[Tier1 reviewer]
+    G -->|findings| H[kyber-tag: coding_subagent]
+    G -->|clean| I[Tier2 reviewer]
+    I -->|findings| H
+    I -->|clean| J[kyber-tag: ready_for_merge]
+    I -->|inconclusive| K[kyber-tag: rerun_reviewer]
+```
+
+## Durable State
+
+- Hermes persists issue-resolution runs in `~/.hermes/issue_resolution.db`.
+- The active run states are `queued`, `running`, `expanded`, `completed`, and `failed`.
+- Local coder execution is FIFO and single-flight to protect the one meaningful local inference lane.
+
+### SQLite schema surface
+
+The queue state machine is backed by:
+
+- `issue_runs`: run metadata (`repo`, `issue_number`, `workdir`, `status`, `run_type`, `attempt_count`, `next_attempt_at`, `pr_number`, `pr_url`, timestamps).
+- `master_subissues`: decomposition mapping between master runs and generated sub-issues.
+
+The canonical field-level behavior is documented in `docs/GITHUB_ISSUE_RESOLUTION.md`.
+
+### Hermes <-> Aider envelope
+
+Hermes invokes Aider with a strict role envelope:
+
+1. Build normalized issue context and run-scoped prompt.
+2. Select role profile (`local_coder`, `tier1_reviewer`, `tier2_reviewer`).
+3. Inject provider endpoint and key from environment (`OPENAI_API_BASE`/`OPENAI_API_KEY`).
+4. Execute Aider non-interactively against the claimed worktree.
+5. Parse output into status + review routing (`kyber-tag`) for PR manager consumption.
+
+This envelope is intentionally deterministic so queue retries and resume behavior remain reproducible.
 
 ## Boundary Decisions
 
-### Outside Docker
+### Host-native defaults
 
 - Guardian proxy
 - `llama-server`
-- GGUF model files
-- GPU allocation and tensor split policy
 - Hermes Gateway daemon and persisted automation state
-- Optional editor clients, which are not required for runtime behavior
-
-### Inside Docker
-
 - Aider runtime
-- OpenCode runtime, if Docker-friendly
-- Agent Zero runtime
-- shared CLI dependencies
-- temporary working shells
+- optional available operator tools such as Claude Code, OpenCode, CrewAI,
+  Superset, and Agent Zero (outside the default active flow unless explicitly enabled)
+- GGUF model files plus GPU allocation and tensor split policy
+
+### Optional containers
+
+- Docker may still be used for bounded experiments or deployable targets.
+- Docker is not the default Kyber runtime path and must not define the architecture narrative.
 
 ## Mount Model
 
@@ -83,7 +143,7 @@ The default must avoid accidental write access to reference repositories.
 All tools should use an OpenAI-compatible endpoint:
 
 ```text
-GUARDIAN_BASE_URL=http://host.docker.internal:11434/v1
+GUARDIAN_BASE_URL=http://127.0.0.1:11434/v1
 ```
 
 The initial deep model alias is:
@@ -94,9 +154,10 @@ qwen3-35b-uncensored
 
 Guardian remains the source of truth for actual model paths, context sizes, VRAM policy, pinned model behavior, and switch allowlists.
 
-## Agent Model Budgets
+## Optional Agent Model Budgets
 
-KyberM0nk tools should use balanced coding-agent budgets rather than maximum stress-test budgets.
+When optional lanes are enabled, KyberM0nk tools should use balanced
+coding-agent budgets rather than maximum stress-test budgets.
 
 Default policy:
 
@@ -121,8 +182,8 @@ Kyber PR automation uses a two-tier Aider reviewer lane and tag-driven routing:
 1. Tier1 reviewer (Aider + fast OR model) evaluates the PR and posts findings.
 2. If Tier1 is clean, Tier2 reviewer (Aider + stronger OR model) re-checks.
 3. PR comments include machine-readable PR-manager tags with:
-    - `state`: `review_findings`, `review_clean`, or `review_inconclusive`
-    - `next_action`: `coding_subagent`, `ready_for_merge`, or `rerun_reviewer`
+   - `state`: `review_findings`, `review_clean`, or `review_inconclusive`
+   - `next_action`: `coding_subagent`, `ready_for_merge`, or `rerun_reviewer`
 4. The PR manager executes the next step from tags.
 
 GitHub Copilot mentions are intentionally excluded from this lane.

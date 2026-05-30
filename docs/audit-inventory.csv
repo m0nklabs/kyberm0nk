@@ -1,0 +1,31 @@
+file_path,summary,status,reason,recommended_action,action_taken,pr_branch,pr_url
+README.md,Root overview and quickstart,current,Canonical entry point for active runtime,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+CONTRIBUTING.md,Docs and PR policy contract,current,Defines docs branch and kyber-tag policy,update,created,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+CHANGELOG.md,Historical change ledger,current,Tracks audit and archive actions,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+SMOKE_TEST.md,Smoke entry for docs validation,current,Quick validation pointer for operators,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/index.md,Documentation landing page,current,Required docs index and orientation,update,created,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/ARCHITECTURE.md,Runtime architecture and workflow,current,Must match Hermes+Aider+SQLite+tiered review+kyber-tag,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/GITHUB_ISSUE_RESOLUTION.md,Issue queue and review lane,current,Canonical queue and state machine behavior,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/TOOL_ROLES.md,Role policy for active tools,current,Still aligned with current runtime,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/ROADMAP.md,Phased roadmap and backlog,current,Tracks active and deferred tracks,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/WORKSPACE_SETUP.md,Workspace setup instructions,current,Path fix needed for workspace file,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/WORKSPACE_POLICY.md,Repo/workspace guardrails,current,Still valid for current operating model,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/WORKSPACE_INVENTORY.md,Repo/runtime inventory,current,Still valid inventory reference,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/SECURITY.md,Security and secret policy,current,Still valid security baseline,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/LOCAL_AGENT_MODEL_SETTINGS.md,Benchmark-based model budgets,current,Still active model policy reference,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/VALIDATION_LOG.md,Historical validation evidence,current,Retained for evidence trail,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/AGENT_HANDOFF_PROMPT.md,Agent handoff guidance,current,Still used for continuity in sessions,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/DOCKER_STACK.md,Optional docker compatibility notes,current,Was outdated and now corrected as optional-only path,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/WINDOWS_UNREAL_EXECUTOR.md,Windows Unreal SSH executor policy,current,Still valid for Unreal host execution flow,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/UNREAL_HEADLESS_PIPELINE.md,Headless Unreal implementation notes,current,Still useful reference for UE workflow,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/AGENT_ZERO_PROJECTS.md,Agent Zero project metadata restore flow,current,Still valid runtime restore contract,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/crewai/MAIN_QUEST_PROJECT_MANAGER.md,Direct CrewAI main quest path,current,Still valid direct CrewAI operating guide,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/crewai/4_BRAIN_ARCHITECTURE.md,CrewAI architecture blueprint,research,Conceptual blueprint and not required for core runtime contract,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/CODING_MONSTER_STACK.md,Conceptual multi-framework design,research,Exploratory and non-canonical,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/SUPERVISOR_LOOP_PLAN.md,Supervisor design notes,research,Future design and non-canonical,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/NAMING.md,Project naming rationale,current,Historical but still accurate context,keep,kept,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/VISION_UI.md,Legacy cockpit UI vision,outdated,No longer matches current headless host-native contract,archive,archived,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/crewai/LLM_COST_PERFORMANCE_ANALYSIS.md,Historical model-price analysis,research,Research artifact not required by runtime contract,archive,archived,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/crewai/LLM_COST_PERFORMANCE_ANALYSIS.html,Interactive analysis artifact,research,Research artifact not required by runtime contract,archive,archived,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/kyber-tag.jsonschema,Machine-readable review tag schema,current,Required for parser contract,update,created,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1
+docs/audit-report.md,Audit execution report,current,Canonical report for status and actions,update,updated,docs/sync-runtime-docs-20260530,https://github.com/m0nklabs/kyberm0nk/pull/1

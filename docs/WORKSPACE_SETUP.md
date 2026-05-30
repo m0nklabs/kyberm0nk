@@ -19,7 +19,7 @@ instead of editing from a broad home-directory view.
 Recommended workspace file:
 
 ```text
-/home/flip/kyberm0nk.code-workspace
+/home/flip/kyberm0nk/kyberm0nk.code-workspace
 ```
 
 It should include only:

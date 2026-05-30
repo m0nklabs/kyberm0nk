@@ -20,17 +20,32 @@ Claude Code is now treated as the primary host-native operator tool on this serv
 
 Kyber and Hermes do not require an active editor session, editor plugin, browser UI, or desktop GUI. Runtime work is driven by CLI commands, Telegram, webhooks, cron jobs, systemd services, and persisted local state.
 
-## Current Stack
+## Available Stack
 
 | Role | Tool | Purpose |
 |------|------|---------|
 | Primary operator | Claude Code | Main goto tool for high-trust repo work, review, and orchestration entry |
-| Strategist | OpenCode | Host-native planning and execution worker via `~/venvs/kyber-workers` |
-| Scalpel | Aider | Host-native focused code-edit worker under `~/aider` |
+| Scalpel | Aider | Host-native focused code-edit worker under `~/aider` (active default implementation lane) |
+| Strategist (optional) | OpenCode | Available host-native planning/execution lane via `~/venvs/kyber-workers`; not in default queue flow unless enabled |
+| Operator (optional) | Agent Zero | Available host-native operator runtime under `~/agentzero`; not in default queue flow unless enabled |
 | Optional editor client | Continue | Manual inline assistance against local Guardian models; not part of daemon execution |
-| Operator | Agent Zero | Host-native operator runtime under `~/agentzero` with isolated runtime home/secrets |
 | Gatekeeper | Guardian | OpenAI-compatible broker for local models |
 | Engine | llama.cpp | GPU inference backend managed by Guardian |
+
+## Current End-to-End Workflow
+
+Kyber's current production workflow is:
+
+1. GitHub issue or operator request enters Hermes.
+2. Hermes persists the run in SQLite and queues it FIFO.
+3. The single-flight local coder lease claims exactly one queued run.
+4. Aider performs the implementation pass against the active project.
+5. Local validation runs before review.
+6. Tier1 reviewer checks the PR with a fast OpenRouter model.
+7. If Tier1 is clean, Tier2 reviewer re-checks with a stronger OpenRouter model.
+8. The reviewer posts a machine-readable `kyber-tag` block that tells the PR manager whether to run `coding_subagent`, `rerun_reviewer`, or mark the PR `ready_for_merge`.
+
+GitHub Copilot mentions are intentionally excluded from PR and issue automation.
 
 ## Intended Default Model
 
@@ -44,17 +59,38 @@ Kyber's `claude-local` launcher defaults Claude Code to `qwen3-35b-uncensored` a
 
 Start here:
 
+- [docs/index.md](docs/index.md)
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/GITHUB_ISSUE_RESOLUTION.md](docs/GITHUB_ISSUE_RESOLUTION.md)
 - [docs/TOOL_ROLES.md](docs/TOOL_ROLES.md)
 - [docs/WORKSPACE_SETUP.md](docs/WORKSPACE_SETUP.md)
 - [docs/WORKSPACE_POLICY.md](docs/WORKSPACE_POLICY.md)
 - [docs/WORKSPACE_INVENTORY.md](docs/WORKSPACE_INVENTORY.md)
 - [docs/SECURITY.md](docs/SECURITY.md)
+- [docs/kyber-tag.jsonschema](docs/kyber-tag.jsonschema)
+- [docs/audit-report.md](docs/audit-report.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
 - [docs/LOCAL_AGENT_MODEL_SETTINGS.md](docs/LOCAL_AGENT_MODEL_SETTINGS.md)
 - [docs/VALIDATION_LOG.md](docs/VALIDATION_LOG.md)
 - [docs/TODO_LIST.md](docs/TODO_LIST.md)
 - [docs/AGENT_HANDOFF_PROMPT.md](docs/AGENT_HANDOFF_PROMPT.md)
+
+## Quickstart
+
+For the current headless Kyber path:
+
+```bash
+scripts/test_quickstart.sh
+scripts/crewai_status.sh
+scripts/superset.sh status
+scripts/validate_docs.sh
+```
+
+Expected docs validation result:
+
+```text
+docs validation: OK
+```
 
 ## Superset Orchestration
 
