@@ -41,3 +41,4 @@ build/
 /launch_nerve_splat.vbs
 /ue_webhook.py
 /ue_webhook_tray.py
+.aider*
