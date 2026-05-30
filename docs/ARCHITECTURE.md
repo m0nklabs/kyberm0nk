@@ -69,18 +69,25 @@ queue-to-merge flow.
 
 ```mermaid
 flowchart TD
-    A[Issue or operator request] --> B[Hermes enqueue_run]
-    B --> C[SQLite queued]
-    C --> D[Single-flight claim]
-    D --> E[Aider implementation]
-    E --> F[Local validation]
-    F --> G[Tier1 reviewer]
-    G -->|findings| H[kyber-tag: coding_subagent]
-    G -->|clean| I[Tier2 reviewer]
-    I -->|findings| H
-    I -->|clean| J[kyber-tag: ready_for_merge]
-    I -->|inconclusive| K[kyber-tag: rerun_reviewer]
+    A[New GitHub issue or operator request] --> B[Hermes triage and enqueue_run]
+    B --> C[Hermes assigns coding agent lane]
+    C --> D[SQLite queued]
+    D --> E[Single-flight claim]
+    E --> F[Coding agent opens or reuses PR branch]
+    F --> G[Coding agent implements issue in PR]
+    G --> H[Local validation]
+    H --> I[PR tagged ready_for_review]
+    I --> J[Tier1 reviewer]
+    J -->|findings| K[kyber-tag: coding_subagent]
+    J -->|clean| L[Tier2 reviewer]
+    L -->|findings| K
+    L -->|clean| M[kyber-tag: ready_for_merge]
+    L -->|inconclusive| N[kyber-tag: rerun_reviewer]
 ```
+
+Issue handling is part of the default flow: Hermes receives and triages a new
+issue, routes it into the coding lane, and only enters the PR review loop after
+the coding agent has pushed the solution and marked the PR `ready_for_review`.
 
 ## Durable State
 

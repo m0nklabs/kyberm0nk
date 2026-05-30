@@ -36,14 +36,16 @@ Kyber and Hermes do not require an active editor session, editor plugin, browser
 
 Kyber's current production workflow is:
 
-1. GitHub issue or operator request enters Hermes.
-2. Hermes persists the run in SQLite and queues it FIFO.
-3. The single-flight local coder lease claims exactly one queued run.
-4. Aider performs the implementation pass against the active project.
-5. Local validation runs before review.
-6. Tier1 reviewer checks the PR with a fast OpenRouter model.
-7. If Tier1 is clean, Tier2 reviewer re-checks with a stronger OpenRouter model.
-8. The reviewer posts a machine-readable `kyber-tag` block that tells the PR manager whether to run `coding_subagent`, `rerun_reviewer`, or mark the PR `ready_for_merge`.
+1. A new GitHub issue (or operator request) enters Hermes.
+2. Hermes triages the issue and assigns the coding-agent lane.
+3. Hermes persists the run in SQLite and queues it FIFO.
+4. The single-flight local coder lease claims exactly one queued run.
+5. The coding agent opens or reuses the PR branch and implements the issue in that PR.
+6. Local validation runs before review handoff.
+7. The coding agent marks the PR `ready_for_review`.
+8. Tier1 reviewer checks the PR with a fast OpenRouter model.
+9. If Tier1 is clean, Tier2 reviewer re-checks with a stronger OpenRouter model.
+10. The reviewer posts a machine-readable `kyber-tag` block that tells the PR manager whether to run `coding_subagent`, `rerun_reviewer`, or mark the PR `ready_for_merge`.
 
 GitHub Copilot mentions are intentionally excluded from PR and issue automation.
 

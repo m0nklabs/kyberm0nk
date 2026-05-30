@@ -2,6 +2,11 @@
 
 ## 2026-05-30
 
+- **Issue-handling workflow expansion in docs:**
+  - Expanded the architecture and README workflow definitions to include explicit issue intake and triage by Hermes.
+  - Documented coding-agent assignment, PR branch creation/reuse, implementation in the PR, and the `ready_for_review` handoff before the review loop.
+  - Updated issue-resolution docs so review routing clearly starts after coding completion and ready-for-review tagging.
+
 - **Root hygiene cleanup:**
   - Removed obsolete one-off patch/fix scripts and stale local history artifacts from the repository root.
   - Removed old Windows Unreal helper leftovers that were no longer referenced by the active Kyber runtime or docs.

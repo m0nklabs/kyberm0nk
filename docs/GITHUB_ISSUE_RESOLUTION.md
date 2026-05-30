@@ -204,6 +204,13 @@ invocation uses OpenRouter and does not change the local FIFO policy.
 
 The reviewer lane is intentionally GitHub-Copilot-free.
 
+Issue-to-PR handoff before review is explicit:
+
+1. Hermes triages a new issue and routes it to the local coding-agent lane.
+2. The coding agent opens or reuses a PR branch and resolves the issue inside that PR.
+3. After local checks pass, the coding agent marks the PR `ready_for_review`.
+4. Only then does the PR review loop start (Tier1 -> Tier2 -> `kyber-tag` routing).
+
 - Tier1 reviewer posts findings immediately when it sees a high-signal issue.
 - If Tier1 is clean, Tier2 reviewer re-checks with a stronger model.
 - Reviewer comments include a `kyber-tag` block that the PR manager parses.
