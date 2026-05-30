@@ -20,15 +20,15 @@ Claude Code is now treated as the primary host-native operator tool on this serv
 
 Kyber and Hermes do not require an active editor session, editor plugin, browser UI, or desktop GUI. Runtime work is driven by CLI commands, Telegram, webhooks, cron jobs, systemd services, and persisted local state.
 
-## Current Stack
+## Available Stack
 
 | Role | Tool | Purpose |
 |------|------|---------|
 | Primary operator | Claude Code | Main goto tool for high-trust repo work, review, and orchestration entry |
-| Strategist | OpenCode | Host-native planning and execution worker via `~/venvs/kyber-workers` |
-| Scalpel | Aider | Host-native focused code-edit worker under `~/aider` |
+| Scalpel | Aider | Host-native focused code-edit worker under `~/aider` (active default implementation lane) |
+| Strategist (optional) | OpenCode | Available host-native planning/execution lane via `~/venvs/kyber-workers`; not in default queue flow unless enabled |
+| Operator (optional) | Agent Zero | Available host-native operator runtime under `~/agentzero`; not in default queue flow unless enabled |
 | Optional editor client | Continue | Manual inline assistance against local Guardian models; not part of daemon execution |
-| Operator | Agent Zero | Host-native operator runtime under `~/agentzero` with isolated runtime home/secrets |
 | Gatekeeper | Guardian | OpenAI-compatible broker for local models |
 | Engine | llama.cpp | GPU inference backend managed by Guardian |
 
