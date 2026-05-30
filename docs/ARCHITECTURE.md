@@ -113,3 +113,16 @@ The benchmark suite and trend renderer in `scripts/` provide the evidence trail 
 - KyberM0nk does not download or manage GGUF model files.
 - KyberM0nk does not start direct `llama-server` processes.
 - KyberM0nk does not replace project-specific workspaces; it coordinates frameworks around them. See [WORKSPACE_POLICY.md](WORKSPACE_POLICY.md).
+
+## PR Review Control Loop
+
+Kyber PR automation uses a two-tier Aider reviewer lane and tag-driven routing:
+
+1. Tier1 reviewer (Aider + fast OR model) evaluates the PR and posts findings.
+2. If Tier1 is clean, Tier2 reviewer (Aider + stronger OR model) re-checks.
+3. PR comments include machine-readable PR-manager tags with:
+    - `state`: `review_findings`, `review_clean`, or `review_inconclusive`
+    - `next_action`: `coding_subagent`, `ready_for_merge`, or `rerun_reviewer`
+4. The PR manager executes the next step from tags.
+
+GitHub Copilot mentions are intentionally excluded from this lane.

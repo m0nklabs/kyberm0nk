@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-05-30
+
+- **Tiered Aider PR review policy (no GH Copilot in PR/issue handling):**
+  - Documented the canonical PR review loop as Tier1 Aider reviewer -> Tier2 Aider reviewer -> tag-driven PR manager routing.
+  - Documented that PR/issue handling lanes must not rely on `@copilot` mentions for review or coding execution.
+  - Standardized PR-manager next-step routing keys: `review_findings` -> `coding_subagent`, `review_clean` -> `ready_for_merge`, and `review_inconclusive` -> `rerun_reviewer`.
+
 ## 2026-05-28 - Persistent Issue Resolution Lane
 
 ### Added
