@@ -29,3 +29,15 @@ build/
 .DS_Store
 *.swp
 *.code-workspace
+
+# Root-level scratch/history clutter that must not live in the tracked repo.
+/.aider.chat.history.md
+/.aider.input.history
+/cookie.txt
+/fix_*.py
+/patch*.py
+/SpawnGrass.py
+/disable_livecoding.ps1
+/launch_nerve_splat.vbs
+/ue_webhook.py
+/ue_webhook_tray.py

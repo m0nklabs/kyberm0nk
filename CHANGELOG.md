@@ -2,6 +2,10 @@
 
 ## 2026-05-30
 
+- **Root hygiene cleanup:**
+  - Removed obsolete one-off patch/fix scripts and stale local history artifacts from the repository root.
+  - Removed old Windows Unreal helper leftovers that were no longer referenced by the active Kyber runtime or docs.
+  - Added `.gitignore` guards so deleted root clutter does not drift back into the tracked repo surface.
 - **Tiered Aider PR review policy (no GH Copilot in PR/issue handling):**
   - Documented the canonical PR review loop as Tier1 Aider reviewer -> Tier2 Aider reviewer -> tag-driven PR manager routing.
   - Documented that PR/issue handling lanes must not rely on `@copilot` mentions for review or coding execution.

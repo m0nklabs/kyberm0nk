@@ -1,5 +1,11 @@
 # TODO List
 
+## 2026-05-30 Root Hygiene Cleanup
+
+- [x] Remove obsolete root-level one-off patch/fix scripts and stale local helper leftovers.
+- [x] Keep only front-door or still-documented root artifacts in the tracked repo surface.
+- [x] Add ignore guards for local history and ad-hoc root scratch files.
+
 ## 2026-05-28 Automated GitHub Issue Resolution
 
 - [x] Add a barebones Hermes Gateway issue-resolution lane.
