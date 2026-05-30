@@ -32,6 +32,17 @@ Use it for:
 
 Aider should operate inside one active project mounted read-write.
 
+### Advisor Lane
+
+Kyber also exposes a scarce Aider advisor lane for hard questions. It is OpenRouter-backed, uses GPT-5.5, and is limited to one invocation per day on the host. Hermes may call the advisor wrapper, but Hermes itself should not use GPT-5.5 as its own orchestration model.
+
+Use it for:
+- ambiguous architecture decisions after local research stalls
+- difficult code paths where a second stronger read is worth cloud spend
+- narrow escalation questions that do not need a full review loop
+
+Do not use it for routine implementation or repeated retries. If the daily slot is gone, wait for the next day instead of forcing another run.
+
 ### PR Review Automation Contract
 
 For PR and issue handling lanes, Kyber does **not** use GitHub Copilot as the

@@ -209,3 +209,9 @@
 - [x] Harden the CrewAI live watcher so raw log content is escaped safely and the page hooks into new live lines without replaying stale historical errors.
 - [x] Retire CrewAI-Studio from the active Kyber path and restore direct host-native CrewAI as the supported main-quest lane.
 - [x] Normalize CrewAI control/MCP state so legacy Studio metadata is translated to direct-runtime paths and status output.
+
+## 2026-05-30 Daily Aider Advisor Lane
+
+- [ ] Add a daily-gated Aider advisor wrapper on OpenRouter GPT-5.5 for hard questions.
+- [ ] Surface advisor availability in Kyber status output and docs so Hermes knows the lane is scarce.
+- [ ] Close the planning issue after implementation and validation.

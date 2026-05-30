@@ -6,6 +6,7 @@ Key active scripts:
 
 - `health-guardian.sh`: verify Guardian from the host runtime.
 - `run-aider.sh`: start Aider against the active project.
+- `aider_advisor.py`: daily-gated OpenRouter GPT-5.5 advisor lane for difficult questions.
 - `run-opencode.sh`: start OpenCode against the active project.
 - `run-agent-zero.sh`: start Agent Zero with isolated host runtime paths.
 - `status.sh`: show active project, model target, and tool status.

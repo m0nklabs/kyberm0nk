@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added a daily-gated Aider advisor lane on OpenRouter GPT-5.5 for hard questions, plus status/docs visibility so Hermes knows the advisor can only be used once per day.
+
 ## 2026-05-30
 
 - **Hermes issue assignment clarification:**
