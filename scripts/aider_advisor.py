@@ -170,16 +170,16 @@ openrouter_key = resolve_secret("OPENROUTER_API_KEY", "OPENROUTER_API_KEY_FILE",
 if not openrouter_key:
     raise SystemExit("❌ ERROR: OPENROUTER_API_KEY or OPENROUTER_API_KEY_FILE is missing")
 
-    save_state(
-        advisor_state_file,
-        {
-            "last_used_date": today,
-            "last_used_at": now,
-            "model": advisor_model,
-            "project": active_project,
-            "command": [aider_bin, "--model", advisor_model, *sys.argv[1:]],
-        },
-    )
+save_state(
+    advisor_state_file,
+    {
+        "last_used_date": today,
+        "last_used_at": now,
+        "model": advisor_model,
+        "project": active_project,
+        "command": [aider_bin, "--model", advisor_model, *sys.argv[1:]],
+    },
+)
 
 child_env = os.environ.copy()
 child_env["OPENAI_API_BASE"] = openrouter_base
