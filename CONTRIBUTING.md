@@ -1,12 +1,13 @@
 # Contributing
 
-KyberM0nk accepts focused, evidence-based changes.
+KyberM0nk accepts focused, evidence-based changes. The goal is to mature the project and the framework that drives project maturity.
 
 ## Scope
 
-- Keep the active architecture narrative aligned with Hermes, Aider, Guardian, the SQLite-backed issue queue, tiered PR review, and machine-readable `kyber-tag` routing.
+- Keep the active architecture narrative aligned with Hermes as the orchestration brain, Aider as the execution worker, Guardian as the local model, and GitHub issues/PRs as the primary coordination mechanism.
 - Treat Docker as optional infrastructure, not as the default runtime story.
 - Do not introduce GitHub Copilot mentions into PR or issue automation lanes.
+- Cryptotrader is the testing playground — changes that improve the maturity process for cryptotrader improve it for all projects.
 
 ## Branches
 

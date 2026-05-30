@@ -1,16 +1,28 @@
 # KyberM0nk
 
-Local agentic coding cockpit powered by Guardian.
+Project orchestration and maturity system powered by Hermes and agentic frameworks.
 
-KyberM0nk is the headless server-side control plane for a local coding-agent stack. It coordinates host-native coding frameworks and supporting extras around the existing Guardian proxy and llama.cpp backend, without owning model files or starting standalone inference servers.
+KyberM0nk is a project orchestrator that matures repositories from their current state into production-ready projects. It uses GitHub issues and PRs as the primary coordination mechanism, with Hermes as the orchestration brain and agentic frameworks (currently Aider, expandable to others) as the execution workers.
+
+Cryptotrader is the active testing playground — Kyber matures it through the same processes it will use for any project.
 
 Claude Code is now treated as the primary host-native operator tool on this server, with its tracked home under `/home/flip/claudecode`. Kyber remains the broader lab for local supporting workers, orchestration, and sandboxed tooling.
 
 ## Core Idea
 
+KyberM0nk takes a project and matures it through a structured lifecycle:
+
+1. **Diagnose** — scan the project for gaps (code quality, test coverage, documentation, infrastructure, CI/CD).
+2. **Prioritize** — rank issues by impact, create or triage GitHub issues.
+3. **Execute** — assign issues to agentic frameworks (Aider today, others later) via PRs.
+4. **Review** — tiered review with `kyber-tag` routing ensures quality gates.
+5. **Repeat** — continuous maturity loop until the project is production-ready.
+
+Each project goes through the same cycle. Cryptotrader is the active testing playground: Kyber matures it through all phases, and the patterns proved there apply to any project.
+
 - Claude Code stays host-native and out of Docker.
 - Guardian and `llama-server` stay outside Docker.
-- Active Kyber-managed frameworks run host-native under dedicated home paths, with upstream source checkouts kept on their real repo names such as `~/aider`, `~/crewAI`, `~/opencode`, `~/langgraph`, `~/superset`, and `~/agentzero`.
+- Active Kyber-managed frameworks run host-native under dedicated home paths, with upstream source checkouts kept on their real repo names such as `~/aider`, `~/crewAI`, `~/opencode`, `~/langgraph`, and `~/agentzero`.
 - Workspace-first is the guiding rule: every framework should attach to one explicit project root, even if the framework stores its own metadata elsewhere.
 - Source checkouts and runtime/install paths are separate concerns: `~/crewAI`, `~/opencode`, and `~/langgraph` are upstream repos, while `~/crewai`, `~/venvs/kyber-workers`, and `~/.opencode` remain runtime/install paths. See [docs/WORKSPACE_INVENTORY.md](docs/WORKSPACE_INVENTORY.md).
 - Docker is optional for mature, shareable deployment targets, not the active Kyber development layer.
@@ -24,23 +36,34 @@ Kyber and Hermes do not require an active editor session, editor plugin, browser
 
 | Role | Tool | Purpose |
 |------|------|---------|
-| Primary operator | Claude Code | Main goto tool for high-trust repo work, review, and orchestration entry |
-| Scalpel | Aider | Host-native focused code-edit worker under `~/aider` (active default implementation lane) |
-| Strategist (optional) | OpenCode | Available host-native planning/execution lane via `~/venvs/kyber-workers`; not in default queue flow unless enabled |
-| Operator (optional) | Agent Zero | Available host-native operator runtime under `~/agentzero`; not in default queue flow unless enabled |
-| Optional editor client | Continue | Manual inline assistance against local Guardian models; not part of daemon execution |
-| Gatekeeper | Guardian | OpenAI-compatible broker for local models |
-| Engine | llama.cpp | GPU inference backend managed by Guardian |
+| Orchestrator | Hermes | Durable event bus, issue triage, PR governance, cron loops, project maturity tracking |
+| Execution worker | Aider | Focused code-change worker — opens PRs, fixes issues, implements features |
+| Primary operator | Claude Code | High-trust repo work, review, and orchestration entry |
+| Strategist | OpenCode | Planning and architecture (optional, not in default lane) |
+| Operator | Agent Zero | Sandbox task runner (optional, not in default lane) |
+| Gatekeeper | Guardian | Local model brokering (OpenAI-compatible endpoint) |
+| Engine | llama.cpp | GPU inference (managed by Guardian) |
+
+### Framework Expandability
+
+Aider is the active default execution worker. Other agentic frameworks can be added as execution lanes without changing the orchestration layer:
+
+- **Hermes** stays the brain — it routes issues to whichever framework is available.
+- **Aider** is the current implementation lane — focused, single-flight, Guardian-backed.
+- **Future frameworks** (CrewAI, LangGraph, etc.) plug in as additional lanes. Hermes manages lane selection and load balancing.
+- **Guardian** serves all frameworks — model routing is framework-agnostic.
+
+The key insight: Kyber orchestrates *projects*, not tools. Tools are replaceable; the maturity process is not.
 
 ## Current End-to-End Workflow
 
-Kyber's current production workflow is:
+Kyber's production workflow matures a project through GitHub issues and PRs:
 
 1. A new GitHub issue (or operator request) enters Hermes.
 2. Hermes triages the issue and assigns exactly one issue at a time to the coding-agent lane.
 3. Hermes persists the run in SQLite and queues it FIFO.
-4. The single-flight local coder lease claims exactly one queued run.
-5. The coding agent opens or reuses the PR branch and implements the issue in that PR.
+4. The single-flight local coder (Aider) claims exactly one queued run.
+5. The coding agent opens or reuses the PR branch and implements the issue.
 6. Local validation runs before review handoff.
 7. The coding agent marks the PR `ready_for_review`.
 8. Tier1 reviewer checks the PR with a fast OpenRouter model.
@@ -48,6 +71,21 @@ Kyber's current production workflow is:
 10. The reviewer posts a machine-readable `kyber-tag` block that tells the PR manager whether to run `coding_subagent`, `rerun_reviewer`, or mark the PR `ready_for_merge`.
 
 GitHub Copilot mentions are intentionally excluded from PR and issue automation.
+
+## Project Maturity Model
+
+Kyber drives projects through maturity stages. Each stage has quality gates:
+
+| Stage | Description | Key Activities |
+|-------|-------------|----------------|
+| **Diagnose** | Understand current state | Code scan, dependency audit, CI check, documentation review |
+| **Stabilize** | Fix critical issues | Bug fixes, test coverage, error handling, edge cases |
+| **Structure** | Build solid foundation | Architecture cleanup, naming conventions, module boundaries |
+| **Automate** | CI/CD and ops | Tests, linting, deployment, monitoring, health checks |
+| **Polish** | Production-ready | Documentation, performance, security, observability |
+| **Sustain** | Continuous improvement | Automated PRs, governance loops, self-healing |
+
+Cryptotrader is currently in the **Stabilize → Structure** phase. The same process applies to any project.
 
 ## Intended Default Model
 
@@ -83,8 +121,6 @@ For the current headless Kyber path:
 
 ```bash
 scripts/test_quickstart.sh
-scripts/crewai_status.sh
-scripts/superset.sh status
 scripts/validate_docs.sh
 ```
 
@@ -94,31 +130,7 @@ Expected docs validation result:
 docs validation: OK
 ```
 
-## Superset Orchestration
-
-Superset is the current preferred session/worktree cockpit for KyberM0nk.
-
-- Website: https://superset.sh
-- Docs: https://docs.superset.sh
-- Repository: https://github.com/superset-sh/superset
-
-Kyber entry point. Superset now runs from the host checkout at `~/superset` with local state under `~/.superset`:
-
-```bash
-scripts/superset_bootstrap.sh
-scripts/superset.sh link
-scripts/superset.sh login
-scripts/superset.sh status
-scripts/superset.sh start
-scripts/superset.sh seed-agents
-scripts/superset.sh import-active
-```
-
-The Superset presets route into the host-native Aider runtime at `~/aider` and the host-native OpenCode worker root at `~/venvs/kyber-workers`.
-
-## CrewAI Main Quest Manager
-
-Direct host-native CrewAI is the active project-manager lane for the game-development main quest. Superset remains the broader Kyber cockpit; CrewAI is the focused planning and project-manager path around the tracked NewNexus crew.
+## Repository Status
 
 The upstream CrewAI source checkout now lives at `~/crewAI`, while the direct runnable runtime stays at `~/crewai` so the repo name can match GitHub without breaking the existing host runtime path.
 

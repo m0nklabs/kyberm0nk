@@ -6,6 +6,14 @@
 - [x] Keep only front-door or still-documented root artifacts in the tracked repo surface.
 - [x] Add ignore guards for local history and ad-hoc root scratch files.
 
+## 2026-05-30 Issue-to-Merge Target State
+
+- [x] Define explicit state machine for issue lifecycle in `ISSUE_TO_MERGE_TARGET_STATE.md`.
+- [x] Specify routing contracts between sync, governor, execution, and reviewer loops.
+- [x] Document failure handling and operator visibility rules.
+- [x] Deliver architecture documentation with runnable checklist.
+- [x] Cross-reference target state from `ARCHITECTURE.md` and `docs/index.md`.
+
 ## 2026-05-28 Automated GitHub Issue Resolution
 
 - [x] Add a barebones Hermes Gateway issue-resolution lane.

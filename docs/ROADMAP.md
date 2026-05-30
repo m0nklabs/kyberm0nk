@@ -1,11 +1,8 @@
-# Roadmap & Vision: The Headless Agentic Automation Layer
+# Roadmap & Vision: The Project Maturity Orchestrator
 
-KyberM0nk is a server-side control plane for local agentic coding frameworks. It
-runs on bare-metal host resources, coordinates headless daemons and CLI workers,
-and reacts to explicit events such as CLI commands, Telegram messages, webhooks,
-cron ticks, and systemd service state. Editors can be used to write or inspect
-code, but they are not part of the runtime architecture and are not required for
-Hermes automation.
+KyberM0nk is a project orchestration system that matures repositories from their current state into production-ready projects. It runs on bare-metal host resources, coordinates headless daemons and CLI workers, and uses GitHub issues and PRs as the primary coordination mechanism.
+
+Cryptotrader is the active testing playground — the same process that matures cryptotrader will mature any project.
 
 ## Current Committed Stack
 
@@ -18,24 +15,23 @@ candidates for evaluation, not architecture commitments.
 - **Role**: Local OpenAI-compatible inference broker and model lifecycle guard.
 - **Setup**: Runs purely on the host (outside Docker). Configured to offload to GPU (`-ngl 99` for 35B models on 28GB VRAM). Uses the `qwen3-35b-uncensored` alias as the baseline.
 
-### 2. Hermes Gateway
+### 2. Hermes Gateway — Orchestration Brain
 - **Tool**: Hermes Gateway.
-- **Role**: Headless event bus and durable automation daemon for CLI, Telegram,
-  webhook, cron, and queue-backed workflows.
+- **Role**: Durable event bus, issue triage, PR governance, cron loops, and project maturity tracking.
 - **Setup**: Runs server-side and persists runtime state under `~/.hermes`.
+- **Projects**: Orchestrates any project through the maturity lifecycle — cryptotrader is the active testing playground.
 
-### 3. Aider
+### 3. Aider — Execution Worker
 - **Tool**: Aider.
-- **Role**: Focused headless code-change worker for the local implementation
-  lane.
+- **Role**: Focused headless code-change worker — opens PRs, fixes issues, implements features.
 - **Setup**: Driven directly or by Hermes `/issue` jobs through Guardian.
+- **Lane**: Single-flight, Guardian-backed, the default implementation worker.
 
 ## Candidate Frameworks
 
-The following tools are not part of the committed runtime architecture yet. They
-may be evaluated later, but the roadmap must not assume they will be adopted.
+Other agentic frameworks can be added as execution lanes without changing the orchestration layer. Hermes routes issues to whichever framework is available; Guardian serves all frameworks.
 
-| Candidate | Possible evaluation question |
+| Candidate | Evaluation question |
 | --- | --- |
 | OpenCode | Does it add enough planning throughput beyond Hermes + Aider to justify another runtime? |
 | Agent Zero | Does it provide a safe, reliable sandbox lane for system-level tasks without creating maintenance drag? |
@@ -47,6 +43,10 @@ may be evaluated later, but the roadmap must not assume they will be adopted.
 Adoption requires an explicit decision record with evidence, validation results,
 operational cost, and rollback path. Until then, candidate frameworks stay out of
 the core stack narrative.
+
+### Framework Expansion Principle
+
+Kyber orchestrates *projects*, not tools. Aider is the current default execution worker, but the maturity process (diagnose → stabilize → structure → automate → polish → sustain) is framework-agnostic. When a new framework is added, it becomes another lane in the same pipeline — not a replacement for the existing one.
 
 ---
 
@@ -134,3 +134,4 @@ the core stack narrative.
     - Add per-repo allowlists, cancellation controls, and richer retry policy.
     - Prevent duplicate sub-issue creation when a Master Plan references an already existing GitHub issue such as `#182`.
     - Harden docs/schema validation around `kyber-tag` parsing so malformed review tags fail closed.
+    - Target state documented in `docs/ISSUE_TO_MERGE_TARGET_STATE.md` with explicit state machine, routing contracts, failure handling, and runnable checklist.

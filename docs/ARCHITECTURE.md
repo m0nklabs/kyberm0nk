@@ -2,26 +2,20 @@
 
 ## Summary
 
-KyberM0nk is a headless, host-native automation control plane. The active
-production path is Hermes for durable orchestration, Aider for code changes,
-Guardian for local model brokering, and a PR-manager loop driven by
-machine-readable `kyber-tag` review comments.
+KyberM0nk is a project orchestration system. It takes a repository and matures it from its current state into a production-ready project by orchestrating GitHub issues and PRs through a pipeline of agentic frameworks.
 
-Hermes assigns one issue at a time to the coding-agent lane, which resolves the
-issue in a PR and hands it off with `ready_for_review` before the review loop
-starts.
+The active stack: **Hermes** (orchestration brain) + **Aider** (execution worker) + **Guardian** (local model). Cryptotrader is the testing playground — the same pipeline matures any project.
 
-OpenCode and Agent Zero are available as optional host-native frameworks for
-future or operator-invoked lanes, but they are not part of the default active
-queue-to-merge flow.
+Hermes assigns one issue at a time to the coding-agent lane, which resolves the issue in a PR and hands it off with `ready_for_review` before the review loop starts.
 
 ```text
-+------------------------------+
-| Operator Events              |
-| CLI / Telegram / Webhooks    |
-+---------------+--------------+
-                |
-                v
++--------------------------------------------------+
+| Project Maturity Lifecycle                       |
+| Diagnose → Stabilize → Structure → Automate →    |
+| Polish → Sustain                                 |
++-------------------+------------------------------+
+                    |
+                    v
 +-----------------------------------+
 | KyberM0nk Control Plane           |
 | - docs                            |
@@ -32,18 +26,20 @@ queue-to-merge flow.
                  |
                  v
 +-----------------------------------+
-| Hermes Gateway                    |
+| Hermes (Orchestration Brain)      |
 | - CLI / Telegram / webhook        |
-| - cron                            |
+| - cron governance loops           |
+| - issue triage & PR management    |
 | - SQLite queue                    |
-| - PR manager                      |
+| - maturity tracking               |
 +----------------+------------------+
                  |
                  v
 +-----------------------------------+
-| Aider local coder                 |
+| Aider (Execution Worker)          |
 | - single-flight lease             |
 | - active project worktree         |
+| - opens PRs, fixes issues         |
 +----------------+------------------+
                  |
                  v
@@ -198,3 +194,8 @@ Kyber PR automation uses a two-tier Aider reviewer lane and tag-driven routing:
 4. The PR manager executes the next step from tags.
 
 GitHub Copilot mentions are intentionally excluded from this lane.
+
+## See Also
+
+- [ISSUE_TO_MERGE_TARGET_STATE.md](ISSUE_TO_MERGE_TARGET_STATE.md) — complete target state: state machine, routing contracts, failure handling, and runnable checklist.
+- [GITHUB_ISSUE_RESOLUTION.md](GITHUB_ISSUE_RESOLUTION.md) — detailed implementation of the Hermes Gateway issue lane.

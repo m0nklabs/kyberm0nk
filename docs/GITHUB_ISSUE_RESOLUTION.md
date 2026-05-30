@@ -1,13 +1,10 @@
 # Automated GitHub Issue Resolution
 
-Kyber's issue-resolution lane is implemented inside the headless Hermes Gateway
-daemon as `/issue`. It is a persistent, single-flight automation lane that uses
-only the active server-side stack: Hermes, Aider, Guardian, GitHub CLI, SQLite,
-and OpenRouter.
+Kyber's issue-resolution lane matures a project through GitHub issues and PRs. It is implemented inside the headless Hermes Gateway as `/issue` — a persistent, single-flight automation lane that uses only the active server-side stack: Hermes, Aider, Guardian, GitHub CLI, SQLite, and OpenRouter.
 
-Hermes assigns exactly one queued issue at a time to the coding-agent lane.
-That coding agent resolves the issue in a PR, marks the PR `ready_for_review`,
-and only then does the review loop begin.
+Hermes assigns exactly one queued issue at a time to the coding-agent lane. That coding agent resolves the issue in a PR, marks the PR `ready_for_review`, and only then does the review loop begin.
+
+This is the core mechanism by which Kyber matures any project — cryptotrader is the active testing playground.
 
 The lane is production-ready for controlled daemon use: requests are persisted
 before execution, local Aider/Guardian work is processed FIFO, interrupted runs
@@ -310,3 +307,7 @@ Useful Master Epic inspection:
 sqlite3 ~/.hermes/issue_resolution.db \
   'SELECT master_run_id, position, sub_issue_number, title FROM master_subissues ORDER BY master_run_id, position;'
 ```
+
+## See Also
+
+- [ISSUE_TO_MERGE_TARGET_STATE.md](ISSUE_TO_MERGE_TARGET_STATE.md) — complete target state with state machine, routing contracts, failure handling, and runnable checklist.
