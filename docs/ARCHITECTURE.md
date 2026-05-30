@@ -84,6 +84,27 @@ flowchart TD
 - The active run states are `queued`, `running`, `expanded`, `completed`, and `failed`.
 - Local coder execution is FIFO and single-flight to protect the one meaningful local inference lane.
 
+### SQLite schema surface
+
+The queue state machine is backed by:
+
+- `issue_runs`: run metadata (`repo`, `issue_number`, `workdir`, `status`, `run_type`, `attempt_count`, `next_attempt_at`, `pr_number`, `pr_url`, timestamps).
+- `master_subissues`: decomposition mapping between master runs and generated sub-issues.
+
+The canonical field-level behavior is documented in `docs/GITHUB_ISSUE_RESOLUTION.md`.
+
+### Hermes <-> Aider envelope
+
+Hermes invokes Aider with a strict role envelope:
+
+1. Build normalized issue context and run-scoped prompt.
+2. Select role profile (`local_coder`, `tier1_reviewer`, `tier2_reviewer`).
+3. Inject provider endpoint and key from environment (`OPENAI_API_BASE`/`OPENAI_API_KEY`).
+4. Execute Aider non-interactively against the claimed worktree.
+5. Parse output into status + review routing (`kyber-tag`) for PR manager consumption.
+
+This envelope is intentionally deterministic so queue retries and resume behavior remain reproducible.
+
 ## Boundary Decisions
 
 ### Host-native defaults

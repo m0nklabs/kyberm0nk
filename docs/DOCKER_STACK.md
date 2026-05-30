@@ -1,8 +1,10 @@
-# Docker Stack Plan
+# Docker Stack (Optional Compatibility Layer)
 
-This file describes the intended Docker Compose stack. The actual `docker-compose.yml` should be added only after the first tool image is verified.
+Docker is optional in KyberM0nk and is not the canonical runtime architecture.
+The tracked `docker-compose.yml` remains a bounded compatibility layer for
+specific sandboxed experiments and legacy helper surfaces.
 
-## Services
+## Current Services (Optional)
 
 ### aider
 
@@ -66,3 +68,9 @@ The stack must not include:
 - Guardian
 - GGUF model volumes
 - Docker socket by default
+
+## Operator Rule
+
+If a capability works in the host-native Hermes + Aider + Guardian lane, keep
+that as the default path and do not promote the Docker path into architecture
+or quickstart docs.

@@ -59,6 +59,7 @@ Kyber's `claude-local` launcher defaults Claude Code to `qwen3-35b-uncensored` a
 
 Start here:
 
+- [docs/index.md](docs/index.md)
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/GITHUB_ISSUE_RESOLUTION.md](docs/GITHUB_ISSUE_RESOLUTION.md)
 - [docs/TOOL_ROLES.md](docs/TOOL_ROLES.md)
@@ -79,6 +80,7 @@ Start here:
 For the current headless Kyber path:
 
 ```bash
+scripts/test_quickstart.sh
 scripts/crewai_status.sh
 scripts/superset.sh status
 scripts/validate_docs.sh

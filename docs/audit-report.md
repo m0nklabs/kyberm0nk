@@ -25,7 +25,14 @@ brokering, SQLite-backed issue queue, tiered PR review, and machine-readable
 - Updated P1 and P2 docs to describe the current end-to-end workflow.
 - Added `docs/kyber-tag.jsonschema` and `CONTRIBUTING.md`.
 - Added a reproducible docs validation script.
+- Added machine-parseable audit inventory artifacts: `docs/audit-inventory.csv` and `docs/audit-inventory.json`.
 - Marked obsolete or research-heavy files for archive under `archive/research/2026-05-30/`.
+- Applied root-level docs hygiene cleanup and path corrections for the optional workspace file.
+
+## Machine-Parseable Inventory
+
+- `docs/audit-inventory.csv`
+- `docs/audit-inventory.json`
 
 ## Inventory
 
@@ -35,6 +42,9 @@ brokering, SQLite-backed issue queue, tiered PR review, and machine-readable
 | CONTRIBUTING.md | Contribution contract for docs branches, PRs, and kyber-tag usage. | current | Missing before this audit. | update | created | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
 | CHANGELOG.md | Historical record of structural and docs changes. | current | Needs explicit audit and archive entries. | update | updated | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
 | SMOKE_TEST.md | Quick smoke surface for the repo. | outdated | Did not reflect the current docs validation path. | update | updated | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
+| docs/index.md | Docs landing page for P1 navigation and quickstart entry. | current | Required docs index surface for operators and automation. | update | created | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
+| docs/audit-inventory.csv | Machine-parseable CSV inventory for audit actions. | current | Required explicit CSV deliverable for automation and review. | update | created | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
+| docs/audit-inventory.json | Machine-parseable JSON inventory for audit actions. | current | Required explicit JSON deliverable for automation and review. | update | created | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
 | scripts/README.md | High-level catalog of active helper scripts. | current | Needed to expose the docs validation script and active runtime helpers. | update | updated | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
 | docs/ARCHITECTURE.md | Current runtime architecture and control loop. | current | Core architecture doc must match Hermes + Aider + SQLite + kyber-tag. | update | updated | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
 | docs/GITHUB_ISSUE_RESOLUTION.md | Durable issue-to-PR automation lane. | current | Needed review-tier and kyber-tag routing updates. | update | updated | docs/sync-runtime-docs-20260530 | https://github.com/m0nklabs/kyberm0nk/pull/1 |
@@ -65,6 +75,7 @@ brokering, SQLite-backed issue queue, tiered PR review, and machine-readable
 | docs_build | passed | `scripts/validate_docs.sh` |
 | links | passed | Local Markdown link validation runs inside `scripts/validate_docs.sh` |
 | linter | passed | Equivalent Markdown hygiene checks run inside `scripts/validate_docs.sh` |
+| quickstart_smoke | passed | `scripts/test_quickstart.sh` |
 
 ## Archive Criteria Applied
 

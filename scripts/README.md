@@ -32,6 +32,7 @@ Key active scripts:
 - `check_mcp_registry_sync.py`: compare live `claude mcp` registrations against `configs/mcp/servers.yaml` and fail on drift when requested.
 - `supervisor_tick.py`: inspect one repo plus worker slice, apply protected-path heuristics, ask Guardian for a bounded decision, and append a JSONL supervisor log entry.
 - `validate_docs.sh`: validate the current docs surface, local Markdown links, and required docs artifacts.
+- `test_quickstart.sh`: run the lightweight quickstart smoke sequence for docs (`validate_docs` + expected success output).
 
 Scripts must be non-interactive by default and log with timestamps where practical.
 

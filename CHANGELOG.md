@@ -14,6 +14,10 @@
   - Updated README, architecture, issue-resolution docs, roadmap, and scripts docs to reflect the current Hermes + Aider + SQLite queue + tiered review workflow.
   - Added a machine-readable `kyber-tag` schema, a structured docs audit report, and explicit contributing guidance for docs PRs.
   - Archived obsolete research docs under `archive/research/2026-05-30/` instead of deleting them.
+- **Documentation contract closure:**
+  - Added `docs/index.md` as docs landing page and fixed workspace-path mismatches in setup/TODO docs.
+  - Added machine-parseable inventory deliverables `docs/audit-inventory.csv` and `docs/audit-inventory.json`.
+  - Added quickstart smoke helper `scripts/test_quickstart.sh` and extended docs validation expectations.
 
 ## 2026-05-28 - Persistent Issue Resolution Lane
 
