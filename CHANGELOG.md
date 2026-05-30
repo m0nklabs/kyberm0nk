@@ -2,6 +2,10 @@
 
 ## 2026-05-30
 
+- **Hermes issue assignment clarification:**
+  - Clarified that Hermes assigns exactly one queued issue at a time to the coding-agent lane.
+  - Documented that the coding agent resolves the issue in a PR, tags it `ready_for_review`, and only then enters the review loop.
+
 - **Issue-handling workflow expansion in docs:**
   - Expanded the architecture and README workflow definitions to include explicit issue intake and triage by Hermes.
   - Documented coding-agent assignment, PR branch creation/reuse, implementation in the PR, and the `ready_for_review` handoff before the review loop.

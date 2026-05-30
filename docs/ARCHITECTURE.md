@@ -7,6 +7,10 @@ production path is Hermes for durable orchestration, Aider for code changes,
 Guardian for local model brokering, and a PR-manager loop driven by
 machine-readable `kyber-tag` review comments.
 
+Hermes assigns one issue at a time to the coding-agent lane, which resolves the
+issue in a PR and hands it off with `ready_for_review` before the review loop
+starts.
+
 OpenCode and Agent Zero are available as optional host-native frameworks for
 future or operator-invoked lanes, but they are not part of the default active
 queue-to-merge flow.

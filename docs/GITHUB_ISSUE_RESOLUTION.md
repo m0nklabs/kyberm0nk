@@ -5,6 +5,10 @@ daemon as `/issue`. It is a persistent, single-flight automation lane that uses
 only the active server-side stack: Hermes, Aider, Guardian, GitHub CLI, SQLite,
 and OpenRouter.
 
+Hermes assigns exactly one queued issue at a time to the coding-agent lane.
+That coding agent resolves the issue in a PR, marks the PR `ready_for_review`,
+and only then does the review loop begin.
+
 The lane is production-ready for controlled daemon use: requests are persisted
 before execution, local Aider/Guardian work is processed FIFO, interrupted runs
 are restored on gateway startup, and Master Epics can be decomposed into ordered

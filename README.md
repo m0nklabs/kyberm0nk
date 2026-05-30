@@ -37,7 +37,7 @@ Kyber and Hermes do not require an active editor session, editor plugin, browser
 Kyber's current production workflow is:
 
 1. A new GitHub issue (or operator request) enters Hermes.
-2. Hermes triages the issue and assigns the coding-agent lane.
+2. Hermes triages the issue and assigns exactly one issue at a time to the coding-agent lane.
 3. Hermes persists the run in SQLite and queues it FIFO.
 4. The single-flight local coder lease claims exactly one queued run.
 5. The coding agent opens or reuses the PR branch and implements the issue in that PR.
