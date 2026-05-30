@@ -2,13 +2,17 @@
 
 OpenCode should act as the Strategist layer.
 
-Planned configuration:
+Active configuration:
 
 - use Guardian `/v1` as OpenAI-compatible endpoint
-- use `DEFAULT_MODEL=qwen3-35b-reasoning-agent` for bounded local reasoning
+- use the active Guardian alias selected by Kyber wrappers for bounded local reasoning
 - mount active project read-write
 - mount reference projects read-only
 - avoid direct access to Guardian backend port `11440`
+
+OpenCode is optional in the current production path. The canonical durable
+automation lane is still Hermes + Aider + Guardian, with OpenCode available as a
+supporting strategist rather than a required runtime dependency.
 
 ## Model Budget
 

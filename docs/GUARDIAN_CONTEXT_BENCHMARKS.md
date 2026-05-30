@@ -64,42 +64,42 @@ Full matrix example for the current Qwen configuration:
 
 ```bash
 python3 scripts/benchmark_guardian_context.py \
-	--preset max \
-	--output-preset standard \
-	--tasks marker,reasoning-stress,long-decode \
-	--thinking-modes both \
-	--context-limit 131072 \
-	--skip-over-context \
-	--timeout 1800 \
-	--run-name qwen_full_matrix
+    --preset max \
+    --output-preset standard \
+    --tasks marker,reasoning-stress,long-decode \
+    --thinking-modes both \
+    --context-limit 131072 \
+    --skip-over-context \
+    --timeout 1800 \
+    --run-name qwen_full_matrix
 ```
 
 Plan a matrix before running it:
 
 ```bash
 python3 scripts/benchmark_guardian_context.py \
-	--preset max \
-	--output-preset standard \
-	--tasks all \
-	--thinking-modes both \
-	--context-limit 131072 \
-	--skip-over-context \
-	--plan-only
+    --preset max \
+    --output-preset standard \
+    --tasks all \
+    --thinking-modes both \
+    --context-limit 131072 \
+    --skip-over-context \
+    --plan-only
 ```
 
 When you need a fast ballpark instead of a complete table, use decision ordering. It tests prefill markers, practical long-decode caps, and reasoning stress points across spread-out context sizes before filling in less urgent combinations:
 
 ```bash
 python3 scripts/benchmark_guardian_context.py \
-	--preset max \
-	--output-sizes 32,1024,4096,8192 \
-	--tasks all \
-	--thinking-modes both \
-	--context-limit 131072 \
-	--skip-over-context \
-	--order decision \
-	--timeout 1200 \
-	--run-name qwen_decision_ballpark
+    --preset max \
+    --output-sizes 32,1024,4096,8192 \
+    --tasks all \
+    --thinking-modes both \
+    --context-limit 131072 \
+    --skip-over-context \
+    --order decision \
+    --timeout 1200 \
+    --run-name qwen_decision_ballpark
 ```
 
 Use `--order shuffle --seed 1234` when you want to spread thermal/cache bias across the matrix.
@@ -108,15 +108,15 @@ Example for a larger-context model such as `gemma4-heretic-deep`:
 
 ```bash
 python3 scripts/benchmark_guardian_context.py \
-	--model gemma4-heretic-deep \
-	--sizes 32768,65536,131072,180224,196608,212992 \
-	--output-sizes 32,1024,4096,8192,16384 \
-	--tasks marker,long-decode \
-	--thinking-modes both \
-	--context-limit 216064 \
-	--skip-over-context \
-	--timeout 2400 \
-	--run-name gemma4_deep_matrix
+    --model gemma4-heretic-deep \
+    --sizes 32768,65536,131072,180224,196608,212992 \
+    --output-sizes 32,1024,4096,8192,16384 \
+    --tasks marker,long-decode \
+    --thinking-modes both \
+    --context-limit 216064 \
+    --skip-over-context \
+    --timeout 2400 \
+    --run-name gemma4_deep_matrix
 ```
 
 Agent Zero-style run with reasoning left enabled:
@@ -161,7 +161,7 @@ Render a trend report from any benchmark CSV:
 
 ```bash
 python3 scripts/render_benchmark_trends.py \
-	logs/guardian-context-benchmarks/qwen_full_matrix.csv
+    logs/guardian-context-benchmarks/qwen_full_matrix.csv
 ```
 
 The report includes prompt-prefill latency, long-decode elapsed time, long-decode tokens/sec, and a risk map for long-decode failures.
@@ -170,14 +170,14 @@ Resume an interrupted matrix by reusing the same run name and adding `--resume`:
 
 ```bash
 python3 scripts/benchmark_guardian_context.py \
-	--preset max \
-	--output-preset max \
-	--tasks all \
-	--thinking-modes both \
-	--context-limit 131072 \
-	--skip-over-context \
-	--resume \
-	--run-name qwen_full_matrix
+    --preset max \
+    --output-preset max \
+    --tasks all \
+    --thinking-modes both \
+    --context-limit 131072 \
+    --skip-over-context \
+    --resume \
+    --run-name qwen_full_matrix
 ```
 
 Important columns:

@@ -1,3 +1,9 @@
+# Archived Research Note
+
+Archived: 2026-05-30
+Reason: This UI-first sandbox concept no longer matches the active host-native, headless Hermes + Aider + Guardian production path.
+Disposition: Kept for historical reference only; not part of the canonical runtime architecture.
+
 # Vision: KyberM0nk Cockpit UI
 
 > "User thinks. OpenCode plans. Agent Zero builds. Cockpit watches."

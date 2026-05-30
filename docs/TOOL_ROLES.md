@@ -41,11 +41,11 @@ Required review loop:
 
 1. Tier1 Aider reviewer runs first (fast, lower-cost OpenRouter model).
 2. If Tier1 finds issues, it posts inline findings and sets PR-manager tags for
-	`coding_subagent`.
+    `coding_subagent`.
 3. If Tier1 is clean, Tier2 Aider reviewer runs with a stronger OpenRouter model
-	(for example `deepseek-v4-pro` with max reasoning effort when configured).
+    (for example `deepseek-v4-pro` with max reasoning effort when configured).
 4. If Tier2 finds issues, it posts inline findings and tags the PR for
-	`coding_subagent`.
+    `coding_subagent`.
 5. If Tier2 is also clean, it tags the PR as `ready_for_merge`.
 
 The PR manager must route next actions from machine-readable tags in review

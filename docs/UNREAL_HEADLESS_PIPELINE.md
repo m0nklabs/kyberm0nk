@@ -137,11 +137,11 @@ When agents are asked to spawn photorealistic assets (like grass) in Unreal Engi
 
 ### 2. File Lock 32 (The "Save Map" DXGI Bug)
 `UnrealEditor-Cmd.exe` cannot overwrite the `.umap` that it currently holds in memory (Error Code 32). Overwriting the map directly fails silently or crashes.
-**Solution**: Spawn the objects into the loaded memory, then use `unreal.EditorAssetLibrary.duplicate_asset` to burn the memory state to a *NEW* `.umap` file (e.g. `Lvl_Grasslands.umap`). 
+**Solution**: Spawn the objects into the loaded memory, then use `unreal.EditorAssetLibrary.duplicate_asset` to burn the memory state to a *NEW* `.umap` file (e.g. `Lvl_Grasslands.umap`).
 
 ### 3. Modifying the Build Cook Target
 UAT handles `-allmaps` by skipping procedurally generated maps that were never set via the Editor.
-**Solution**: Have Python rewrite `Config/DefaultEngine.ini` (`GameDefaultMap` and `EditorStartupMap`) exactly after duplication. UAT will parse the overridden INI directly and package the new headless map automatically. 
+**Solution**: Have Python rewrite `Config/DefaultEngine.ini` (`GameDefaultMap` and `EditorStartupMap`) exactly after duplication. UAT will parse the overridden INI directly and package the new headless map automatically.
 
 ### 4. Hierarchical Instanced Static Meshes (HISM)
 Spawning 100,000 normal `StaticMeshActor` blades in Python will freeze the commandlet and completely crash the packaged executable due to draw call limits.
@@ -150,7 +150,7 @@ Spawning 100,000 normal `StaticMeshActor` blades in Python will freeze the comma
 ### CrewAI Application
 When generating tasks for CrewAI agents that orchestrate Unreal Engine:
 * Provide strict pipelines: Do not tell the agent "make grass". Tell the agent "Write a python script that imports an OBJ, applies it to an HISM component, duplicates the loaded map, and rewrites the INI".
-* Use explicit urls or embedded OBJ generation to side-step Quixel login requirements during autonomous CI/CD runs. 
+* Use explicit urls or embedded OBJ generation to side-step Quixel login requirements during autonomous CI/CD runs.
 
 ### 5. Downloading Free CC0 Assets Headlessly
 Instead of fighting Epic Games' Fab / Quixel login flows or writing custom OBJ geometry strings, Python can be used to dynamically fetch CC0 models from public URLs (e.g. raw `.obj` or `.fbx` files on a github repo, AWS S3, or open asset stores like PolyHaven).

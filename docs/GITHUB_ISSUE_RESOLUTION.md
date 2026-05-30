@@ -25,7 +25,9 @@ The lane has five headless execution layers:
 4. **Single-flight worker**: `_issue_queue_worker()` claims the oldest queued
    run and processes exactly one local Aider/Guardian job at a time.
 5. **Review layer**: successful coder runs open or find a PR, then invoke the
-   cloud reviewer through OpenRouter using `deepseek/deepseek-v4-flash`.
+  tiered reviewer lane through OpenRouter. Tier1 is the fast reviewer and
+  Tier2 is the stronger reviewer. Reviewer comments emit machine-readable
+  `kyber-tag` blocks so the PR manager can route the next action.
 
 The implementation lives in Hermes:
 
@@ -198,6 +200,22 @@ multiple Telegram commands or webhook events arrive close together.
 Cloud review happens after the local coder finishes and a PR exists. The review
 invocation uses OpenRouter and does not change the local FIFO policy.
 
+## Review Routing
+
+The reviewer lane is intentionally GitHub-Copilot-free.
+
+- Tier1 reviewer posts findings immediately when it sees a high-signal issue.
+- If Tier1 is clean, Tier2 reviewer re-checks with a stronger model.
+- Reviewer comments include a `kyber-tag` block that the PR manager parses.
+
+Canonical next-action routing:
+
+| Review result | `kyber-tag.state` | `kyber-tag.next_action` |
+| --- | --- | --- |
+| Findings posted | `review_findings` | `coding_subagent` |
+| No issues after Tier2 | `review_clean` | `ready_for_merge` |
+| Reviewer output unusable | `review_inconclusive` | `rerun_reviewer` |
+
 ## Startup Resume and Crash Recovery
 
 Hermes Gateway calls `resume_issue_resolution_queue()` during startup from
@@ -224,12 +242,20 @@ OPENAI_API_KEY=$AIDER_GUARDIAN_API_KEY \
 /home/flip/aider/.venv/bin/aider --model openai/qwen3-35b-uncensored --yes --no-gitignore --message "$PROMPT"
 ```
 
-Cloud reviewer:
+Tier1 reviewer:
 
 ```bash
 OPENROUTER_API_KEY=$OPENROUTER_API_KEY \
 OPENAI_API_KEY=$OPENROUTER_API_KEY \
 /home/flip/aider/.venv/bin/aider --model openrouter/deepseek/deepseek-v4-flash --cache-prompts --no-auto-commits --yes --no-gitignore --message "$PROMPT"
+```
+
+Tier2 reviewer:
+
+```bash
+OPENROUTER_API_KEY=$OPENROUTER_API_KEY \
+OPENAI_API_KEY=$OPENROUTER_API_KEY \
+/home/flip/aider/.venv/bin/aider --model openrouter/deepseek/deepseek-v4-pro --cache-prompts --no-auto-commits --yes --no-gitignore --message "$PROMPT"
 ```
 
 ## Current Scope
@@ -246,9 +272,10 @@ OPENAI_API_KEY=$OPENROUTER_API_KEY \
 - Runs local Aider against Guardian.
 - Pushes the branch.
 - Opens or finds a GitHub PR.
-- Runs cloud Aider reviewer against OpenRouter.
+- Runs tiered cloud Aider reviewers against OpenRouter.
+- Emits machine-readable `kyber-tag` review routing comments for the PR manager.
 - Posts reviewer feedback as an inline PR comment when a diff anchor is found,
-  otherwise as a normal PR review comment.
+  otherwise as a normal PR comment.
 
 ## Next Hardening
 
