@@ -7,6 +7,10 @@ production path is Hermes for durable orchestration, Aider for code changes,
 Guardian for local model brokering, and a PR-manager loop driven by
 machine-readable `kyber-tag` review comments.
 
+OpenCode and Agent Zero are available as optional host-native frameworks for
+future or operator-invoked lanes, but they are not part of the default active
+queue-to-merge flow.
+
 ```text
 +------------------------------+
 | Operator Events              |
@@ -113,7 +117,8 @@ This envelope is intentionally deterministic so queue retries and resume behavio
 - `llama-server`
 - Hermes Gateway daemon and persisted automation state
 - Aider runtime
-- optional operator tools such as Claude Code, OpenCode, CrewAI, Superset, and Agent Zero
+- optional available operator tools such as Claude Code, OpenCode, CrewAI,
+  Superset, and Agent Zero (outside the default active flow unless explicitly enabled)
 - GGUF model files plus GPU allocation and tensor split policy
 
 ### Optional containers
@@ -149,9 +154,10 @@ qwen3-35b-uncensored
 
 Guardian remains the source of truth for actual model paths, context sizes, VRAM policy, pinned model behavior, and switch allowlists.
 
-## Agent Model Budgets
+## Optional Agent Model Budgets
 
-KyberM0nk tools should use balanced coding-agent budgets rather than maximum stress-test budgets.
+When optional lanes are enabled, KyberM0nk tools should use balanced
+coding-agent budgets rather than maximum stress-test budgets.
 
 Default policy:
 
