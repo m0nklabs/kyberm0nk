@@ -77,7 +77,9 @@ Hermes treats an issue as a Master Epic when either condition is true:
 For Master Epics, Hermes asks Guardian to decompose the plan into ordered atomic
 tasks, creates one GitHub sub-issue per task, writes `Part of Master Issue #X` in
 each sub-issue body, and queues those sub-issues sequentially through the same
-`/issue` lane.
+`/issue` lane. Before creating a sub-issue, Hermes searches existing open and
+closed issues for the Master Issue marker, task position, title, and task body so
+crash retries reuse already-created issues instead of duplicating backlog items.
 
 Guardian is called through the local OpenAI-compatible endpoint at
 `http://127.0.0.1:11434/v1/chat/completions`. The decomposition model resolves

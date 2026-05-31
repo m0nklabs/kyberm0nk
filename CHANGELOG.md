@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recorded the shipped Hermes Master Epic duplicate suppression (`m0nklabs/hermes-agent` fork commit `23d979e61`), which searches existing all-state GitHub sub-issues for matching `Part of Master Issue #N` and task markers before creating new sub-issues, making crash retries idempotent.
 - Recorded the shipped Hermes lifecycle audit comments (`m0nklabs/hermes-agent` fork commit `863aad702`), which post compact GitHub issue/PR audit notes when Hermes claims an issue, opens or reuses a PR, requests review, routes reviewer findings back to same-branch coding, trips the review-loop circuit breaker, or completes review.
 - Recorded the shipped Hermes review-loop circuit breaker (`m0nklabs/hermes-agent` commit `b77f4eef8`), which tracks repeated `review_findings` loops and fails closed after the bounded fix-attempt budget instead of ping-ponging indefinitely.
 - Added tracked `hermes-queue-watchdog` systemd user service/timer units and `--emit on-change` watchdog output so Hermes queue alerts and recoveries can surface continuously without noisy healthy polls.
