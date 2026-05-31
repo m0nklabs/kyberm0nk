@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recorded the shipped Hermes review-loop circuit breaker (`m0nklabs/hermes-agent` commit `b77f4eef8`), which tracks repeated `review_findings` loops and fails closed after the bounded fix-attempt budget instead of ping-ponging indefinitely.
 - Added tracked `hermes-queue-watchdog` systemd user service/timer units and `--emit on-change` watchdog output so Hermes queue alerts and recoveries can surface continuously without noisy healthy polls.
 - Recorded the shipped Hermes fail-closed review tag parser (`m0nklabs/hermes-agent` commit `badab438f`), which requires valid reviewer routing tags, retries malformed output once, and then fails the run instead of treating malformed output as clean.
 - Recorded the shipped Hermes pre-merge current-head blocker (`m0nklabs/hermes-agent` commit `7fc85409a`), which parses reviewer `head_ref_oid` tags and fails closed unless `ready_for_merge` matches the live PR head.

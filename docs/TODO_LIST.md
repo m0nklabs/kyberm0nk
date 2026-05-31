@@ -46,7 +46,7 @@
 - [x] Add a read-only Hermes queue-health watchdog for stale `running` rows, old `queued` rows, queue depth backpressure, recent failures, and WIP-limit violations.
 - [x] Integrate the Hermes queue-health watchdog with timer-driven alert/recovery output.
 - [ ] Add priority and capability metadata to `issue_runs` once Hermes has more than the default Aider implementation lane.
-- [ ] Add a review-loop circuit breaker for repeated `review_findings` -> `coding_subagent` ping-pong.
+- [x] Add a review-loop circuit breaker for repeated `review_findings` -> `coding_subagent` ping-pong.
 - [x] Add runtime validation that malformed `kyber-tag` output fails closed in the Hermes review ingestion path.
 
 ## 2026-05-30 Issue-to-Merge Target State
