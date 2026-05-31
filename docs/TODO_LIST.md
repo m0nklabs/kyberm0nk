@@ -47,7 +47,7 @@
 - [ ] Integrate the Hermes queue-health watchdog with Hermes cron or MoniFuse alerting.
 - [ ] Add priority and capability metadata to `issue_runs` once Hermes has more than the default Aider implementation lane.
 - [ ] Add a review-loop circuit breaker for repeated `review_findings` -> `coding_subagent` ping-pong.
-- [ ] Add runtime validation that malformed `kyber-tag` output fails closed in the Hermes review ingestion path.
+- [x] Add runtime validation that malformed `kyber-tag` output fails closed in the Hermes review ingestion path.
 
 ## 2026-05-30 Issue-to-Merge Target State
 
@@ -78,7 +78,7 @@
 
 ## Hermes Enhancement Backlog
 
-- [ ] Add a fail-closed kyber-tag parser mode: one bounded rerun for malformed reviewer output, then mark the review failed/escalated instead of silently treating it as clean or repeatedly spending review budget.
+- [x] Add a fail-closed kyber-tag parser mode: one bounded rerun for malformed reviewer output, then mark the review failed/escalated instead of silently treating it as clean or repeatedly spending review budget.
 
 ## 2026-05-27 MoniFuse Service Registration
 

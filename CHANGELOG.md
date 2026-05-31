@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recorded the shipped Hermes fail-closed review tag parser (`m0nklabs/hermes-agent` commit `badab438f`), which requires valid reviewer routing tags, retries malformed output once, and then fails the run instead of treating malformed output as clean.
 - Recorded the shipped Hermes pre-merge current-head blocker (`m0nklabs/hermes-agent` commit `7fc85409a`), which parses reviewer `head_ref_oid` tags and fails closed unless `ready_for_merge` matches the live PR head.
 - Recorded the shipped Hermes review-findings consumer (`m0nklabs/hermes-agent` commit `02b09cbc5`), which requeues `review_findings` + `coding_subagent` outputs for same-branch coder fixes instead of treating reviewer feedback as terminal completion.
 - Recorded the shipped Hermes branch/PR contract (`m0nklabs/hermes-agent` commit `d2a052a7c`), which creates repo-scoped CryptoTrader issue branches and PR bodies with linked issue/run, validation, risk, and review-handoff sections.
