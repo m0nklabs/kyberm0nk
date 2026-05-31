@@ -65,7 +65,7 @@ Goal: stop known pipeline violations and make the backlog executable.
 2. Backlog consolidation and wave plan.
 3. Hermes pre-claim git guard implemented for the direct CryptoTrader issue lane.
 4. Branch and PR body contract.
-5. Compact OpenRouter preflight command.
+5. Compact OpenRouter preflight command. (Implemented as `scripts/openrouter_preflight.py`.)
 
 Success metrics:
 
