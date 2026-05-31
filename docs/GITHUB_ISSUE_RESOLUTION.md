@@ -166,6 +166,19 @@ All existing webhook safety rails remain active: route secrets, event filtering,
 rate limiting, idempotency cache, and body-size limits are still enforced by the
 generic webhook platform.
 
+## Cancellation Control
+
+Operators can cancel queued or running issue automation by run id:
+
+```bash
+/issue-cancel 42 reason for stopping this run
+```
+
+Cancellation marks the run `cancelled`, stores `cancelled by operator: <reason>`
+in the run error field, notifies the source platform, and posts a compact GitHub
+issue audit comment. Terminal runs are left unchanged; only `queued` and
+`running` rows can move to `cancelled`.
+
 ## SQLite State Machine
 
 State lives in `~/.hermes/issue_resolution.db`. The main table is `issue_runs`;
@@ -199,6 +212,7 @@ Master Epic child mapping is stored in `master_subissues`.
 | `expanded` | Master Epic was decomposed and its sub-issues were queued. | `_execute_master_issue()` creates sub-issues, records them, queues child runs, then calls `mark_expanded()`. |
 | `completed` | Normal/sub-issue run has opened or found a PR and reviewer feedback has been posted; Master Epic has all children completed. | `_execute_single_issue()` calls `mark_completed()` after review feedback; `_complete_ready_masters()` completes expanded parents after every child is completed. |
 | `failed` | Execution raised an exception. | `_issue_queue_worker()` catches the exception, stores truncated error text, notifies the operator, and keeps draining later queued work. |
+| `cancelled` | Operator stopped queued or running issue automation before it should continue. | `/issue-cancel <run-id> [reason]` calls `cancel_issue_resolution()`, records the reason, and writes a GitHub issue audit comment when possible. |
 
 Duplicate submission protection is status-aware. `find_incomplete_run()` reuses
 an existing `queued`, `running`, or `expanded` run for the same repo and issue
@@ -335,6 +349,7 @@ OPENAI_API_KEY=$OPENROUTER_API_KEY \
 
 - Runs as a headless Hermes Gateway automation lane.
 - Enforces `HERMES_ISSUE_ALLOWED_REPOS`, defaulting to `m0nklabs/cryptotrader`.
+- Supports `/issue-cancel <run-id> [reason]` for queued/running run cancellation with audit comments.
 - Creates/checks out an `issue/<number>-<slug>` branch.
 - Detects Master Epics via `master-plan` label or `# Master Project Plan` body.
 - Decomposes Master Epics through Guardian.

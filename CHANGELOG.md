@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recorded the shipped Hermes issue-run cancellation control (`m0nklabs/hermes-agent` fork commit `840f525bb`), which adds `/issue-cancel <run-id> [reason]`, a persisted `cancelled` state, and GitHub issue audit comments for queued/running run cancellation.
 - Recorded the shipped Hermes issue repo allowlist (`m0nklabs/hermes-agent` fork commit `97667b70d`), which defaults `/issue` execution to `m0nklabs/cryptotrader` and requires explicit `HERMES_ISSUE_ALLOWED_REPOS` configuration before any other repository can run automation.
 - Recorded the shipped Hermes Master Epic duplicate suppression (`m0nklabs/hermes-agent` fork commit `23d979e61`), which searches existing all-state GitHub sub-issues for matching `Part of Master Issue #N` and task markers before creating new sub-issues, making crash retries idempotent.
 - Recorded the shipped Hermes lifecycle audit comments (`m0nklabs/hermes-agent` fork commit `863aad702`), which post compact GitHub issue/PR audit notes when Hermes claims an issue, opens or reuses a PR, requests review, routes reviewer findings back to same-branch coding, trips the review-loop circuit breaker, or completes review.
