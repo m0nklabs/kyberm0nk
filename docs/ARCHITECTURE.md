@@ -71,7 +71,7 @@ Hermes assigns one issue at a time to the coding-agent lane, which resolves the 
 flowchart TD
     A[GitHub issue created manually or by Hermes/Kanban] --> B[Hermes intake validates repo allowlist and priority]
     B --> C[Hermes claims issue and persists issue_run]
-    C --> D[Create feature branch; forbid direct CT master/main edits]
+    C --> D[Create feature branch; forbid direct CryptoTrader master/main edits]
     D --> E[Single-flight implementation lane]
     E --> F[Implement change on branch]
     F --> G[Run local validation]
@@ -108,7 +108,7 @@ review gates pass.
 |-------|-------|-------------------|
 | Intake | Hermes Gateway / GitHub sync | Detect eligible open issues and sync them to Kanban with repo, issue, priority, and workspace metadata. |
 | Claim | Hermes queue | Claim one eligible issue at a time, persist `issue_runs`, and avoid duplicate active work for the same issue. |
-| Branch | Hermes implementation lane | Create or reuse a feature branch named for the issue/task; never implement directly on CT `master`/`main`. |
+| Branch | Hermes implementation lane | Create or reuse a feature branch named for the issue/task; never implement directly on CryptoTrader `master`/`main`. |
 | Implement | Aider/local coding worker | Apply scoped changes on the branch, commit atomically, and push to GitHub. |
 | PR | Hermes PR manager | Open or update a PR with issue link, summary, validation, and risk notes. |
 | Review | Kyber review agent | Run bounded Tier1/Tier2 review, post inline/anchored findings when possible, and emit `kyber-tag` routing. |

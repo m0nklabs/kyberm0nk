@@ -90,21 +90,21 @@ Kyber orchestrates *projects*, not tools. Aider is the current default execution
 - Deliverables: Keep the `/issue` lane understandable, observable, resumable,
   and easy to operate without requiring extra frameworks.
 
-### Phase 8a - Fully Autonomous CT Issue-to-Merge Pipeline
+### Phase 8a - Fully Autonomous CryptoTrader Issue-to-Merge Pipeline
 - Goal: Make CryptoTrader the proving ground for a zero-manual-intervention
   issue-to-merge pipeline.
 - Target flow:
     1. GitHub issue is created manually or by Hermes/Kanban.
     2. Hermes claims the highest-priority eligible issue and creates a feature branch.
-    3. Hermes/Aider implements on that branch only; direct CT `master`/`main` work is forbidden.
+    3. Hermes/Aider implements on that branch only; direct CryptoTrader `master`/`main` work is forbidden.
     4. Hermes opens a PR with summary, validation evidence, linked issue, and risk notes.
     5. Kyber review runs multi-round review and posts anchored findings plus `kyber-tag` routing.
     6. Hermes addresses review comments on the same branch and reruns review until clean or blocked.
     7. Hermes merges the PR after `ready_for_merge`, passing checks, and no unresolved review-findings tag.
     8. Hermes closes the issue and marks the Kanban task done.
 - Acceptance criteria:
-    - No direct commits or uncommitted implementation drift on CT `master`/`main`.
-    - Every CT implementation has a branch, PR, validation evidence, and review trail.
+    - No direct commits or uncommitted implementation drift on CryptoTrader `master`/`main`.
+    - Every CryptoTrader implementation has a branch, PR, validation evidence, and review trail.
     - Review findings become concrete fix tasks or branch updates, not advisory-only comments.
     - Merge and issue closure are automated for routine low-risk changes.
     - Blockers are reported with exact missing credential, failing check, or unsafe-risk reason.

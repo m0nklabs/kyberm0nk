@@ -18,16 +18,16 @@
 - [x] Keep only front-door or still-documented root artifacts in the tracked repo surface.
 - [x] Add ignore guards for local history and ad-hoc root scratch files.
 
-## 2026-05-31 Fully Autonomous CT Issue-to-Merge Pipeline
+## 2026-05-31 Fully Autonomous CryptoTrader Issue-to-Merge Pipeline
 
 - [x] Establish the hard rule that CryptoTrader implementation work must use branch -> PR -> review -> merge, never direct `master`/`main` edits.
 - [x] Recover existing CryptoTrader local working-tree drift onto a feature branch and PR for review instead of leaving it on `master`.
-- [ ] Add a Hermes pre-claim git guard that refuses to start CT implementation when the workspace is on `master`/`main` or has dirty tracked/untracked implementation files.
+- [x] Add a Hermes pre-claim git guard that refuses to start CryptoTrader implementation when the workspace is on `master`/`main` or has dirty tracked/untracked implementation files.
 - [ ] Add branch naming and PR body requirements to the Hermes issue execution lane: linked issue, validation evidence, risk notes, and review handoff state.
 - [ ] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review comments become concrete same-branch fix work.
 - [ ] Add automatic merge and issue closure once review returns `ready_for_merge`, required checks pass, and no unresolved review-findings tag remains.
 - [ ] Add audit comments to both GitHub issue and Kanban task at claim, PR open, review requested, review fixed, merge, and closure.
-- [x] Add a periodic CT workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.
+- [x] Add a periodic CryptoTrader workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.
 
 ## 2026-05-31 OpenRouter Token Efficiency Hardening
 

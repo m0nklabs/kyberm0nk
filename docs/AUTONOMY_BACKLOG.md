@@ -19,7 +19,7 @@ priority = impact + urgency + autonomy_multiplier + inverse_complexity
 |---:|---|---|---|---|---|---|---|---|---:|---:|---:|---:|---:|---|
 | 1 | Managed repo branch/drift guard | CryptoTrader can accumulate direct `master`/`main` implementation drift, bypassing branch -> PR review. | Prevents the most damaging pipeline violation. | Small | Low | Local git checkout | Kyber | `scripts/managed_repo_guard.py` fails on protected-branch implementation drift and passes on clean CryptoTrader. | 5 | 5 | 5 | 5 | 20 | 1 |
 | 2 | Backlog consolidation and wave plan | TODOs are broad, duplicated, and hard to execute autonomously. | Converts backlog into ranked delivery queue. | Small | Low | Current docs and issues | Kyber | Ranked backlog exists with title, problem, impact, effort, risk, dependencies, owner, acceptance criteria, scores, and waves. | 4 | 5 | 4 | 5 | 18 | 1 |
-| 3 | Hermes pre-claim git guard | Hermes can start implementation from a dirty or protected CryptoTrader checkout. | Blocks bad starts before Aider spends tokens or creates drift. | Medium | Medium | Managed repo guard semantics; Hermes execution lane | Hermes | CT issue claim refuses dirty protected checkout; failure message names branch and paths. | 5 | 5 | 5 | 3 | 18 | 1 |
+| 3 | Hermes pre-claim git guard | Hermes can start implementation from a dirty or protected CryptoTrader checkout. | Blocks bad starts before Aider spends tokens or creates drift. | Medium | Medium | Managed repo guard semantics; Hermes execution lane | Hermes | CryptoTrader issue dispatch refuses dirty protected checkout; failure message names branch and paths. | 5 | 5 | 5 | 3 | 18 | 1 |
 | 4 | Branch and PR body contract | PRs can lack issue link, validation evidence, risk notes, or review handoff state. | Makes every autonomous PR reviewable and auditable. | Medium | Low | Hermes issue execution lane | Hermes | New PRs include linked issue/task, branch naming convention, validation evidence, risk notes, and review state. | 5 | 4 | 5 | 3 | 17 | 1 |
 | 5 | PR-manager review-findings consumer | `review_findings` can remain advisory text instead of concrete fix work. | Closes the review -> fix loop. | Medium | Medium | Valid `kyber-tag`; PR manager state | Hermes | Current-head `review_findings` creates/continues a same-branch fix task and blocks merge. | 5 | 4 | 5 | 3 | 17 | 2 |
 | 6 | Pre-merge unresolved findings blocker | A PR could merge while latest current-head tag still has findings. | Protects quality gate integrity. | Medium | Medium | Review tag parser; PR manager | Hermes | Merge path fails closed unless latest current-head tag is clean or explicit override is recorded. | 5 | 4 | 5 | 3 | 17 | 2 |
@@ -35,7 +35,7 @@ priority = impact + urgency + autonomy_multiplier + inverse_complexity
 | 16 | Expand reviewer output into anchored inline comments | Review findings may be hard to apply when only summary comments exist. | Improves review quality and fix precision. | Medium | Medium | Diff position mapping; GitHub review API | Hermes/Kyber | Multiple findings post as anchored inline comments where possible, with fallback summary. | 4 | 2 | 3 | 2 | 11 | 3 |
 | 17 | Cloud escalation gates | Cloud review/escalation should trigger only on repeated failures or risky diffs. | Controls cost while preserving quality. | Medium | Low | Review state and diff-risk classifier | Kyber | Escalation policy documents and enforces repeated-failure/risky-diff/pre-commit criteria. | 3 | 2 | 3 | 3 | 11 | 3 |
 | 18 | Worker MCP registry consultation | Worker wrappers may ask for tools already declared in registry. | Reduces tool confusion. | Medium | Low | MCP registry; worker prompts | Kyber | Worker prompts/wrappers consult `configs/mcp/servers.yaml` before tool requests. | 3 | 2 | 3 | 3 | 11 | 3 |
-| 19 | Guardian/AZ cancellation regression tests | Agent Zero/Guardian cancellations may leave orphaned backend requests. | Improves runtime reliability outside core CT pipeline. | Medium | Medium | Agent Zero and Guardian test harness | Kyber | Regression catches orphaned `llama-server` requests after cancellation. | 3 | 2 | 2 | 2 | 9 | 3 |
+| 19 | Guardian/AZ cancellation regression tests | Agent Zero/Guardian cancellations may leave orphaned backend requests. | Improves runtime reliability outside core CryptoTrader pipeline. | Medium | Medium | Agent Zero and Guardian test harness | Kyber | Regression catches orphaned `llama-server` requests after cancellation. | 3 | 2 | 2 | 2 | 9 | 3 |
 | 20 | Optional direct Claude provider pilot | Direct provider overrides may improve cost/latency but risk auth/routing confusion. | Potential optimization, not current blocker. | Medium | Medium | Disposable workflow slice; local-only settings | Manual/Kyber | Comparison report covers cost, latency, tool reliability, rollback; no global auth changes. | 2 | 1 | 2 | 2 | 7 | 3 |
 
 ## Quick wins vs foundational work
@@ -63,13 +63,13 @@ Goal: stop known pipeline violations and make the backlog executable.
 
 1. Managed repo branch/drift guard.
 2. Backlog consolidation and wave plan.
-3. Hermes pre-claim git guard design/implementation start.
+3. Hermes pre-claim git guard implemented for the direct CryptoTrader issue lane.
 4. Branch and PR body contract.
 5. Compact OpenRouter preflight command.
 
 Success metrics:
 
-- CryptoTrader protected-branch drift is detected before implementation starts.
+- CryptoTrader protected-branch drift is detected before direct issue-lane implementation starts.
 - The top autonomy backlog is ranked and deduplicated.
 - Future implementation work has concrete acceptance criteria.
 - Review/provider preflight can be run before spending full review budget.
