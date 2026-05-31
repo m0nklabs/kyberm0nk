@@ -69,25 +69,56 @@ Hermes assigns one issue at a time to the coding-agent lane, which resolves the 
 
 ```mermaid
 flowchart TD
-    A[New GitHub issue or operator request] --> B[Hermes triage and enqueue_run]
-    B --> C[Hermes assigns coding agent lane]
-    C --> D[SQLite queued]
-    D --> E[Single-flight claim]
-    E --> F[Coding agent opens or reuses PR branch]
-    F --> G[Coding agent implements issue in PR]
-    G --> H[Local validation]
-    H --> I[PR tagged ready_for_review]
-    I --> J[Tier1 reviewer]
-    J -->|findings| K[kyber-tag: coding_subagent]
-    J -->|clean| L[Tier2 reviewer]
-    L -->|findings| K
-    L -->|clean| M[kyber-tag: ready_for_merge]
-    L -->|inconclusive| N[kyber-tag: rerun_reviewer]
+    A[GitHub issue created manually or by Hermes/Kanban] --> B[Hermes intake validates repo allowlist and priority]
+    B --> C[Hermes claims issue and persists issue_run]
+    C --> D[Create feature branch; forbid direct CT master/main edits]
+    D --> E[Single-flight implementation lane]
+    E --> F[Implement change on branch]
+    F --> G[Run local validation]
+    G --> H[Push branch and open PR]
+    H --> I[Request Kyber review]
+    I --> J[Tier1 fast reviewer]
+    J -->|clean| K[Tier2 stronger reviewer]
+    J -->|findings| L[kyber-tag: coding_subagent]
+    K -->|findings| L
+    K -->|inconclusive| M[kyber-tag: rerun_reviewer]
+    K -->|clean| N[kyber-tag: ready_for_merge]
+    L --> O[Hermes applies review fixes on same branch]
+    O --> G
+    M --> I
+    N --> P[Hermes merges PR]
+    P --> Q[Close issue and mark Kanban task done]
 ```
 
 Issue handling is part of the default flow: Hermes receives and triages a new
 issue, routes it into the coding lane, and only enters the PR review loop after
 the coding agent has pushed the solution and marked the PR `ready_for_review`.
+The intended steady state is fully autonomous: **issue intake → branch → PR →
+multi-round review → fix loop → merge → issue closure → Kanban done** without
+manual intervention for routine steps.
+
+For CryptoTrader specifically, direct commits or uncommitted implementation work
+on `master`/`main` are treated as pipeline violations. Recovery work must be
+moved to a feature branch, pushed, reviewed through a PR, and merged only after
+review gates pass.
+
+### Autonomous pipeline responsibilities
+
+| Stage | Owner | Required behavior |
+|-------|-------|-------------------|
+| Intake | Hermes Gateway / GitHub sync | Detect eligible open issues and sync them to Kanban with repo, issue, priority, and workspace metadata. |
+| Claim | Hermes queue | Claim one eligible issue at a time, persist `issue_runs`, and avoid duplicate active work for the same issue. |
+| Branch | Hermes implementation lane | Create or reuse a feature branch named for the issue/task; never implement directly on CT `master`/`main`. |
+| Implement | Aider/local coding worker | Apply scoped changes on the branch, commit atomically, and push to GitHub. |
+| PR | Hermes PR manager | Open or update a PR with issue link, summary, validation, and risk notes. |
+| Review | Kyber review agent | Run bounded Tier1/Tier2 review, post inline/anchored findings when possible, and emit `kyber-tag` routing. |
+| Fix loop | Hermes + coding worker | Convert `review_findings` into concrete branch edits, push fixes, and rerun review until clean or blocked. |
+| Merge | Hermes PR manager | Merge only after `ready_for_merge`, passing checks, and no unresolved review-findings tag. |
+| Closure | Hermes/Kanban sync | Close the source issue, write audit comments, and mark the Kanban task done. |
+
+Manual intervention is reserved for explicit blockers: missing credentials,
+unsafe live-capital risk, ambiguous product decisions, broken provider routing,
+or repeated validation failure after bounded retries.
 
 ## Durable State
 

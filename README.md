@@ -57,18 +57,20 @@ The key insight: Kyber orchestrates *projects*, not tools. Tools are replaceable
 
 ## Current End-to-End Workflow
 
-Kyber's production workflow matures a project through GitHub issues and PRs:
+Kyber's production workflow matures a project through GitHub issues and PRs. The target model is a hard autonomous branch-to-merge pipeline: operators create or approve the input issue, then Hermes owns every routine step until the issue is closed.
 
-1. A new GitHub issue (or operator request) enters Hermes.
-2. Hermes triages the issue and assigns exactly one issue at a time to the coding-agent lane.
-3. Hermes persists the run in SQLite and queues it FIFO.
-4. The single-flight local coder (Aider) claims exactly one queued run.
-5. The coding agent opens or reuses the PR branch and implements the issue.
-6. Local validation runs before review handoff.
-7. The coding agent marks the PR `ready_for_review`.
-8. Tier1 reviewer checks the PR with a fast OpenRouter model.
-9. If Tier1 is clean, Tier2 reviewer re-checks with a stronger OpenRouter model.
-10. The reviewer posts a machine-readable `kyber-tag` block that tells the PR manager whether to run `coding_subagent`, `rerun_reviewer`, or mark the PR `ready_for_merge`.
+1. A GitHub issue is created manually, by Hermes/Kanban, or by a webhook-backed intake lane.
+2. Hermes claims the highest-priority eligible issue, persists the run in SQLite, and creates a dedicated feature branch. Direct work on CryptoTrader `master`/`main` is forbidden.
+3. The single-flight local coder lane implements the change on that branch and pushes it to GitHub.
+4. Hermes opens a PR with a clear summary, validation evidence, linked issue, and risk notes.
+5. Local validation runs before review handoff.
+6. The Kyber review agent runs multi-round review: fast Tier1 first, stronger Tier2 when Tier1 is clean or risk warrants it.
+7. Review comments are posted as anchored GitHub feedback plus a machine-readable `kyber-tag` block.
+8. If review returns `coding_subagent`, Hermes addresses the comments on the same branch and pushes fixes.
+9. If review returns `rerun_reviewer`, Hermes reruns the bounded review lane without changing routing/auth.
+10. If review returns `ready_for_merge`, Hermes merges the PR, closes the issue, and marks the Kanban task done.
+
+Routine implementation must therefore follow: **issue intake → feature branch → PR → multi-round review → fix loop → merge → issue closure → Kanban done**, with zero manual intervention unless Hermes reports a blocker.
 
 GitHub Copilot mentions are intentionally excluded from PR and issue automation.
 
