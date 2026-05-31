@@ -27,8 +27,8 @@
 - [x] Add branch naming and PR body requirements to the Hermes issue execution lane: linked issue, validation evidence, risk notes, and review handoff state.
 - [x] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review comments become concrete same-branch fix work.
 - [x] Add a current-head pre-merge blocker so stale `ready_for_merge` tags or unresolved `review_findings` tags cannot authorize merge.
-- [ ] Add automatic merge and issue closure once review returns `ready_for_merge`, required checks pass, and no unresolved review-findings tag remains.
-- [x] Add GitHub issue/PR audit comments at issue claim, PR open/reuse, review requested, review findings routed to same-branch coding, review-loop circuit breaker, and review completion.
+- [x] Add automatic merge and issue closure once review returns `ready_for_merge`, required checks pass, and no unresolved review-findings tag remains. Implemented in Hermes fork commit `bf542e744`.
+- [x] Add GitHub issue/PR audit comments at issue claim, PR open/reuse, review requested, review findings routed to same-branch coding, review-loop circuit breaker, review completion, automatic merge, and issue closure.
 - [ ] Add Kanban task audit comments for claim, PR open, review fixed, merge, and closure transitions.
 - [x] Add a periodic CryptoTrader workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.
 
@@ -76,7 +76,7 @@
 - [x] Add per-repo allowlist controls for Hermes issue automation.
 - [x] Add operator cancellation controls for queued/running issue automation.
 - [ ] Expand reviewer output into multiple anchored inline comments.
-- [x] Add a pre-merge blocker for unresolved `review_findings` tags by requiring current-head `ready_for_merge` before merge eligibility; explicit operator override path and audit trail remain part of automatic merge/closure hardening.
+- [x] Add a pre-merge blocker for unresolved `review_findings` tags by requiring current-head `ready_for_merge` before merge eligibility; automatic merge/closure now records merge and issue-closure audit trail events.
 
 ## Hermes Enhancement Backlog
 

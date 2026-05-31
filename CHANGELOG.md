@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recorded the shipped Hermes automatic merge and issue-closure path (`m0nklabs/hermes-agent` fork commit `bf542e744`), which merges current-head `ready_for_merge` PRs only after the live PR is open, non-draft, still on the reviewed head, and `mergeStateStatus=CLEAN`, then closes the linked issue and writes merge/closure audit comments.
 - Recorded the shipped Hermes issue-run cancellation control (`m0nklabs/hermes-agent` fork commit `840f525bb`), which adds `/issue-cancel <run-id> [reason]`, a persisted `cancelled` state, and GitHub issue audit comments for queued/running run cancellation.
 - Recorded the shipped Hermes issue repo allowlist (`m0nklabs/hermes-agent` fork commit `97667b70d`), which defaults `/issue` execution to `m0nklabs/cryptotrader` and requires explicit `HERMES_ISSUE_ALLOWED_REPOS` configuration before any other repository can run automation.
 - Recorded the shipped Hermes Master Epic duplicate suppression (`m0nklabs/hermes-agent` fork commit `23d979e61`), which searches existing all-state GitHub sub-issues for matching `Part of Master Issue #N` and task markers before creating new sub-issues, making crash retries idempotent.

@@ -27,8 +27,8 @@ priority = impact + urgency + autonomy_multiplier + inverse_complexity
 | 8 | OpenRouter preflight command | Operators lack a compact auth/model/rate-limit sanity check before review runs. | Reduces failed review launches and protects connectivity. | Small | Low | OpenRouter key env/file | Kyber | Command checks auth, model availability, and reports available rate-limit headers without full review. | 4 | 4 | 3 | 4 | 15 | 1 |
 | 9 | Queue watchdog cron/MoniFuse integration | Queue health exists as a script but is not yet surfaced continuously. | Improves stuck-run detection and operator load. | Small | Low | `scripts/hermes_queue_watchdog.py`; MoniFuse or Hermes cron | Kyber/Hermes | Implemented as tracked `hermes-queue-watchdog.timer` systemd user units plus `--emit on-change` alert/recovery output. | 4 | 4 | 4 | 3 | 15 | 2 |
 | 10 | Review-loop circuit breaker | Repeated `review_findings` -> `coding_subagent` can ping-pong indefinitely. | Controls cost and failure loops. | Medium | Medium | Review state history | Hermes | Implemented in Hermes commit `b77f4eef8`: repeated reviewer findings increment a run counter and trip a failed safety gate after the bounded same-branch fix budget. | 4 | 4 | 4 | 3 | 15 | 2 |
-| 11 | Automatic merge and issue closure | `ready_for_merge` still needs a complete merge/close/done path. | Completes zero-manual issue-to-merge loop. | Large | High | Pre-merge blocker; CI status checks; permissions | Hermes | Passing clean PR merges, issue closes, Kanban task done, audit comments written. | 5 | 3 | 5 | 1 | 14 | 3 |
-| 12 | Audit comments at lifecycle points | Claim, PR, review, fix, merge, and closure transitions are not uniformly auditable. | Improves observability and forensic debugging. | Medium | Low | Hermes state transitions | Hermes | Implemented for GitHub issue/PR transitions in Hermes fork commit `863aad702`: claim, PR open/reuse, review request, review findings routed to same-branch coding, review-loop circuit breaker, and review completion now post compact audit comments. Kanban task audit remains part of automatic merge/closure hardening. | 4 | 3 | 4 | 3 | 14 | 2 |
+| 11 | Automatic merge and issue closure | `ready_for_merge` still needs complete Kanban done-state closure after PR/issue closure. | Completes zero-manual issue-to-merge loop. | Medium | Medium | Pre-merge blocker; CI status checks; permissions | Hermes | Implemented in Hermes fork commit `bf542e744`: current-head `ready_for_merge` PRs merge automatically only when the live PR is open, non-draft, still on the reviewed head, and `mergeStateStatus=CLEAN`; linked issues are closed and merge/closure audit comments are written. Kanban task done-state closure remains separate. | 5 | 3 | 5 | 2 | 15 | 3 |
+| 12 | Audit comments at lifecycle points | Claim, PR, review, fix, merge, and closure transitions are not uniformly auditable. | Improves observability and forensic debugging. | Medium | Low | Hermes state transitions | Hermes | Implemented for GitHub issue/PR transitions in Hermes fork commit `863aad702`; automatic merge and issue-closure audit comments implemented in Hermes fork commit `bf542e744`. Kanban task audit remains a separate task-level hardening item. | 4 | 3 | 4 | 3 | 14 | 2 |
 | 13 | Duplicate suppression for Master Epic issue creation | Crash window can create duplicate sub-issues before SQLite persistence. | Prevents backlog duplication and noisy execution. | Medium | Medium | GitHub search/issue references; SQLite transaction design | Hermes | Implemented in Hermes fork commit `23d979e61`: before creating each Master Epic sub-issue, Hermes searches all issue states for matching `Part of Master Issue #N`, task position, title, and body markers, then records/reuses the existing issue instead of duplicating it. | 4 | 3 | 4 | 3 | 14 | 2 |
 | 14 | Per-repo allowlists and cancellation controls | Issue automation needs clearer repo boundaries and operator stop controls. | Reduces accidental cross-repo or unwanted execution. | Medium | Medium | Gateway config; issue lane | Hermes | Implemented in Hermes fork commits `97667b70d` and `840f525bb`: `/issue` defaults to `m0nklabs/cryptotrader`, blocks unconfigured repos before issue loading, and exposes `/issue-cancel <run-id> [reason]` to mark queued/running rows `cancelled` with an audit comment. | 4 | 3 | 4 | 3 | 14 | 2 |
 | 15 | Priority/capability metadata in `issue_runs` | Lane selection will be weak once more than default Aider exists. | Enables future routing quality. | Medium | Low | Multiple implementation lanes | Hermes | `issue_runs` records priority/capability metadata and routing reason. | 3 | 2 | 4 | 3 | 12 | 3 |
@@ -53,7 +53,7 @@ Foundational architecture work:
 - Branch and PR body contract.
 - PR-manager review-findings consumer.
 - Pre-merge blocker.
-- Automatic merge and issue closure.
+- Automatic merge and issue closure. (PR merge and linked issue closure implemented in Hermes fork commit `bf542e744`; Kanban done-state closure remains.)
 
 ## Execution waves
 
@@ -97,7 +97,7 @@ Success metrics:
 
 Goal: scale the autonomous pipeline beyond the current single Aider lane.
 
-1. Automatic merge and issue closure.
+1. Automatic merge and issue closure. (PR merge and linked issue closure implemented in Hermes fork commit `bf542e744`; Kanban done-state closure remains.)
 2. Priority/capability metadata in `issue_runs`.
 3. Anchored inline reviewer comments.
 4. Cloud escalation gates.
@@ -107,7 +107,7 @@ Goal: scale the autonomous pipeline beyond the current single Aider lane.
 
 Success metrics:
 
-- Routine clean PRs merge and close issues automatically.
+- Routine clean PRs merge, close linked issues, and record audit comments automatically; Kanban done-state closure is the remaining task-level step.
 - Lane selection has recorded capability/priority rationale.
 - Review comments are actionable at diff-line granularity.
 - Costly cloud/model escalation is bounded and explainable.

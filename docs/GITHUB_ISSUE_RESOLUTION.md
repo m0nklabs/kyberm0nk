@@ -210,7 +210,7 @@ Master Epic child mapping is stored in `master_subissues`.
 | `queued` | Run is persisted and waiting for the single-flight worker. | Inserted by `enqueue_run()` or restored by `reset_interrupted_runs()`. |
 | `running` | Worker has claimed the oldest queued run. | `claim_next_run()` selects `ORDER BY id ASC LIMIT 1` and updates that row before execution. |
 | `expanded` | Master Epic was decomposed and its sub-issues were queued. | `_execute_master_issue()` creates sub-issues, records them, queues child runs, then calls `mark_expanded()`. |
-| `completed` | Normal/sub-issue run has opened or found a PR and reviewer feedback has been posted; Master Epic has all children completed. | `_execute_single_issue()` calls `mark_completed()` after review feedback; `_complete_ready_masters()` completes expanded parents after every child is completed. |
+| `completed` | Normal/sub-issue run has opened or found a PR, received a current-head `ready_for_merge` review tag, passed the live PR merge gate, merged the PR, and requested linked issue closure; Master Epic has all children completed. | `_execute_single_issue()` calls `mark_completed()` after automatic merge/closure succeeds; `_complete_ready_masters()` completes expanded parents after every child is completed. |
 | `failed` | Execution raised an exception. | `_issue_queue_worker()` catches the exception, stores truncated error text, notifies the operator, and keeps draining later queued work. |
 | `cancelled` | Operator stopped queued or running issue automation before it should continue. | `/issue-cancel <run-id> [reason]` calls `cancel_issue_resolution()`, records the reason, and writes a GitHub issue audit comment when possible. |
 
@@ -263,14 +263,14 @@ Canonical next-action routing:
 | Review result | `kyber-tag.state` | `kyber-tag.next_action` | Gate effect |
 | --- | --- | --- | --- |
 | Findings posted | `review_findings` | `coding_subagent` | Blocking: PR must not merge until a follow-up commit addresses findings and a later review returns clean, or an operator applies an explicit merge override. |
-| No issues after Tier2 | `review_clean` | `ready_for_merge` | Merge-eligible only when repository CI and scoped validation gates are also green. |
+| No issues after Tier2 | `ready_for_merge` | `ready_for_merge` | Automatically mergeable only when the reviewed head matches the live PR head, the live PR is open/non-draft, GitHub reports `mergeStateStatus=CLEAN`, and no unresolved `review_findings` tag remains. |
 | Reviewer output unusable | `review_inconclusive` | `rerun_reviewer` | Blocking until one bounded rerun succeeds; repeated inconclusive output escalates to an operator instead of being treated as clean. |
 
 The PR manager must treat review tags as durable state, not advisory prose. A tag
 with `state=review_findings` remains open while the PR head SHA matches the tag's
 reviewed SHA. A later code commit may clear only the handoff condition, not the
 finding itself; merge readiness still requires a fresh reviewer tag with
-`state=review_clean` and `next_action=ready_for_merge` unless an explicit operator
+`state=ready_for_merge` and `next_action=ready_for_merge` unless an explicit operator
 override is recorded.
 
 Additional review-loop safety gates:
@@ -295,9 +295,19 @@ Hermes now writes compact GitHub audit notes on the externally visible issue-to-
 - PR comment when cloud review is requested, including the reviewed head SHA;
 - PR comment when reviewer findings are routed back to same-branch coding;
 - PR comment when the review-loop circuit breaker trips;
-- PR comment when review completes and records the parsed routing state.
+- PR comment when automatic merge starts at the reviewed head SHA;
+- PR comment when Hermes merges the PR;
+- issue comment when Hermes records the merged PR and starts linked issue closure;
+- issue close comment when Hermes closes the linked issue after merge;
+- PR comment when review completes and records the parsed routing state plus merge/closure outcome.
 
-These comments make the daemon path inspectable from GitHub without reading the local SQLite database. Kanban task audit comments and merge/closure audit notes remain part of the automatic merge and issue-closure hardening work.
+These comments make the daemon path inspectable from GitHub without reading the local SQLite database. Kanban task audit comments remain the remaining task-level audit hardening item for claim, PR open/reuse, review-fixed, merge, issue-closure, and done/closed transitions.
+
+## Automatic Merge and Closure
+
+When the PR manager sees a current-head reviewer tag with `state=ready_for_merge` and `next_action=ready_for_merge`, it verifies that the reviewed `head_ref_oid` still matches the live PR head, the PR is open and non-draft, and GitHub reports `mergeStateStatus=CLEAN`. If all gates pass, Hermes squash-merges the PR with branch deletion, records PR and issue audit comments, explicitly closes the linked issue, then marks the issue run `completed`.
+
+If any gate fails, Hermes leaves the run unmerged, records a blocking audit note, and fails closed through the review safety-gate path. Operator overrides must be explicit and auditable.
 
 ## Startup Resume and Crash Recovery
 
@@ -365,6 +375,11 @@ OPENAI_API_KEY=$OPENROUTER_API_KEY \
 - Emits machine-readable `kyber-tag` review routing comments for the PR manager.
 - Posts reviewer feedback as an inline PR comment when a diff anchor is found,
   otherwise as a normal PR comment.
+- Blocks automatic merge unless the latest parsed reviewer tag is current-head `ready_for_merge` with `next_action=ready_for_merge`.
+- Verifies the live PR is open, non-draft, still on the reviewed head, and `mergeStateStatus=CLEAN` before merge.
+- Automatically squash-merges eligible PRs and deletes the issue branch.
+- Explicitly closes the linked issue after successful merge.
+- Emits merge and issue-closure lifecycle audit comments.
 
 ## Queue Health Watchdog
 
@@ -418,14 +433,10 @@ supervisor loop before more retries are spent.
   continuous alert/recovery path.
 - Add priority and capability metadata once Hermes has more than the default Aider
   implementation lane; until then, FIFO remains the safer local-capacity policy.
-- Add review-loop circuit breakers so repeated `review_findings` ->
-  `coding_subagent` cycles escalate instead of ping-ponging indefinitely.
-- Add per-repo allowlists and richer concurrency controls for cloud review.
-- Add cancellation and retry controls.
 - Add richer reviewer output parsing for multiple inline comments.
-- Add duplicate prevention for crash windows between `gh issue create` and state write.
-- Teach the Guardian decomposition parser to detect existing issue references
-  such as `#182` and link/reuse them instead of blindly creating new sub-issues.
+- Add Kanban task-level lifecycle audit comments for claim, PR open/reuse,
+  review-fixed, merge, issue-closure, and done/closed transitions.
+- Add richer cloud-review concurrency controls after more than one reviewer lane exists.
 
 ## SQLite Inspection
 
