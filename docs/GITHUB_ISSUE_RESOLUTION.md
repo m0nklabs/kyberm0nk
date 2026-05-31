@@ -257,6 +257,19 @@ Additional review-loop safety gates:
   static checks related to touched files; unrelated environment failures are
   reported separately so they do not drown out review findings.
 
+## Lifecycle Audit Comments
+
+Hermes now writes compact GitHub audit notes on the externally visible issue-to-PR lifecycle path:
+
+- issue comment when a run claims an issue and selects the branch;
+- issue comment when the run opens or reuses the PR;
+- PR comment when cloud review is requested, including the reviewed head SHA;
+- PR comment when reviewer findings are routed back to same-branch coding;
+- PR comment when the review-loop circuit breaker trips;
+- PR comment when review completes and records the parsed routing state.
+
+These comments make the daemon path inspectable from GitHub without reading the local SQLite database. Kanban task audit comments and merge/closure audit notes remain part of the automatic merge and issue-closure hardening work.
+
 ## Startup Resume and Crash Recovery
 
 Hermes Gateway calls `resume_issue_resolution_queue()` during startup from

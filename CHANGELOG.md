@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recorded the shipped Hermes lifecycle audit comments (`m0nklabs/hermes-agent` fork commit `863aad702`), which post compact GitHub issue/PR audit notes when Hermes claims an issue, opens or reuses a PR, requests review, routes reviewer findings back to same-branch coding, trips the review-loop circuit breaker, or completes review.
 - Recorded the shipped Hermes review-loop circuit breaker (`m0nklabs/hermes-agent` commit `b77f4eef8`), which tracks repeated `review_findings` loops and fails closed after the bounded fix-attempt budget instead of ping-ponging indefinitely.
 - Added tracked `hermes-queue-watchdog` systemd user service/timer units and `--emit on-change` watchdog output so Hermes queue alerts and recoveries can surface continuously without noisy healthy polls.
 - Recorded the shipped Hermes fail-closed review tag parser (`m0nklabs/hermes-agent` commit `badab438f`), which requires valid reviewer routing tags, retries malformed output once, and then fails the run instead of treating malformed output as clean.

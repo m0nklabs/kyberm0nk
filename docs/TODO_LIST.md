@@ -28,7 +28,8 @@
 - [x] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review comments become concrete same-branch fix work.
 - [x] Add a current-head pre-merge blocker so stale `ready_for_merge` tags or unresolved `review_findings` tags cannot authorize merge.
 - [ ] Add automatic merge and issue closure once review returns `ready_for_merge`, required checks pass, and no unresolved review-findings tag remains.
-- [ ] Add audit comments to both GitHub issue and Kanban task at claim, PR open, review requested, review fixed, merge, and closure.
+- [x] Add GitHub issue/PR audit comments at issue claim, PR open/reuse, review requested, review findings routed to same-branch coding, review-loop circuit breaker, and review completion.
+- [ ] Add Kanban task audit comments for claim, PR open, review fixed, merge, and closure transitions.
 - [x] Add a periodic CryptoTrader workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.
 
 ## 2026-05-31 OpenRouter Token Efficiency Hardening
