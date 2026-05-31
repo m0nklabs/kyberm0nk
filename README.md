@@ -112,6 +112,7 @@ Start here:
 - [docs/kyber-tag.jsonschema](docs/kyber-tag.jsonschema)
 - [docs/audit-report.md](docs/audit-report.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
+- [docs/AUTONOMY_BACKLOG.md](docs/AUTONOMY_BACKLOG.md)
 - [docs/LOCAL_AGENT_MODEL_SETTINGS.md](docs/LOCAL_AGENT_MODEL_SETTINGS.md)
 - [docs/VALIDATION_LOG.md](docs/VALIDATION_LOG.md)
 - [docs/TODO_LIST.md](docs/TODO_LIST.md)

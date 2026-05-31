@@ -13,6 +13,7 @@ This index maps the current KyberM0nk runtime documentation to the active archit
 - [Architecture](ARCHITECTURE.md)
 - [Automated GitHub Issue Resolution](GITHUB_ISSUE_RESOLUTION.md)
 - [Issue-to-Merge Target State](ISSUE_TO_MERGE_TARGET_STATE.md)
+- [Autonomy Backlog](AUTONOMY_BACKLOG.md)
 - [Roadmap](ROADMAP.md)
 
 ## P3 Contracts

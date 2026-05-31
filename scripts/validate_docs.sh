@@ -19,6 +19,7 @@ required = [
     Path('docs/index.md'),
     Path('docs/ARCHITECTURE.md'),
     Path('docs/GITHUB_ISSUE_RESOLUTION.md'),
+    Path('docs/AUTONOMY_BACKLOG.md'),
     Path('docs/kyber-tag.jsonschema'),
     Path('docs/audit-inventory.csv'),
     Path('docs/audit-inventory.json'),

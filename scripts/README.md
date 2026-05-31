@@ -32,6 +32,7 @@ Key active scripts:
 - `test_windows_unreal_ssh.sh`: verify host and Agent Zero runtime SSH access to the Windows Unreal executor.
 - `check_mcp_registry_sync.py`: compare live `claude mcp` registrations against `configs/mcp/servers.yaml` and fail on drift when requested.
 - `hermes_queue_watchdog.py`: read the Hermes `issue_runs` SQLite queue, report stale `running` rows, old `queued` rows, queue-depth pressure, recent failures, and append JSONL improvement signals.
+- `managed_repo_guard.py`: fail when a managed repository such as CryptoTrader has direct implementation drift on protected `master`/`main` branches.
 - `supervisor_tick.py`: inspect one repo plus worker slice, apply protected-path heuristics, ask Guardian for a bounded decision, and append a JSONL supervisor log entry.
 - `validate_docs.sh`: validate the current docs surface, local Markdown links, required docs artifacts, and basic `kyber-tag` schema hygiene.
 - `validate_kyber_tag_schema.py`: validate the PR routing tag schema and bundled examples for fail-closed review-loop routing.

@@ -27,7 +27,7 @@
 - [ ] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review comments become concrete same-branch fix work.
 - [ ] Add automatic merge and issue closure once review returns `ready_for_merge`, required checks pass, and no unresolved review-findings tag remains.
 - [ ] Add audit comments to both GitHub issue and Kanban task at claim, PR open, review requested, review fixed, merge, and closure.
-- [ ] Add a periodic CT workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.
+- [x] Add a periodic CT workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.
 
 ## 2026-05-31 OpenRouter Token Efficiency Hardening
 
