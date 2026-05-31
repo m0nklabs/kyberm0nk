@@ -26,6 +26,7 @@
 - [x] Add a Hermes Kanban dispatch guard that leaves dirty protected CryptoTrader checkout tasks `ready`, records `managed_dispatch_guarded`, and refuses to claim/spawn them.
 - [x] Add branch naming and PR body requirements to the Hermes issue execution lane: linked issue, validation evidence, risk notes, and review handoff state.
 - [x] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review comments become concrete same-branch fix work.
+- [x] Add a current-head pre-merge blocker so stale `ready_for_merge` tags or unresolved `review_findings` tags cannot authorize merge.
 - [ ] Add automatic merge and issue closure once review returns `ready_for_merge`, required checks pass, and no unresolved review-findings tag remains.
 - [ ] Add audit comments to both GitHub issue and Kanban task at claim, PR open, review requested, review fixed, merge, and closure.
 - [x] Add a periodic CryptoTrader workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.
@@ -73,7 +74,7 @@
 - [ ] Add duplicate suppression for crash windows between GitHub sub-issue creation and SQLite persistence, including Master Plan references to existing issues such as `#182`.
 - [ ] Add per-repo allowlists and cancellation controls.
 - [ ] Expand reviewer output into multiple anchored inline comments.
-- [ ] Add a pre-merge blocker for unresolved `review_findings` tags, with an explicit operator override path and audit trail.
+- [x] Add a pre-merge blocker for unresolved `review_findings` tags by requiring current-head `ready_for_merge` before merge eligibility; explicit operator override path and audit trail remain part of automatic merge/closure hardening.
 
 ## Hermes Enhancement Backlog
 
