@@ -19,7 +19,7 @@ priority = impact + urgency + autonomy_multiplier + inverse_complexity
 |---:|---|---|---|---|---|---|---|---|---:|---:|---:|---:|---:|---|
 | 1 | Managed repo branch/drift guard | CryptoTrader can accumulate direct `master`/`main` implementation drift, bypassing branch -> PR review. | Prevents the most damaging pipeline violation. | Small | Low | Local git checkout | Kyber | `scripts/managed_repo_guard.py` fails on protected-branch implementation drift and passes on clean CryptoTrader. | 5 | 5 | 5 | 5 | 20 | 1 |
 | 2 | Backlog consolidation and wave plan | TODOs are broad, duplicated, and hard to execute autonomously. | Converts backlog into ranked delivery queue. | Small | Low | Current docs and issues | Kyber | Ranked backlog exists with title, problem, impact, effort, risk, dependencies, owner, acceptance criteria, scores, and waves. | 4 | 5 | 4 | 5 | 18 | 1 |
-| 3 | Hermes pre-claim git guard | Hermes can start implementation from a dirty or protected CryptoTrader checkout. | Blocks bad starts before Aider spends tokens or creates drift. | Medium | Medium | Managed repo guard semantics; Hermes execution lane | Hermes | CryptoTrader issue dispatch refuses dirty protected checkout; failure message names branch and paths. | 5 | 5 | 5 | 3 | 18 | 1 |
+| 3 | Hermes pre-claim git guard | Hermes can start implementation from a dirty or protected CryptoTrader checkout. | Blocks bad starts before Aider spends tokens or creates drift. | Medium | Medium | Managed repo guard semantics; Hermes execution lane | Hermes | Implemented in Hermes commit `8310636ab`: CryptoTrader Kanban dispatch leaves dirty protected checkout tasks `ready`, records `managed_dispatch_guarded`, and does not claim/spawn. | 5 | 5 | 5 | 3 | 18 | 1 |
 | 4 | Branch and PR body contract | PRs can lack issue link, validation evidence, risk notes, or review handoff state. | Makes every autonomous PR reviewable and auditable. | Medium | Low | Hermes issue execution lane | Hermes | New PRs include linked issue/task, branch naming convention, validation evidence, risk notes, and review state. | 5 | 4 | 5 | 3 | 17 | 1 |
 | 5 | PR-manager review-findings consumer | `review_findings` can remain advisory text instead of concrete fix work. | Closes the review -> fix loop. | Medium | Medium | Valid `kyber-tag`; PR manager state | Hermes | Current-head `review_findings` creates/continues a same-branch fix task and blocks merge. | 5 | 4 | 5 | 3 | 17 | 2 |
 | 6 | Pre-merge unresolved findings blocker | A PR could merge while latest current-head tag still has findings. | Protects quality gate integrity. | Medium | Medium | Review tag parser; PR manager | Hermes | Merge path fails closed unless latest current-head tag is clean or explicit override is recorded. | 5 | 4 | 5 | 3 | 17 | 2 |
@@ -63,7 +63,7 @@ Goal: stop known pipeline violations and make the backlog executable.
 
 1. Managed repo branch/drift guard.
 2. Backlog consolidation and wave plan.
-3. Hermes pre-claim git guard implemented for the direct CryptoTrader issue lane.
+3. Hermes pre-claim git guard implemented for the direct CryptoTrader issue lane and Kanban dispatcher. (Kanban guard shipped in Hermes commit `8310636ab`.)
 4. Branch and PR body contract.
 5. Compact OpenRouter preflight command. (Implemented as `scripts/openrouter_preflight.py`.)
 

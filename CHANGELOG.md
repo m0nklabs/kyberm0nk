@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recorded the shipped Hermes Kanban managed-dispatch guard (`m0nklabs/hermes-agent` commit `8310636ab`), which refuses to claim or spawn CryptoTrader tasks on dirty protected `master`/`main` checkouts and emits `managed_dispatch_guarded` events.
 - Reduced Kyber Claude subagent cloud-token pressure by moving the generalist and validation-runner lanes from scarce/pro models to `deepseek/deepseek-v4-flash`, while documenting explicit escalation back to stronger review only for high-risk or repeatedly failing work.
 - Documented OpenRouter review-loop efficiency and rate-limit resilience guardrails: bounded fan-out, duplicate-repost avoidance, diff-size control before model escalation, and capped jittered retry knobs.
 - Added `scripts/hermes_queue_watchdog.py`, a read-only Hermes queue-health and KPI probe for stale `running` rows, old `queued` rows, queue-depth pressure, recent failures, and single-flight WIP-limit violations, plus docs and environment threshold defaults.
