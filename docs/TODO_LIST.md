@@ -1,10 +1,40 @@
 # TODO List
 
+## 2026-05-31 Kyber Claude Code Subagents
+
+- [x] Add a read-only repo scanner Claude subagent for easy maintenance candidate discovery.
+- [x] Add a docs-sync Claude subagent for focused documentation reconciliation.
+- [x] Add a validation-runner Claude subagent for targeted smoke/verification commands.
+- [x] Add a changelog/TODO maintainer Claude subagent for bookkeeping updates.
+- [x] Add an issue/PR triage Claude subagent for concise routing decisions.
+- [x] Add a general-purpose Claude subagent for broad implementation/refactor tasks.
+- [x] Add a codebase-indexer Claude subagent for lightweight repository mapping updates.
+- [x] Pin explicit model selection per subagent.
+- [x] Remove project-level subagent model override so per-agent model pinning is used.
+
 ## 2026-05-30 Root Hygiene Cleanup
 
 - [x] Remove obsolete root-level one-off patch/fix scripts and stale local helper leftovers.
 - [x] Keep only front-door or still-documented root artifacts in the tracked repo surface.
 - [x] Add ignore guards for local history and ad-hoc root scratch files.
+
+## 2026-05-31 OpenRouter Token Efficiency Hardening
+
+- [x] Move routine Kyber generalist and validation-runner subagents to the fast OpenRouter route to reduce token-per-minute pressure and reserve stronger models for explicit escalation.
+- [x] Document review-loop guardrails for duplicate suppression, bounded fan-out, diff-size control, and capped jittered retries.
+- [ ] Add runtime support in the Hermes review script for the documented `AIDER_REVIEW_MAX_RETRIES`, `AIDER_REVIEW_RETRY_*`, `AIDER_REVIEW_PARALLELISM`, and `AIDER_REVIEW_RATE_LIMIT_COOLDOWN_SECONDS` knobs if missing.
+- [ ] Add a compact OpenRouter preflight command that checks auth, model availability, and rate-limit headers without running a full review.
+
+## 2026-05-31 Issue Assignment Reliability Hardening
+
+- [x] Document the lane-selection and assignment contract for the current Aider-only implementation lane.
+- [x] Align the persisted issue-run state docs around the five stored states: `queued`, `running`, `expanded`, `completed`, and `failed`.
+- [x] Extend docs validation so core issue-assignment docs must keep those persisted states visible.
+- [x] Add a read-only Hermes queue-health watchdog for stale `running` rows, old `queued` rows, queue depth backpressure, recent failures, and WIP-limit violations.
+- [ ] Integrate the Hermes queue-health watchdog with Hermes cron or MoniFuse alerting.
+- [ ] Add priority and capability metadata to `issue_runs` once Hermes has more than the default Aider implementation lane.
+- [ ] Add a review-loop circuit breaker for repeated `review_findings` -> `coding_subagent` ping-pong.
+- [ ] Add runtime validation that malformed `kyber-tag` output fails closed in the Hermes review ingestion path.
 
 ## 2026-05-30 Issue-to-Merge Target State
 
@@ -28,13 +58,15 @@
 - [x] Persist Master Epic child mappings in SQLite for operator inspection.
 - [x] Reframe `/issue` documentation as a headless Hermes Gateway daemon lane rather than an editor-driven workflow.
 - [x] Reframe the Kyber roadmap so only Hermes, Aider, and Guardian are committed runtime components; all other agentic frameworks are evaluation candidates.
-- [ ] Add duplicate suppression for crash windows between GitHub sub-issue creation and SQLite persistence.
+- [ ] Add duplicate suppression for crash windows between GitHub sub-issue creation and SQLite persistence, including Master Plan references to existing issues such as `#182`.
 - [ ] Add per-repo allowlists and cancellation controls.
 - [ ] Expand reviewer output into multiple anchored inline comments.
+- [ ] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review findings create a concrete fix task instead of remaining advisory text.
+- [ ] Add a pre-merge blocker for unresolved `review_findings` tags, with an explicit operator override path and audit trail.
 
 ## Hermes Enhancement Backlog
 
-- [ ] Critical: Edge-case handling in Guardian parser: Voorkom duplicatie van issues wanneer een Master Plan verwijst naar reeds bestaande issue-referenties (zoals `#182`), in plaats van blind nieuwe sub-issues aan te maken.
+- [ ] Add a fail-closed kyber-tag parser mode: one bounded rerun for malformed reviewer output, then mark the review failed/escalated instead of silently treating it as clean or repeatedly spending review budget.
 
 ## 2026-05-27 MoniFuse Service Registration
 
@@ -215,3 +247,9 @@
 - [ ] Add a daily-gated Aider advisor wrapper on OpenRouter GPT-5.5 for hard questions.
 - [ ] Surface advisor availability in Kyber status output and docs so Hermes knows the lane is scarce.
 - [ ] Close the planning issue after implementation and validation.
+
+## 2026-05-31 Claude Direct Provider Overrides (Idea)
+
+- [x] Document a future-option design note for direct Claude provider/model overrides in Kyber docs.
+- [ ] Pilot project-local `.claude/settings.local.json` overrides on one disposable workflow slice.
+- [ ] Compare direct-provider mode vs `claude-local` + Guardian for cost, latency, and tool reliability.

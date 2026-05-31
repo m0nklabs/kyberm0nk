@@ -13,6 +13,17 @@ GitHub sub-issues. It does not require an active editor, GUI, IDE plugin, or
 interactive desktop session. It reacts to CLI, Telegram, and webhook events and
 then continues autonomously from persisted state.
 
+## Lane Selection and Assignment Contract
+
+Hermes assigns exactly one queued issue at a time to the coding-agent lane through a strict single-flight contract:
+
+1. **Lane selection**: Today, Hermes routes all normal issues and sub-issues to the Aider lane. Master Epics are routed to Guardian for decomposition, then their sub-issues are routed to Aider.
+2. **Claim contract**: `claim_next_run()` selects the oldest `queued` row (`ORDER BY id ASC LIMIT 1`), marks it `running`, and executes the coder work. Only one row should be `running` for the local coder lane at a time.
+3. **Guard rails**: `_QUEUE_GUARD` prevents concurrent worker creation inside the gateway process. `_QUEUE_WORKER_TASK` tracks the active worker.
+4. **Availability**: Hermes does not currently run a lane health probe before assignment. If Aider or Guardian is unavailable after claim, the run is failed or remains `running` until gateway restart resets it to `queued`.
+5. **Persistence**: The `running` state is persisted in SQLite before any coder work begins. Gateway restart triggers `reset_interrupted_runs()`, which converts interrupted `running` rows back to `queued`.
+6. **Lease semantics**: There is no explicit persisted lease timeout yet. The worker holds the run until completion, failure, or gateway restart.
+
 ## Architecture
 
 The lane has five headless execution layers:
@@ -160,6 +171,8 @@ Master Epic child mapping is stored in `master_subissues`.
 | `master_issue_number` | Source Master Epic issue number for sub-issues. |
 | `pr_number` / `pr_url` | PR created or found for completed coder runs. |
 | `error` | Truncated failure text for failed runs. |
+| `attempt_count` | Number of execution attempts used by retry policy. |
+| `next_attempt_at` | Unix timestamp for next retry eligibility. |
 | `created_at` / `updated_at` | Unix timestamps used for audit and ordering. |
 
 ### Statuses
@@ -218,11 +231,31 @@ Issue-to-PR handoff before review is explicit:
 
 Canonical next-action routing:
 
-| Review result | `kyber-tag.state` | `kyber-tag.next_action` |
-| --- | --- | --- |
-| Findings posted | `review_findings` | `coding_subagent` |
-| No issues after Tier2 | `review_clean` | `ready_for_merge` |
-| Reviewer output unusable | `review_inconclusive` | `rerun_reviewer` |
+| Review result | `kyber-tag.state` | `kyber-tag.next_action` | Gate effect |
+| --- | --- | --- | --- |
+| Findings posted | `review_findings` | `coding_subagent` | Blocking: PR must not merge until a follow-up commit addresses findings and a later review returns clean, or an operator applies an explicit merge override. |
+| No issues after Tier2 | `review_clean` | `ready_for_merge` | Merge-eligible only when repository CI and scoped validation gates are also green. |
+| Reviewer output unusable | `review_inconclusive` | `rerun_reviewer` | Blocking until one bounded rerun succeeds; repeated inconclusive output escalates to an operator instead of being treated as clean. |
+
+The PR manager must treat review tags as durable state, not advisory prose. A tag
+with `state=review_findings` remains open while the PR head SHA matches the tag's
+reviewed SHA. A later code commit may clear only the handoff condition, not the
+finding itself; merge readiness still requires a fresh reviewer tag with
+`state=review_clean` and `next_action=ready_for_merge` unless an explicit operator
+override is recorded.
+
+Additional review-loop safety gates:
+
+- **Substantive-review gate:** at least one parseable Aider reviewer tag is
+  required. Smoke tests, failed Copilot reviews, or comments saying a reviewer
+  could not run do not count as review coverage.
+- **Review-churn gate:** more than five review dismissals in one hour is abnormal
+  and must pause auto-merge for operator inspection.
+- **Mixed-scope gate:** PRs that combine CI/workflow edits with application logic
+  require either split PRs or an explicit `meta:ci+logic` override label.
+- **Diff-scoped validation gate:** reviewer evidence should prefer tests and
+  static checks related to touched files; unrelated environment failures are
+  reported separately so they do not drown out review findings.
 
 ## Startup Resume and Crash Recovery
 
@@ -258,6 +291,10 @@ OPENAI_API_KEY=$OPENROUTER_API_KEY \
 /home/flip/aider/.venv/bin/aider --model openrouter/deepseek/deepseek-v4-flash --cache-prompts --no-auto-commits --yes --no-gitignore --message "$PROMPT"
 ```
 
+See `.env.example` for the complete list of `AIDER_REVIEW_*` environment variables
+that control the review loop behaviour (model selection, dedup window, force-rerun
+overrides, dry-run mode, size limits).
+
 Tier2 reviewer:
 
 ```bash
@@ -285,8 +322,45 @@ OPENAI_API_KEY=$OPENROUTER_API_KEY \
 - Posts reviewer feedback as an inline PR comment when a diff anchor is found,
   otherwise as a normal PR comment.
 
+## Queue Health Watchdog
+
+Kyber ships a read-only queue-health watchdog at
+`scripts/hermes_queue_watchdog.py`. It inspects `issue_runs` in
+`~/.hermes/issue_resolution.db` and emits JSON or text without mutating the
+queue. The default thresholds are documented in `.env.example`:
+
+- stale `running` rows after two hours without a fresh update;
+- old `queued` rows after one hour of waiting;
+- queue-depth pressure above five queued rows;
+- recent failure pressure at three failed rows in the last 24 hours;
+- WIP-limit violation when more than one row is `running`.
+
+Recommended operator check:
+
+```bash
+scripts/hermes_queue_watchdog.py --output text
+```
+
+Recommended automation mode:
+
+```bash
+scripts/hermes_queue_watchdog.py --fail-on-alert
+```
+
+Alerts are self-improvement triggers. Stale `running` rows should lead to an
+operator-audited requeue/fail decision, queue-depth pressure should trigger
+triage or lane-capability planning, and repeated failures should feed the
+supervisor loop before more retries are spent.
+
 ## Next Hardening
 
+- Integrate the queue-health watchdog with Hermes cron or MoniFuse so stale
+  `running` rows, old `queued` rows, and queue-depth backpressure alert without
+  manual SQLite inspection.
+- Add priority and capability metadata once Hermes has more than the default Aider
+  implementation lane; until then, FIFO remains the safer local-capacity policy.
+- Add review-loop circuit breakers so repeated `review_findings` ->
+  `coding_subagent` cycles escalate instead of ping-ponging indefinitely.
 - Add per-repo allowlists and richer concurrency controls for cloud review.
 - Add cancellation and retry controls.
 - Add richer reviewer output parsing for multiple inline comments.

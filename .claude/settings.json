@@ -1,8 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  },
   "statusLine": {
     "type": "command",
-    "command": "PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); python3 \"$PROJECT_ROOT/.claude/statusline.py\"",
+    "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/statusline.py\"",
     "padding": 1,
     "refreshInterval": 3
   },

@@ -48,23 +48,23 @@ The issue lifecycle is governed by a five-state machine persisted in `~/.hermes/
 | State | Meaning | Transition In | Transition Out |
 |-------|---------|--------------|----------------|
 | `queued` | Run persisted, waiting for single-flight worker | Inserted by `enqueue_run()`, restored by `reset_interrupted_runs()` | Claimed by worker |
-| `running` | Worker has claimed the run | `claim_next_run()` updates `queued` to `running` | Executes coder work |
+| `running` | Worker has claimed the run and is executing coder work plus review handoff | `claim_next_run()` updates `queued` to `running` | Completes, fails, or expands |
 | `expanded` | Master Epic decomposed, sub-issues queued | `_execute_master_issue()` creates sub-issues | Children complete |
-| `executing` | Local Aider/Guardian coder work in progress | Entered after claim | Coder work finishes |
-| `reviewing` | PR created, tiered reviewers active | Entered after coder work | Review completes |
 | `completed` | Issue resolved, review clean, PR ready | Review clean or all children done | Merged or archived |
 | `failed` | Execution raised an exception | Catch block in worker | Retried or archived |
+
+`executing` and `reviewing` are internal sub-states inside persisted `running`; they are not stored as `issue_runs.status` values.
 
 ### State Transitions
 
 1. **queued -> running**: `claim_next_run()` selects oldest `queued` row (`ORDER BY id ASC LIMIT 1`) and updates to `running`.
-2. **running -> executing**: Worker begins Aider invocation.
-3. **executing -> reviewing**: Aider finishes, PR opened/found, marked `ready_for_review`.
-4. **reviewing -> completed**: Tier1/Tier2 review clean, `kyber-tag` routes to `ready_for_merge`.
-5. **reviewing -> executing**: Tier1/Tier2 finds issues, `kyber-tag` routes to `coding_subagent`.
-6. **reviewing -> reviewing**: Tier2 rerun, `kyber-tag` routes to `rerun_reviewer`.
-7. **executing -> failed**: Exception during coder work.
-8. **reviewing -> failed**: Reviewer output unusable or timeout.
+2. **running -> internal executing**: Worker begins Aider invocation.
+3. **internal executing -> internal reviewing**: Aider finishes, PR opened/found, marked `ready_for_review`.
+4. **internal reviewing -> completed**: Tier1/Tier2 review clean, `kyber-tag` routes to `ready_for_merge`.
+5. **internal reviewing -> internal executing**: Tier1/Tier2 finds issues, `kyber-tag` routes to `coding_subagent`.
+6. **internal reviewing -> internal reviewing**: Tier2 rerun, `kyber-tag` routes to `rerun_reviewer`.
+7. **running -> expanded**: Master Epic decomposes into sub-issues.
+8. **running -> failed**: Exception during coder work, reviewer timeout, or unusable reviewer output after bounded retry.
 9. **failed -> queued**: Retry or manual re-queue.
 
 ## 2. Routing Contracts
@@ -90,7 +90,7 @@ The issue lifecycle is governed by a five-state machine persisted in `~/.hermes/
 
 **Contract**:
 - Input: `queued` rows in `issue_runs`.
-- Output: Rows transitioned to `running`/`executing`.
+- Output: Rows transitioned to persisted `running` state, then internal execution/review sub-states.
 - Concurrency: Strict single-flight. Only one Aider/Guardian job at a time.
 - FIFO ordering: `ORDER BY id ASC LIMIT 1`.
 - Guard: `_QUEUE_GUARD` prevents concurrent worker creation.
@@ -128,9 +128,14 @@ The issue lifecycle is governed by a five-state machine persisted in `~/.hermes/
 - Tier1 (fast): `deepseek-v4-flash`, posts findings or clean.
 - Tier2 (strong): `deepseek-v4-pro`, re-checks if Tier1 clean.
 - `kyber-tag` routing:
-  - `review_findings` + `coding_subagent` -> back to execution.
-  - `review_clean` + `ready_for_merge` -> completed.
-  - `review_inconclusive` + `rerun_reviewer` -> rerun Tier2.
+  - `review_findings` + `coding_subagent` -> back to execution. This is a blocking state: the PR cannot merge while the reviewed head SHA still has unresolved findings.
+  - `review_clean` + `ready_for_merge` -> completed only after repository CI and diff-scoped validation are green.
+  - `review_inconclusive` + `rerun_reviewer` -> one bounded rerun, then escalation/failure if output remains unusable.
+
+The PR manager must create a concrete fix task for every `review_findings` ->
+`coding_subagent` tag, then require a fresh clean review after the fix commit.
+Review comments that fail to run, smoke-only reviews, or malformed tags are not
+clean reviews and must not satisfy the merge gate.
 
 **Error handling**:
 - Unusable reviewer output: Routes to `rerun_reviewer`.
@@ -146,6 +151,9 @@ The issue lifecycle is governed by a five-state machine persisted in `~/.hermes/
 | Worker crash | `running` row persists after gateway restart | `reset_interrupted_runs()` -> `queued` |
 | Aider timeout | Timeout exception in worker loop | Marked `failed`, retried on next cycle |
 | Review timeout | Tier1/Tier2 exceeds deadline | Marked `failed`, retried |
+| Malformed `kyber-tag` | Reviewer tag missing required fields, invalid JSON, or invalid fingerprint | One bounded rerun, then escalation/failure; never treated as clean |
+| Unresolved review findings | Latest tag for current head SHA has `review_findings` | Create/continue a coding fix task; block merge until fresh clean tag or explicit override |
+| Review churn | More than five review dismissals in one hour | Pause auto-merge and escalate to operator |
 | GitHub API error | `gh` command returns non-zero | Retried once, then `failed` |
 | Guardian unavailable | Connection refused on `11434/v1` | Marked `failed`, logged |
 | Master Epic duplicate | Guardian returns existing issue refs | Reuses existing sub-issues |
@@ -154,12 +162,15 @@ The issue lifecycle is governed by a five-state machine persisted in `~/.hermes/
 ### 3.2 Retry Policy
 
 - Single-flight worker retries `failed` rows after a backoff period.
-- Max retries: Configurable (default: 3).
-- Retry count stored in `attempt_count` field.
-- Next retry time stored in `next_attempt_at`.
+- Max retries: configurable in Hermes Gateway policy (default: 3); this is not currently exposed as a Kyber environment variable.
+- Retry count stored in `issue_runs.attempt_count`.
+- Next retry time stored in `issue_runs.next_attempt_at` as a Unix timestamp.
+- Backoff policy target: exponential with jitter, base delay 60s, maximum delay 3600s.
+- Retry eligibility: workers should claim only rows where `next_attempt_at` is unset or in the past.
 
 ### 3.3 Operator Visibility
 
+- **Queue watchdog**: `scripts/hermes_queue_watchdog.py --output text` reports stale `running` rows, old `queued` rows, queue-depth pressure, WIP-limit violations, recent failures, and KPI proxies from `~/.hermes/issue_resolution.db` without mutating state.
 - **SQLite inspection**: `sqlite3 ~/.hermes/issue_resolution.db 'SELECT * FROM issue_runs ORDER BY id DESC LIMIT 20;'`
 - **Master sub-issues**: `sqlite3 ~/.hermes/issue_resolution.db 'SELECT * FROM master_subissues ORDER BY master_run_id, position;'`
 - **Gateway logs**: All transitions logged with timestamps.

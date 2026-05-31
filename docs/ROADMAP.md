@@ -133,5 +133,5 @@ Kyber orchestrates *projects*, not tools. Aider is the current default execution
 - Remaining hardening:
     - Add per-repo allowlists, cancellation controls, and richer retry policy.
     - Prevent duplicate sub-issue creation when a Master Plan references an already existing GitHub issue such as `#182`.
-    - Harden docs/schema validation around `kyber-tag` parsing so malformed review tags fail closed.
+    - Add runtime fail-closed `kyber-tag` parsing in Hermes after the Kyber schema and docs validation baseline.
     - Target state documented in `docs/ISSUE_TO_MERGE_TARGET_STATE.md` with explicit state machine, routing contracts, failure handling, and runnable checklist.

@@ -33,6 +33,15 @@ schema = json.loads(Path('docs/kyber-tag.jsonschema').read_text(encoding='utf-8'
 if 'required' not in schema or 'next_action' not in schema['required']:
     print('invalid kyber-tag schema: required fields missing')
     sys.exit(1)
+fingerprint_schema = schema.get('properties', {}).get('content_fingerprint', {})
+if fingerprint_schema.get('pattern') != '^[0-9a-f]{16}$':
+    print('invalid kyber-tag schema: content_fingerprint pattern missing')
+    sys.exit(1)
+for example in schema.get('examples', []):
+    fingerprint = example.get('content_fingerprint') if isinstance(example, dict) else None
+    if not isinstance(fingerprint, str) or not re.fullmatch(r'[0-9a-f]{16}', fingerprint):
+        print(f'invalid kyber-tag schema example fingerprint: {fingerprint!r}')
+        sys.exit(1)
 
 md_paths = [
     Path('README.md'),
@@ -82,6 +91,21 @@ if broken:
     for issue in broken:
         print(issue)
     sys.exit(1)
+
+# Keep the persisted issue-run state machine consistent across the core docs.
+state_docs = [
+    Path('docs/GITHUB_ISSUE_RESOLUTION.md'),
+    Path('docs/ARCHITECTURE.md'),
+    Path('docs/ISSUE_TO_MERGE_TARGET_STATE.md'),
+]
+for doc in state_docs:
+    if not doc.exists():
+        continue
+    text = doc.read_text(encoding='utf-8')
+    for state in ['queued', 'running', 'expanded', 'completed', 'failed']:
+        if f'`{state}`' not in text:
+            print(f'{doc}: missing persisted issue-run state `{state}`')
+            sys.exit(1)
 
 print('docs validation: OK')
 PY

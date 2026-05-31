@@ -2,7 +2,18 @@
 
 ## Unreleased
 
+- Reduced Kyber Claude subagent cloud-token pressure by moving the generalist and validation-runner lanes from scarce/pro models to `deepseek/deepseek-v4-flash`, while documenting explicit escalation back to stronger review only for high-risk or repeatedly failing work.
+- Documented OpenRouter review-loop efficiency and rate-limit resilience guardrails: bounded fan-out, duplicate-repost avoidance, diff-size control before model escalation, and capped jittered retry knobs.
+- Added `scripts/hermes_queue_watchdog.py`, a read-only Hermes queue-health and KPI probe for stale `running` rows, old `queued` rows, queue-depth pressure, recent failures, and single-flight WIP-limit violations, plus docs and environment threshold defaults.
+- Clarified the Hermes issue-assignment lane contract: current routing is Aider-only and FIFO single-flight, Master Epics decompose through Guardian before Aider sub-issue execution, and `executing`/`reviewing` are documented as internal sub-states rather than persisted `issue_runs.status` values.
+- Added issue-assignment state-machine coverage to docs validation and captured queue-health, priority/capability routing, review-loop circuit breaker, and fail-closed `kyber-tag` ingestion follow-ups in the TODO list.
+- Tightened Hermes/Aider review routing docs and validation after the PR #309 failure analysis: unresolved `review_findings` now document a blocking merge gate, `kyber-tag` fingerprints require valid lowercase hex, and the Tier1 probe no longer fabricates validation evidence by default.
+- Added `scripts/validate_kyber_tag_schema.py` plus stricter docs validation for `kyber-tag` schema examples.
+- Added two additional general-purpose Claude Code subagents under `.claude/agents/`: `kyber-generalist` for broad implementation tasks and `kyber-codebase-indexer` for lightweight codebase mapping/index refresh.
+- Added five project-scoped Claude Code subagents under `.claude/agents/` for Kyber maintenance lanes: repo scanning, docs sync, validation runs, changelog/TODO maintenance, and issue/PR triage.
+- Added explicit per-subagent model selection (`deepseek/deepseek-v4-flash` or `deepseek/deepseek-v4-pro`) and removed the project-level `CLAUDE_CODE_SUBAGENT_MODEL` override so subagent-level model pinning is honored.
 - Added a daily-gated Aider advisor lane on OpenRouter GPT-5.5 for hard questions, plus status/docs visibility so Hermes knows the advisor can only be used once per day.
+- Added a new Kyber design note for future direct Claude provider/model overrides (`docs/CLAUDE_PROVIDER_OVERRIDES_IDEA.md`), including caveats, rollout guards, and pilot evaluation steps.
 
 ## 2026-05-30
 

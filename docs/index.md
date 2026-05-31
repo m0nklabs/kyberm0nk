@@ -21,7 +21,11 @@ This index maps the current KyberM0nk runtime documentation to the active archit
 - [Contributing](../CONTRIBUTING.md)
 - [Tool Roles](TOOL_ROLES.md)
 
-## P4 Archive and Historical Material
+## P4 Future Options
+
+- [Claude Provider Overrides Idea](CLAUDE_PROVIDER_OVERRIDES_IDEA.md)
+
+## P5 Archive and Historical Material
 
 - [Audit Report](audit-report.md)
 - [Archive Root](../archive/research/2026-05-30/)
@@ -33,6 +37,7 @@ Run:
 ```bash
 scripts/test_quickstart.sh
 scripts/validate_docs.sh
+scripts/validate_kyber_tag_schema.py
 ```
 
 Expected result:

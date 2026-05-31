@@ -31,6 +31,7 @@ build/
 *.code-workspace
 
 # Root-level scratch/history clutter that must not live in the tracked repo.
+/CLAUDE.md.old
 /.aider.chat.history.md
 /.aider.input.history
 /cookie.txt
