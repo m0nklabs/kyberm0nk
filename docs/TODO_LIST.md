@@ -25,7 +25,7 @@
 - [x] Add a Hermes pre-claim git guard that refuses to start CryptoTrader implementation when the workspace is on `master`/`main` or has dirty tracked/untracked implementation files.
 - [x] Add a Hermes Kanban dispatch guard that leaves dirty protected CryptoTrader checkout tasks `ready`, records `managed_dispatch_guarded`, and refuses to claim/spawn them.
 - [x] Add branch naming and PR body requirements to the Hermes issue execution lane: linked issue, validation evidence, risk notes, and review handoff state.
-- [ ] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review comments become concrete same-branch fix work.
+- [x] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review comments become concrete same-branch fix work.
 - [ ] Add automatic merge and issue closure once review returns `ready_for_merge`, required checks pass, and no unresolved review-findings tag remains.
 - [ ] Add audit comments to both GitHub issue and Kanban task at claim, PR open, review requested, review fixed, merge, and closure.
 - [x] Add a periodic CryptoTrader workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.

@@ -21,7 +21,7 @@ priority = impact + urgency + autonomy_multiplier + inverse_complexity
 | 2 | Backlog consolidation and wave plan | TODOs are broad, duplicated, and hard to execute autonomously. | Converts backlog into ranked delivery queue. | Small | Low | Current docs and issues | Kyber | Ranked backlog exists with title, problem, impact, effort, risk, dependencies, owner, acceptance criteria, scores, and waves. | 4 | 5 | 4 | 5 | 18 | 1 |
 | 3 | Hermes pre-claim git guard | Hermes can start implementation from a dirty or protected CryptoTrader checkout. | Blocks bad starts before Aider spends tokens or creates drift. | Medium | Medium | Managed repo guard semantics; Hermes execution lane | Hermes | Implemented in Hermes commit `8310636ab`: CryptoTrader Kanban dispatch leaves dirty protected checkout tasks `ready`, records `managed_dispatch_guarded`, and does not claim/spawn. | 5 | 5 | 5 | 3 | 18 | 1 |
 | 4 | Branch and PR body contract | PRs can lack issue link, validation evidence, risk notes, or review handoff state. | Makes every autonomous PR reviewable and auditable. | Medium | Low | Hermes issue execution lane | Hermes | Implemented in Hermes commit `d2a052a7c`: CryptoTrader issue branches include the repo slug and PR bodies include linked issue/run, branch/base, validation placeholder, risk notes, and review handoff state. | 5 | 4 | 5 | 3 | 17 | 1 |
-| 5 | PR-manager review-findings consumer | `review_findings` can remain advisory text instead of concrete fix work. | Closes the review -> fix loop. | Medium | Medium | Valid `kyber-tag`; PR manager state | Hermes | Current-head `review_findings` creates/continues a same-branch fix task and blocks merge. | 5 | 4 | 5 | 3 | 17 | 2 |
+| 5 | PR-manager review-findings consumer | `review_findings` can remain advisory text instead of concrete fix work. | Closes the review -> fix loop. | Medium | Medium | Valid `kyber-tag`; PR manager state | Hermes | Implemented in Hermes commit `02b09cbc5`: reviewer output with `kyber-tag.state=review_findings` and `next_action=coding_subagent` requeues the same issue run for same-branch coder fixes instead of marking the run complete. | 5 | 4 | 5 | 3 | 17 | 2 |
 | 6 | Pre-merge unresolved findings blocker | A PR could merge while latest current-head tag still has findings. | Protects quality gate integrity. | Medium | Medium | Review tag parser; PR manager | Hermes | Merge path fails closed unless latest current-head tag is clean or explicit override is recorded. | 5 | 4 | 5 | 3 | 17 | 2 |
 | 7 | Runtime fail-closed kyber-tag parser | Malformed reviewer output may be treated as clean or retried wastefully. | Prevents unsafe merge signals and review spend loops. | Medium | Medium | Schema and review ingestion path | Hermes | One bounded rerun for malformed tag, then failed/escalated review state. | 5 | 4 | 4 | 3 | 16 | 2 |
 | 8 | OpenRouter preflight command | Operators lack a compact auth/model/rate-limit sanity check before review runs. | Reduces failed review launches and protects connectivity. | Small | Low | OpenRouter key env/file | Kyber | Command checks auth, model availability, and reports available rate-limit headers without full review. | 4 | 4 | 3 | 4 | 15 | 1 |
@@ -78,7 +78,7 @@ Success metrics:
 
 Goal: close the review/fix loop and surface operational health continuously.
 
-1. PR-manager review-findings consumer.
+1. PR-manager review-findings consumer. (Implemented in Hermes commit `02b09cbc5`.)
 2. Pre-merge unresolved findings blocker.
 3. Runtime fail-closed kyber-tag parser.
 4. Queue watchdog cron/MoniFuse integration.
