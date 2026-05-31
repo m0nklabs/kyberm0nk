@@ -347,6 +347,21 @@ Recommended automation mode:
 scripts/hermes_queue_watchdog.py --fail-on-alert
 ```
 
+For continuous alert/recovery visibility, install the tracked user timer:
+
+```bash
+install -Dm644 configs/hermes/hermes-queue-watchdog.service \
+  ~/.config/systemd/user/hermes-queue-watchdog.service
+install -Dm644 configs/hermes/hermes-queue-watchdog.timer \
+  ~/.config/systemd/user/hermes-queue-watchdog.timer
+systemctl --user daemon-reload
+systemctl --user enable --now hermes-queue-watchdog.timer
+```
+
+The timer runs every five minutes and uses `--emit on-change`, so routine healthy
+checks stay quiet while first alerts and recovery transitions are printed to the
+unit journal and appended to `logs/hermes_queue_watchdog/`.
+
 Alerts are self-improvement triggers. Stale `running` rows should lead to an
 operator-audited requeue/fail decision, queue-depth pressure should trigger
 triage or lane-capability planning, and repeated failures should feed the
@@ -354,9 +369,9 @@ supervisor loop before more retries are spent.
 
 ## Next Hardening
 
-- Integrate the queue-health watchdog with Hermes cron or MoniFuse so stale
-  `running` rows, old `queued` rows, and queue-depth backpressure alert without
-  manual SQLite inspection.
+- Surface Hermes queue watchdog state in MoniFuse if richer dashboard-native alert
+  widgets become necessary; the tracked systemd timer is now the default
+  continuous alert/recovery path.
 - Add priority and capability metadata once Hermes has more than the default Aider
   implementation lane; until then, FIFO remains the safer local-capacity policy.
 - Add review-loop circuit breakers so repeated `review_findings` ->

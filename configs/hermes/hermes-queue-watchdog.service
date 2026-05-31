@@ -1,0 +1,8 @@
+[Unit]
+Description=KyberM0nk Hermes Queue Watchdog
+Documentation=file:/home/flip/kyberm0nk/docs/GITHUB_ISSUE_RESOLUTION.md
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/flip/kyberm0nk
+ExecStart=/home/flip/kyberm0nk/.venv/kyberm0nk/bin/python /home/flip/kyberm0nk/scripts/hermes_queue_watchdog.py --output text --emit on-change

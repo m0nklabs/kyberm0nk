@@ -21,6 +21,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DB_PATH = Path("~/.hermes/issue_resolution.db")
 DEFAULT_LOG_PATH = REPO_ROOT / "logs" / "hermes_queue_watchdog" / "hermes_queue_watchdog.jsonl"
+DEFAULT_STATE_PATH = REPO_ROOT / "logs" / "hermes_queue_watchdog" / "last_state.json"
 DEFAULT_RUNNING_STALE_SECONDS = 2 * 60 * 60
 DEFAULT_QUEUED_STALE_SECONDS = 60 * 60
 DEFAULT_QUEUE_DEPTH_THRESHOLD = 5
@@ -83,7 +84,9 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--now", type=int, help="Unix timestamp override for deterministic checks.")
     parser.add_argument("--log-path", type=Path, default=DEFAULT_LOG_PATH, help="Optional JSONL log path.")
+    parser.add_argument("--state-path", type=Path, default=DEFAULT_STATE_PATH, help="Alert state file for change-only output.")
     parser.add_argument("--no-log", action="store_true", help="Do not append the JSONL watchdog log.")
+    parser.add_argument("--emit", choices=("always", "on-change", "alerts"), default="always", help="Control when output is printed.")
     parser.add_argument("--fail-on-alert", action="store_true", help="Exit non-zero when alerts are present.")
     parser.add_argument("--output", choices=("text", "json"), default="json", help="Output format.")
     return parser.parse_args()
@@ -359,6 +362,45 @@ def append_log(path: Path, payload: dict[str, Any]) -> None:
         handle.write(json.dumps(payload, sort_keys=True) + "\n")
 
 
+def alert_fingerprint(record: dict[str, Any]) -> dict[str, Any]:
+    """Return the stable state used for alert/recovery change detection."""
+    alerts = record.get("alerts", [])
+    return {
+        "status": record.get("status"),
+        "alerts": sorted(
+            (
+                {
+                    "type": alert.get("type"),
+                    "severity": alert.get("severity"),
+                    "count": alert.get("count"),
+                }
+                for alert in alerts
+            ),
+            key=lambda alert: (alert.get("severity") or "", alert.get("type") or ""),
+        ),
+    }
+
+
+def should_emit(record: dict[str, Any], args: argparse.Namespace) -> bool:
+    """Return true when the selected emission policy should print output."""
+    if args.emit == "always":
+        return True
+    if args.emit == "alerts":
+        return bool(record.get("alerts"))
+
+    current = alert_fingerprint(record)
+    state_path = args.state_path
+    previous: dict[str, Any] | None = None
+    if state_path.exists():
+        try:
+            previous = json.loads(state_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            previous = None
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(json.dumps(current, sort_keys=True), encoding="utf-8")
+    return current != previous and (bool(current.get("alerts")) or previous is not None)
+
+
 def render_text(record: dict[str, Any]) -> str:
     """Render concise text output for operators."""
     lines = [
@@ -421,10 +463,11 @@ def main() -> int:
     if not args.no_log:
         append_log(args.log_path, record)
 
-    if args.output == "json":
-        print(json.dumps(record, indent=2, sort_keys=True))
-    else:
-        print(render_text(record))
+    if should_emit(record, args):
+        if args.output == "json":
+            print(json.dumps(record, indent=2, sort_keys=True))
+        else:
+            print(render_text(record))
 
     if args.fail_on_alert and record.get("alerts"):
         return 1
