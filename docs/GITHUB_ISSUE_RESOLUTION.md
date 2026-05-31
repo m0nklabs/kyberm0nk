@@ -50,6 +50,19 @@ The implementation lives in Hermes:
   same `/issue` lane.
 - `hermes_cli/commands.py`: command registry entry for gateway `/issue`.
 
+## Repository Allowlist
+
+Hermes issue automation is repo-scoped. By default, the issue lane only runs for
+the controlled CryptoTrader playground, `m0nklabs/cryptotrader`. Operators can
+add repositories explicitly with the comma-separated environment variable:
+
+```bash
+HERMES_ISSUE_ALLOWED_REPOS=m0nklabs/cryptotrader,owner/other-repo
+```
+
+The allowlist is enforced before issue metadata is loaded, so unconfigured repos
+cannot start webhook, CLI, or direct queue execution by accident.
+
 ## Manual Trigger
 
 ```bash
@@ -321,6 +334,7 @@ OPENAI_API_KEY=$OPENROUTER_API_KEY \
 ## Current Scope
 
 - Runs as a headless Hermes Gateway automation lane.
+- Enforces `HERMES_ISSUE_ALLOWED_REPOS`, defaulting to `m0nklabs/cryptotrader`.
 - Creates/checks out an `issue/<number>-<slug>` branch.
 - Detects Master Epics via `master-plan` label or `# Master Project Plan` body.
 - Decomposes Master Epics through Guardian.

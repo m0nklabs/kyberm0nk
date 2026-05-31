@@ -73,7 +73,8 @@
 - [x] Reframe `/issue` documentation as a headless Hermes Gateway daemon lane rather than an editor-driven workflow.
 - [x] Reframe the Kyber roadmap so only Hermes, Aider, and Guardian are committed runtime components; all other agentic frameworks are evaluation candidates.
 - [x] Add duplicate suppression for crash windows between GitHub sub-issue creation and SQLite persistence, including Master Plan references to existing issues such as `#182`.
-- [ ] Add per-repo allowlists and cancellation controls.
+- [x] Add per-repo allowlist controls for Hermes issue automation.
+- [ ] Add operator cancellation controls for queued/running issue automation.
 - [ ] Expand reviewer output into multiple anchored inline comments.
 - [x] Add a pre-merge blocker for unresolved `review_findings` tags by requiring current-head `ready_for_merge` before merge eligibility; explicit operator override path and audit trail remain part of automatic merge/closure hardening.
 
