@@ -34,6 +34,11 @@ If no issue exists yet, keep the commit message focused and create a follow-up i
 
 ## PR Policy
 
+Downstream project rule: Kyber-managed projects are not edited directly on their
+default or protected branches. Any implementation change outside the KyberM0nk
+framework scope must use a dedicated branch and a GitHub PR. When the change is
+triggered by a GitHub issue, the PR must mention and link that source issue.
+
 PR title format:
 
 ```text

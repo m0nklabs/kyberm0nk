@@ -37,9 +37,10 @@ The lane has five headless execution layers:
 4. **Single-flight worker**: `_issue_queue_worker()` claims the oldest queued
    run and processes exactly one local Aider/Guardian job at a time.
 5. **Review layer**: successful coder runs open or find a PR, then invoke the
-  tiered reviewer lane through OpenRouter. Tier1 is the fast reviewer and
-  Tier2 is the stronger reviewer. Reviewer comments emit machine-readable
-  `kyber-tag` blocks so the PR manager can route the next action.
+  tiered reviewer lane. Tier1 is the fast OpenRouter reviewer, Tier2 is the
+  local Guardian reviewer, and Tier3 is the stronger OpenRouter escalation
+  reviewer. Reviewer comments emit machine-readable `kyber-tag` blocks and
+  `suggestions_count` telemetry so the PR manager can route the next action.
 
 The implementation lives in Hermes:
 
@@ -63,10 +64,44 @@ HERMES_ISSUE_ALLOWED_REPOS=m0nklabs/cryptotrader,owner/other-repo
 The allowlist is enforced before issue metadata is loaded, so unconfigured repos
 cannot start webhook, CLI, or direct queue execution by accident.
 
+## Managed Project PR Discipline
+
+CryptoTrader is a Kyber-managed downstream project. Hermes must never leave
+direct implementation changes on its `master` or `main` checkout. All
+implementation work outside the KyberM0nk framework scope must follow the
+branch -> PR -> review flow.
+
+For issue-driven work, the PR must mention and link the source issue. The Hermes
+issue lane enforces this in three places:
+
+1. Before coder dispatch, managed checkouts on protected branches are blocked
+  when tracked or untracked implementation drift is present.
+2. The local coder prompt explicitly forbids switching to `main`, `master`, or
+  unrelated branches and requires PR-only handoff.
+3. After coder execution and before push/PR creation, Hermes verifies that the
+  checkout is still on the expected issue branch and has no uncommitted
+  implementation drift outside allowed local tool noise.
+
 ## Manual Trigger
 
+On this host, manual CryptoTrader issue-lane work must target the isolated
+Hermes sandbox checkout at `./cryptotrader_hermes` (absolute path
+`/home/flip/cryptotrader_hermes`). The active Hermes test stack uses the 51k
+port range:
+
+- Backend health/API: `http://127.0.0.1:51000/health`
+- Frontend: `http://127.0.0.1:51176`
+- Legacy helper API: `http://127.0.0.1:51787`
+
 ```bash
-/issue m0nklabs/cryptotrader 10 --workdir /home/flip/cryptotrader
+/issue m0nklabs/cryptotrader 10 --workdir ./cryptotrader_hermes
+```
+
+To link the issue run back to a Hermes Kanban task, pass the task id and, when
+needed, the board slug explicitly:
+
+```bash
+/issue m0nklabs/cryptotrader 10 --workdir ./cryptotrader_hermes --kanban-task t_abc123 --kanban-board production
 ```
 
 The gateway stores the request, starts the worker if needed, and returns a queued
@@ -78,6 +113,15 @@ connected.
 Local coder execution is strict single-flight. If another issue is already in
 the local Aider/Guardian lane, the new run stays queued in SQLite until the
 current run finishes.
+
+When a run carries `--kanban-task`, Hermes writes task-level audit events for
+issue claim, PR open/reuse, review request, review-fix routing, merge blocking,
+merge start, PR merge, issue closure, run completion, cancellation, and terminal
+failure. Human-facing Kanban comments are reserved for significant milestones
+such as PR open/reuse, review-fix routing, merge blocking, PR merge, issue
+closure, cancellation, and failure. After a `ready_for_merge` PR is merged and
+the linked GitHub issue is closed, the linked Kanban task is completed with the
+existing `done` state; Hermes does not add a separate `closed` Kanban status.
 
 ## Master Epic Detection
 
@@ -218,6 +262,11 @@ Duplicate submission protection is status-aware. `find_incomplete_run()` reuses
 an existing `queued`, `running`, or `expanded` run for the same repo and issue
 instead of inserting a second active row.
 
+Current live CryptoTrader operations run in a temporary manual gatekeeper mode.
+The historical automatic-merge completion path still exists in Hermes docs and
+code history, but the live flow now pauses at PR readiness and waits for an
+explicit operator merge after the GitHub PR comment + Telegram notification.
+
 ### `master_subissues`
 
 `master_subissues` records the generated task position, title, body, and GitHub
@@ -252,19 +301,22 @@ Issue-to-PR handoff before review is explicit:
 1. Hermes triages a new issue and routes it to the local coding-agent lane.
 2. The coding agent opens or reuses a PR branch and resolves the issue inside that PR.
 3. After local checks pass, the coding agent marks the PR `ready_for_review`.
-4. Only then does the PR review loop start (Tier1 -> Tier2 -> `kyber-tag` routing).
+4. Only then does the PR review loop start (Tier1 -> Tier2 -> optional Tier3 -> `kyber-tag` routing).
 
-- Tier1 reviewer posts findings immediately when it sees a high-signal issue.
-- If Tier1 is clean, Tier2 reviewer re-checks with a stronger model.
-- Reviewer comments include a `kyber-tag` block that the PR manager parses.
+- Tier1 reviewer uses OpenRouter `deepseek/deepseek-v4-flash` and posts findings immediately when it sees a high-signal issue.
+- If Tier1 is clean, Tier2 reviewer uses Guardian `gemma4-26b-a4b` for local deep review.
+- Tier3 reviewer uses OpenRouter `deepseek/deepseek-v4-pro` only for inconclusive or escalated review states.
+- Reviewer comments include a `kyber-tag` block plus `review_tier`, `suggestions_count`, and `source` lines that the PR manager parses.
+- Existing Copilot/code-quality inline review comments are treated as actionable suggestion signals when they are attached to changed lines, even when they do not include GitHub suggestion fences.
 
 Canonical next-action routing:
 
 | Review result | `kyber-tag.state` | `kyber-tag.next_action` | Gate effect |
 | --- | --- | --- | --- |
 | Findings posted | `review_findings` | `coding_subagent` | Blocking: PR must not merge until a follow-up commit addresses findings and a later review returns clean, or an operator applies an explicit merge override. |
-| No issues after Tier2 | `ready_for_merge` | `ready_for_merge` | Automatically mergeable only when the reviewed head matches the live PR head, the live PR is open/non-draft, GitHub reports `mergeStateStatus=CLEAN`, and no unresolved `review_findings` tag remains. |
-| Reviewer output unusable | `review_inconclusive` | `rerun_reviewer` | Blocking until one bounded rerun succeeds; repeated inconclusive output escalates to an operator instead of being treated as clean. |
+| No issues after Tier1 | `ready_for_merge` | `tier2_review` | Non-terminal: Tier2 must re-check before merge readiness. |
+| No issues after Tier2 or highest active tier | `ready_for_merge` | `ready_for_merge` | Posts the exact audit comment `Ready for merge`; in the current manual gatekeeper mode Hermes then leaves a prominent PR comment + Telegram ping and pauses for operator merge instead of merging autonomously. |
+| Reviewer output unusable | `review_inconclusive` | `tier2_review` or `tier3_review` | Blocking until the next tier succeeds; repeated inconclusive output escalates to an operator instead of being treated as clean. |
 
 The PR manager must treat review tags as durable state, not advisory prose. A tag
 with `state=review_findings` remains open while the PR head SHA matches the tag's
@@ -295,17 +347,19 @@ Hermes now writes compact GitHub audit notes on the externally visible issue-to-
 - PR comment when cloud review is requested, including the reviewed head SHA;
 - PR comment when reviewer findings are routed back to same-branch coding;
 - PR comment when the review-loop circuit breaker trips;
-- PR comment when automatic merge starts at the reviewed head SHA;
-- PR comment when Hermes merges the PR;
+- PR comment when a PR becomes ready for manual merge at the reviewed head SHA;
+- PR comment when Hermes records the parsed routing state and pauses for operator merge;
 - issue comment when Hermes records the merged PR and starts linked issue closure;
 - issue close comment when Hermes closes the linked issue after merge;
-- PR comment when review completes and records the parsed routing state plus merge/closure outcome.
+- Telegram notification when the PR reaches the manual merge gate with green review + validation state.
 
 These comments make the daemon path inspectable from GitHub without reading the local SQLite database. Kanban task audit comments remain the remaining task-level audit hardening item for claim, PR open/reuse, review-fixed, merge, issue-closure, and done/closed transitions.
 
-## Automatic Merge and Closure
+## Manual Gatekeeper Mode (Current)
 
-When the PR manager sees a current-head reviewer tag with `state=ready_for_merge` and `next_action=ready_for_merge`, it verifies that the reviewed `head_ref_oid` still matches the live PR head, the PR is open and non-draft, and GitHub reports `mergeStateStatus=CLEAN`. If all gates pass, Hermes squash-merges the PR with branch deletion, records PR and issue audit comments, explicitly closes the linked issue, then marks the issue run `completed`.
+When the PR manager sees a current-head reviewer tag with `state=ready_for_merge` and `next_action=ready_for_merge`, it still verifies that the reviewed `head_ref_oid` matches the live PR head, the PR is open and non-draft, GitHub reports `mergeStateStatus=CLEAN`, and the current PR checks are green. If those gates pass, Hermes leaves a prominent GitHub PR comment, emits a Telegram notification through the gateway, and pauses.
+
+Automatic merge is hard-disabled in the current CryptoTrader flow, even if older scripts or env knobs still mention opt-in auto-merge flags. Flip reviews the diff and merges manually after the ready notification.
 
 If any gate fails, Hermes leaves the run unmerged, records a blocking audit note, and fails closed through the review safety-gate path. Operator overrides must be explicit and auditable.
 
@@ -350,6 +404,14 @@ overrides, dry-run mode, size limits).
 Tier2 reviewer:
 
 ```bash
+OPENAI_API_BASE=http://127.0.0.1:11434/v1 \
+OPENAI_API_KEY=$AIDER_GUARDIAN_API_KEY \
+/home/flip/aider/.venv/bin/aider --model openai/gemma4-26b-a4b --cache-prompts --no-auto-commits --yes --no-gitignore --message "$PROMPT"
+```
+
+Tier3 reviewer:
+
+```bash
 OPENROUTER_API_KEY=$OPENROUTER_API_KEY \
 OPENAI_API_KEY=$OPENROUTER_API_KEY \
 /home/flip/aider/.venv/bin/aider --model openrouter/deepseek/deepseek-v4-pro --cache-prompts --no-auto-commits --yes --no-gitignore --message "$PROMPT"
@@ -371,14 +433,15 @@ OPENAI_API_KEY=$OPENROUTER_API_KEY \
 - Runs local Aider against Guardian.
 - Pushes the branch.
 - Opens or finds a GitHub PR.
-- Runs tiered cloud Aider reviewers against OpenRouter.
-- Emits machine-readable `kyber-tag` review routing comments for the PR manager.
+- Runs tiered Aider reviewers across OpenRouter Tier1, Guardian Tier2, and OpenRouter Tier3 escalation.
+- Emits machine-readable `kyber-tag`, `review_tier`, `suggestions_count`, and `source` review routing comments for the PR manager.
+- Counts actionable internal and Copilot/code-quality inline review comments as suggestion signals for coder routing.
 - Posts reviewer feedback as an inline PR comment when a diff anchor is found,
   otherwise as a normal PR comment.
 - Blocks automatic merge unless the latest parsed reviewer tag is current-head `ready_for_merge` with `next_action=ready_for_merge`.
 - Verifies the live PR is open, non-draft, still on the reviewed head, and `mergeStateStatus=CLEAN` before merge.
-- Automatically squash-merges eligible PRs and deletes the issue branch.
-- Explicitly closes the linked issue after successful merge.
+- Keeps PR-manager auto-merge disabled unless `HERMES_ISSUE_AUTO_MERGE_ENABLED=1` is explicitly set.
+- When explicitly enabled, automatically squash-merges eligible PRs, deletes the issue branch, and closes the linked issue after successful merge.
 - Emits merge and issue-closure lifecycle audit comments.
 
 ## Queue Health Watchdog

@@ -25,6 +25,7 @@ resolve_python_bin() {
 
   for candidate in \
     "${HOME}/crewai/bin/python" \
+    "${REPO_ROOT}/.venv/kyberm0nk/bin/python" \
     "${REPO_ROOT}/.venv/crewai/bin/python" \
     "$(command -v python3 2>/dev/null || true)"
   do

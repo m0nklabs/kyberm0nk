@@ -11,6 +11,7 @@
     "source",
     "tier",
     "model",
+    "suggestions_count",
     "content_fingerprint"
   ],
   "properties": {
@@ -32,7 +33,7 @@
     },
     "tier": {
       "type": "string",
-      "enum": ["tier1", "tier2"],
+      "enum": ["tier1", "tier2", "tier3"],
       "description": "Review tier that produced the tag."
     },
     "model": {
@@ -47,15 +48,21 @@
         "ready_for_merge",
         "tier1_review",
         "tier2_review",
+        "tier3_review",
         "rerun_reviewer"
       ],
       "description": "Routing instruction: what should happen next in the PR lifecycle."
+    },
+    "suggestions_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Actionable internal plus Copilot/code-quality suggestion count observed by the reviewer pass."
     },
     "state": {
       "type": "string",
       "enum": [
         "review_findings",
-        "review_clean",
+        "ready_for_merge",
         "review_inconclusive"
       ],
       "description": "Outcome state of this review pass."
@@ -68,6 +75,7 @@
       "pr": 309,
       "tier": "tier1",
       "model": "openrouter/deepseek/deepseek-v4-flash",
+      "suggestions_count": 2,
       "next_action": "coding_subagent",
       "state": "review_findings"
     },
@@ -76,9 +84,10 @@
       "source": "aider-reviewer",
       "pr": 309,
       "tier": "tier2",
-      "model": "openrouter/deepseek/deepseek-v4-pro",
+      "model": "openai/gemma4-26b-a4b",
+      "suggestions_count": 0,
       "next_action": "ready_for_merge",
-      "state": "review_clean"
+      "state": "ready_for_merge"
     }
   ]
 }

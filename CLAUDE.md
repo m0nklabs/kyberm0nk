@@ -16,6 +16,7 @@ Claude Code is the operator's high-trust tool for repo work, review, and orchest
 - **English only** for code, docs, commits, issues, and PRs.
 - **Never edit Guardian model config** (`~/llama_cpp_guardian/config/models.yaml`) unless the operator explicitly asks.
 - **Framework stewardship**: Kyber manages frameworks — their runtimes, wrappers, prompts, MCP wiring, safety rails, and autonomy settings. Do not use Kyber sessions to manually do the downstream domain work those frameworks are supposed to handle. Validate framework behavior with bounded tests and dry-runs, then let the framework run its own loop.
+- **Downstream PR discipline**: Any implementation change outside the KyberM0nk framework scope, including CryptoTrader, must happen on a dedicated branch and be submitted through a GitHub PR. Never leave direct local implementation drift on a managed project's default/protected branch. If work is triggered by an issue, the PR must mention and link that issue.
 
 ## Runtime / Model Routing
 

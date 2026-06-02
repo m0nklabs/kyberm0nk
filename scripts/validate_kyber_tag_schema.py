@@ -15,6 +15,7 @@ REQUIRED_FIELDS = {
     "source",
     "tier",
     "model",
+    "suggestions_count",
     "content_fingerprint",
 }
 FINGERPRINT_RE = re.compile(r"^[0-9a-f]{16}$")
@@ -53,6 +54,10 @@ def validate_example(schema: dict, example: object, index: int) -> str | None:
         if not isinstance(value, str) or not value.strip():
             return f"example {index} has empty {field}"
 
+    suggestions_count = example.get("suggestions_count")
+    if not isinstance(suggestions_count, int) or suggestions_count < 0:
+        return f"example {index} has invalid suggestions_count: {suggestions_count!r}"
+
     return None
 
 
@@ -75,9 +80,13 @@ def main() -> int:
     allowed_pairs = {
         ("review_findings", "coding_subagent"),
         ("review_clean", "ready_for_merge"),
+        ("ready_for_merge", "ready_for_merge"),
         ("review_inconclusive", "rerun_reviewer"),
+        ("review_inconclusive", "tier2_review"),
+        ("review_inconclusive", "tier3_review"),
         ("review_findings", "tier1_review"),
         ("review_clean", "tier2_review"),
+        ("ready_for_merge", "tier2_review"),
     }
     examples = schema.get("examples", [])
     if not examples:

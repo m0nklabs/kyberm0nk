@@ -17,6 +17,7 @@ KyberM0nk is a local agentic coding cockpit. It coordinates host-native coding f
 - Do not hardcode secrets. Use `.env` and document required variables in `.env.example`.
 - Do not mount the Docker socket unless a task explicitly requires it and the risk is documented.
 - Project documentation, code comments, and commits must be in English.
+- Downstream project PR discipline is mandatory: any implementation change outside the KyberM0nk framework scope, including CryptoTrader, must happen on a dedicated branch and be submitted through a GitHub PR. Never leave direct local implementation drift on a managed project's default/protected branch. If the work is triggered by an issue, the PR must mention and link that issue.
 
 ## Framework Stewardship
 

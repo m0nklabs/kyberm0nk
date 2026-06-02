@@ -3,7 +3,7 @@
 
 This script is intentionally read-only. It fails when a managed repository is on
 its protected branch with local implementation drift, because Kyber/Hermes work
-must flow through issue -> feature branch -> PR -> review -> merge.
+must flow through issue -> feature branch -> PR -> review -> manual merge.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from typing import Any
 DEFAULT_MANAGED_REPOS = [
     {
         "name": "CryptoTrader",
-        "path": "/home/flip/cryptotrader",
+        "path": "/home/flip/cryptotrader_hermes",
         "remote": "m0nklabs/cryptotrader",
         "protected_branches": ["master", "main"],
         "allowed_dirty_prefixes": [
