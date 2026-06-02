@@ -2,7 +2,31 @@
 
 KyberM0nk is a project orchestration system that matures repositories from their current state into production-ready projects. It runs on bare-metal host resources, coordinates headless daemons and CLI workers, and uses GitHub issues and PRs as the primary coordination mechanism.
 
-Cryptotrader is the active testing playground — the same process that matures cryptotrader will mature any project.
+CryptoTrader is the active testing playground — the same process that matures CryptoTrader must remain reusable for any project.
+
+## Structural Hierarchy
+
+- **KyberM0nk** is the multi-agent orchestration system and operator control plane.
+- **Hermes Agent** is the generic motor that must stay repository-agnostic.
+- **GitHub** is the middle-layer contract for issue intake, branch state, PR review, and merge coordination.
+- **Target repositories** are downstream products. CryptoTrader is the current target; future targets can be unrelated repositories.
+
+## Three-Phase Program
+
+### Phase 1 - Framework & Gatekeeper Stabilization (Completed / Ongoing)
+- Make the generic Hermes coding, review, and gatekeeper loops deterministic, bounded, and reusable.
+- Remove target-repository hardcoding from the Hermes engine so project onboarding remains configuration-driven.
+- Keep Guardian, reviewer routing, and branch/PR discipline stable before scaling outward.
+
+### Phase 2 - CryptoTrader Success Story (Current Focus)
+- Use GitHub as the middle-layer to drive CryptoTrader toward a fully green, stable, bug-free state.
+- Treat CryptoTrader as the proof that the Kyber -> Hermes -> GitHub -> target-repo chain works end to end.
+- Keep target-repository logic in the target repo or operator config, never embedded as Hermes engine hardcoding.
+
+### Phase 3 - Multi-Repo Scaling (Future)
+- Plug additional unrelated GitHub repositories into the same generic control chain.
+- Reuse the same issue, PR, review, and merge governance with target-specific configuration only.
+- Expand lanes only after the generic chain is proven clean and stable on CryptoTrader.
 
 ## Current Committed Stack
 

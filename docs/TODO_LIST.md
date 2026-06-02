@@ -1,5 +1,22 @@
 # TODO List
 
+## 2026-06-02 Generic Architecture & Multi-Repo Scaling
+
+- [x] Formalize the KyberM0nk -> Hermes -> GitHub -> target-repository hierarchy in the front-door workspace docs.
+- [x] Document the three-phase program: framework stabilization, CryptoTrader success story, and multi-repo scaling.
+- [x] Keep the roadmap language explicit that Hermes must stay repository-agnostic and that target-specific behavior belongs in configuration or downstream repos.
+
+## 2026-06-02 Manual Merge Gatekeeper Mode
+
+- [x] Disable CryptoTrader Mergify auto-merge actions and convert them into manual-ready candidate marking only.
+- [x] Disable local Hermes/CryptoTrader merge calls in the dependency autopilot and PR result-sync paths.
+- [x] Add a prominent ready-for-manual-merge PR notification path that also pings Telegram through the existing `pr-result-sync` delivery lane.
+
+## 2026-06-02 Hermes 51k Sandbox Finalization
+
+- [x] Update Kyber operator docs so manual CryptoTrader issue-lane examples target `./cryptotrader_hermes` and the 51k sandbox port range.
+- [x] Smoke-test the installed `ct-backend-hermes.service` and `ct-frontend-hermes.service` units on the Hermes 51k stack, then return them to standby.
+
 ## 2026-05-31 Kyber Claude Code Subagents
 
 - [x] Add a read-only repo scanner Claude subagent for easy maintenance candidate discovery.
@@ -22,14 +39,17 @@
 
 - [x] Establish the hard rule that CryptoTrader implementation work must use branch -> PR -> review -> merge, never direct `master`/`main` edits.
 - [x] Recover existing CryptoTrader local working-tree drift onto a feature branch and PR for review instead of leaving it on `master`.
+- [x] Recover the 2026-06-01 CryptoTrader local drift into PR #325 and restore the local `master` checkout to `origin/master`.
 - [x] Add a Hermes pre-claim git guard that refuses to start CryptoTrader implementation when the workspace is on `master`/`main` or has dirty tracked/untracked implementation files.
+- [x] Add a Hermes post-coder branch/dirty-state guard that refuses to push or open a PR unless coder output is still on the expected issue branch with no local-only implementation drift.
 - [x] Add a Hermes Kanban dispatch guard that leaves dirty protected CryptoTrader checkout tasks `ready`, records `managed_dispatch_guarded`, and refuses to claim/spawn them.
 - [x] Add branch naming and PR body requirements to the Hermes issue execution lane: linked issue, validation evidence, risk notes, and review handoff state.
 - [x] Add a PR-manager consumer for `kyber-tag.state=review_findings` + `next_action=coding_subagent` so review comments become concrete same-branch fix work.
+- [x] Add tiered PR-manager routing: Tier1 OpenRouter flash review, Tier2 Guardian local review, Tier3 OpenRouter pro escalation, Copilot/code-quality suggestion detection, and exact `Ready for merge` audit comments after Tier2/highest clean review.
 - [x] Add a current-head pre-merge blocker so stale `ready_for_merge` tags or unresolved `review_findings` tags cannot authorize merge.
 - [x] Add automatic merge and issue closure once review returns `ready_for_merge`, required checks pass, and no unresolved review-findings tag remains. Implemented in Hermes fork commit `bf542e744`.
 - [x] Add GitHub issue/PR audit comments at issue claim, PR open/reuse, review requested, review findings routed to same-branch coding, review-loop circuit breaker, review completion, automatic merge, and issue closure.
-- [ ] Add Kanban task audit comments for claim, PR open, review fixed, merge, and closure transitions.
+- [x] Add Kanban task audit comments/events for claim, PR open/reuse, review requested, review-fix routing, merge, issue closure, cancellation/failure, and terminal done-state closure. Implemented in Hermes fork local changes pending commit/push.
 - [x] Add a periodic CryptoTrader workspace drift watchdog that reports any dirty `master`/`main` checkout as a pipeline violation.
 
 ## 2026-05-31 OpenRouter Token Efficiency Hardening
@@ -75,7 +95,8 @@
 - [x] Add duplicate suppression for crash windows between GitHub sub-issue creation and SQLite persistence, including Master Plan references to existing issues such as `#182`.
 - [x] Add per-repo allowlist controls for Hermes issue automation.
 - [x] Add operator cancellation controls for queued/running issue automation.
-- [ ] Expand reviewer output into multiple anchored inline comments.
+- [x] Expand reviewer output into multiple anchored inline comments; live CryptoTrader reviewer now posts GitHub inline review threads first and refuses body-only `review_findings` fallbacks.
+- [x] Temporarily disable Hermes issue PR-manager, result-sync, and autopilot auto-merge defaults while review quality and posting style are being tuned; explicit env opt-in is required to re-enable auto-merge.
 - [x] Add a pre-merge blocker for unresolved `review_findings` tags by requiring current-head `ready_for_merge` before merge eligibility; automatic merge/closure now records merge and issue-closure audit trail events.
 
 ## Hermes Enhancement Backlog

@@ -4,9 +4,22 @@ Project orchestration and maturity system powered by Hermes and agentic framewor
 
 KyberM0nk is a project orchestrator that matures repositories from their current state into production-ready projects. It uses GitHub issues and PRs as the primary coordination mechanism, with Hermes as the orchestration brain and agentic frameworks (currently Aider, expandable to others) as the execution workers.
 
-Cryptotrader is the active testing playground — Kyber matures it through the same processes it will use for any project.
+CryptoTrader is the active Phase 2 proving ground. Kyber matures it through the same generic process the stack must eventually use for unrelated repositories.
 
 Claude Code is now treated as the primary host-native operator tool on this server, with its tracked home under `/home/flip/claudecode`. Kyber remains the broader lab for local supporting workers, orchestration, and sandboxed tooling.
+
+## System Hierarchy
+
+- **KyberM0nk (the system)** orchestrates the stack, chooses the active target repo, and owns the cross-repo operating model.
+- **Hermes Agent (the motor)** is the generic automation engine. Hermes must stay repository-agnostic and reusable across multiple target projects.
+- **GitHub (the middle layer)** is the coordination surface for issues, branches, PRs, reviews, and merge state.
+- **Target repositories (the products)** are the downstream codebases being improved. Today that is CryptoTrader; later it can be any other GitHub project.
+
+## Current Program Phases
+
+1. **Phase 1: Framework & Gatekeeper Stabilization** — completed/ongoing hardening of the generic Hermes review, coding, and guardrail loops.
+2. **Phase 2: CryptoTrader Success Story** — current focus on making CryptoTrader fully green through the Kyber -> Hermes -> GitHub -> target-repo chain.
+3. **Phase 3: Multi-Repo Scaling** — future expansion where the same generic framework is pointed at additional unrelated repositories.
 
 ## Core Idea
 
@@ -18,7 +31,7 @@ KyberM0nk takes a project and matures it through a structured lifecycle:
 4. **Review** — tiered review with `kyber-tag` routing ensures quality gates.
 5. **Repeat** — continuous maturity loop until the project is production-ready.
 
-Each project goes through the same cycle. Cryptotrader is the active testing playground: Kyber matures it through all phases, and the patterns proved there apply to any project.
+Each project goes through the same cycle. CryptoTrader is the current proving ground: Kyber matures it through all phases, and the patterns proved there must remain reusable for any project.
 
 - Claude Code stays host-native and out of Docker.
 - Guardian and `llama-server` stay outside Docker.
@@ -68,9 +81,9 @@ Kyber's production workflow matures a project through GitHub issues and PRs. The
 7. Review comments are posted as anchored GitHub feedback plus a machine-readable `kyber-tag` block.
 8. If review returns `coding_subagent`, Hermes addresses the comments on the same branch and pushes fixes.
 9. If review returns `rerun_reviewer`, Hermes reruns the bounded review lane without changing routing/auth.
-10. If review returns `ready_for_merge`, Hermes merges the PR, closes the issue, and marks the Kanban task done.
+10. If review returns `ready_for_merge`, Hermes posts a ready-for-manual-merge PR comment and Telegram ping; Flip reviews the diff and merges manually.
 
-Routine implementation must therefore follow: **issue intake → feature branch → PR → multi-round review → fix loop → merge → issue closure → Kanban done**, with zero manual intervention unless Hermes reports a blocker.
+Routine implementation must therefore follow: **issue intake → feature branch → PR → multi-round review → fix loop → manual merge gatekeeper notification → operator merge → issue closure → Kanban done**, with zero manual intervention until the explicit operator merge gate.
 
 GitHub Copilot mentions are intentionally excluded from PR and issue automation.
 
