@@ -119,13 +119,35 @@ Kyber orchestrates *projects*, not tools. Aider is the current default execution
   issue-to-merge pipeline.
 - Target flow:
     1. GitHub issue is created manually or by Hermes/Kanban.
-    2. Hermes claims the highest-priority eligible issue and creates a feature branch.
-    3. Hermes/Aider implements on that branch only; direct CryptoTrader `master`/`main` work is forbidden.
-    4. Hermes opens a PR with summary, validation evidence, linked issue, and risk notes.
-    5. Kyber review runs multi-round review and posts anchored findings plus `kyber-tag` routing.
-    6. Hermes addresses review comments on the same branch and reruns review until clean or blocked.
-    7. Hermes merges the PR after `ready_for_merge`, passing checks, and no unresolved review-findings tag.
-    8. Hermes closes the issue and marks the Kanban task done.
+    2. Hermes PR-manager detects the issue and assigns it to the issue resolution lane.
+    3. **Aider Researcher** analyzes the issue scope, researches affected files, and creates a detailed implementation plan PR documenting the approach, affected components, and solution strategy.
+    4. Hermes claims the highest-priority eligible issue and creates a feature branch.
+    5. **Aider Coder** reads the issue and the researcher's plan, then designs its own implementation strategy. The Coder writes the actual code changes needed to resolve the issue — new functions, bug fixes, refactors, test additions — commits each logical change separately with descriptive messages, and posts a summary comment explaining what was implemented and how it solves the issue.
+    6. Hermes/Aider implements on that branch only; direct CryptoTrader `master`/`main` work is forbidden.
+    7. Hermes opens a PR with summary, validation evidence, linked issue, and risk notes.
+    8. Kyber review runs multi-round review and posts anchored findings plus `kyber-tag` routing.
+    9. Hermes addresses review comments on the same branch and reruns review until clean or blocked.
+    10. Hermes merges the PR after `ready_for_merge`, passing checks, and no unresolved review-findings tag.
+    11. Hermes closes the issue and marks the Kanban task done.
+- Agent accountability: Every GitHub interaction (issue, PR, commit, comment) carries explicit co-author attribution showing which agent (researcher, coder, reviewer), model, and tier performed the action.
+
+### Agent Identity and Accountability Model
+
+Since automated agents perform GitHub actions using the operator's account, every interaction must carry explicit attribution to distinguish agent-driven work from human work. This mirrors how Claude Code appears as a co-author on commits.
+
+**Agent roles in the pipeline:**
+- **Aider Researcher** - Analyzes issue scope, researches codebase, creates detailed implementation plan PR
+- **Aider Coder** - Reads issue and plan, creates implementation strategy, modifies files, posts summary comment
+- **Aider Reviewer** (tier1/tier2/tier3) - Performs code review at different depth levels
+- **Issue Resolver** - Hermes gateway agent for issue triage and PR creation
+- **Release Manager** - Hermes gateway agent for version bumps and releases
+
+**Attribution mechanisms:**
+1. **Git commits** - `Co-authored-by: Agent Name (tier) <model>` trailer in commit messages
+2. **PR bodies** - Co-author trailer appended to pull request descriptions
+3. **PR comments** - Header showing agent, model, tier, and task type
+
+This ensures full traceability: any change can be traced back to the specific agent, model, and tier that produced it — critical for debugging automated workflows and understanding PR provenance.
 - Acceptance criteria:
     - No direct commits or uncommitted implementation drift on CryptoTrader `master`/`main`.
     - Every CryptoTrader implementation has a branch, PR, validation evidence, and review trail.

@@ -71,24 +71,60 @@ Hermes assigns one issue at a time to the coding-agent lane, which resolves the 
 flowchart TD
     A[GitHub issue created manually or by Hermes/Kanban] --> B[Hermes intake validates repo allowlist and priority]
     B --> C[Hermes claims issue and persists issue_run]
-    C --> D[Create feature branch; forbid direct CryptoTrader master/main edits]
-    D --> E[Single-flight implementation lane]
-    E --> F[Implement change on branch]
-    F --> G[Run local validation]
-    G --> H[Push branch and open PR]
-    H --> I[Request Kyber review]
-    I --> J[Tier1 fast reviewer]
-    J -->|clean| K[Tier2 stronger reviewer]
-    J -->|findings| L[kyber-tag: coding_subagent]
-    K -->|findings| L
-    K -->|inconclusive| M[kyber-tag: rerun_reviewer]
-    K -->|clean| N[kyber-tag: ready_for_merge]
-    L --> O[Hermes applies review fixes on same branch]
-    O --> G
-    M --> I
-    N --> P[Hermes merges PR]
-    P --> Q[Close issue and mark Kanban task done]
+    C --> D[Aider Researcher analyzes issue scope and approach]
+    D --> E[Researcher creates detailed implementation plan PR]
+    E --> F[Create feature branch from plan]
+    F --> G[Aider Coder implements solution following plan]
+    G --> H[Coder adds summary comment to PR]
+    H --> I[Run local validation]
+    I --> J[Push branch and open PR]
+    J --> K[Request Kyber review]
+    K --> L[Tier1 fast reviewer]
+    L -->|clean| M[Tier2 stronger reviewer]
+    L -->|findings| N[kyber-tag: coding_subagent]
+    M -->|findings| N
+    M -->|inconclusive| O[kyber-tag: rerun_reviewer]
+    M -->|clean| P[kyber-tag: ready_for_merge]
+    N --> Q[Hermes applies review fixes on same branch]
+    Q --> I
+    O --> K
+    P --> R[Hermes merges PR]
+    R --> S[Close issue and mark Kanban task done]
 ```
+
+### Agent Roles and Accountability
+
+Every automated GitHub interaction (issue, PR, commit, comment) carries explicit attribution showing which agent performed the action. This mirrors how Claude Code appears as a co-author on commits and ensures full traceability in the project history.
+
+**Agent Identity Model:**
+- `aider-researcher` - Analyzes issues, creates implementation plans
+- `aider-coder` - Implements solutions, creates file changes, posts summaries
+- `aider-reviewer` (tier1/tier2/tier3) - Performs code review at different depth levels
+- `Issue Resolver` - Hermes gateway agent for issue triage and PR creation
+- `Release Manager` - Hermes gateway agent for version bumps and releases
+
+**Attribution Mechanisms:**
+1. **Git commits** - `Co-authored-by: Agent Name (tier) <model>` trailer in commit messages
+2. **PR bodies** - Co-author trailer appended to pull request descriptions
+3. **PR comments** - Header showing agent, model, tier, and task type
+
+Example PR comment header:
+```
+**Agent:** aider-coder | **Model:** openrouter/deepseek/deepseek-v3 | **Tier:** tier3 | **Task:** code-implementation
+
+[comment body with implementation details]
+```
+
+Example git commit message:
+```
+fix(orders): resolve limit order validation bug
+
+Fixes #345 where market fills could occur during low liquidity windows
+
+Co-authored-by: aider-coder (tier3) <openrouter/deepseek/deepseek-v3>
+```
+
+This attribution system ensures every change can be traced back to the specific agent, model, and tier that produced it — critical for debugging automated workflows and understanding PR provenance.
 
 Issue handling is part of the default flow: Hermes receives and triages a new
 issue, routes it into the coding lane, and only enters the PR review loop after
