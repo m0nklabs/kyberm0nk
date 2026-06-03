@@ -14,7 +14,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = ROOT / ".env"
-DEFAULT_ADVISOR_MODEL = "openrouter/openai/gpt-5.5"
+DEFAULT_ADVISOR_MODEL = "openrouter/openai/gpt-5.4"
 DEFAULT_STATE_DIR = Path.home() / ".local" / "state" / "kyberm0nk"
 
 
