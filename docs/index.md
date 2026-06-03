@@ -16,6 +16,16 @@ This index maps the current KyberM0nk runtime documentation to the active archit
 - [Autonomy Backlog](AUTONOMY_BACKLOG.md)
 - [Roadmap](ROADMAP.md)
 
+## Operations
+
+Practical reference for running Hermes in production:
+
+- [Operator Guide](OPERATOR_GUIDE.md) — Hermes lifecycle, queue management, common issues, recovery procedures
+- [Testing Guide](TESTING.md) — Validation scripts, pass/fail criteria, dependencies for all test runners
+- [Incident Response](INCIDENT_RESPONSE.md) — P1-P4 severity classification, runbooks for crashes, corruption, rate limits
+- [Backup and Recovery](BACKUP.md) — Auto-backup script, restore procedures, disaster recovery rebuild
+- [Configuration Reference](CONFIGURATION.md) — All environment variables for launchers, Hermes, Guardian, CryptoTrader
+
 ## P3 Contracts
 
 - [Kyber Tag Schema](kyber-tag.jsonschema)
