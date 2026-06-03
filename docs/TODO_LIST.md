@@ -56,7 +56,7 @@
 
 - [x] Move routine Kyber generalist and validation-runner subagents to the fast OpenRouter route to reduce token-per-minute pressure and reserve stronger models for explicit escalation.
 - [x] Document review-loop guardrails for duplicate suppression, bounded fan-out, diff-size control, and capped jittered retries.
-- [ ] Add runtime support in the Hermes review script for the documented `AIDER_REVIEW_MAX_RETRIES`, `AIDER_REVIEW_RETRY_*`, `AIDER_REVIEW_PARALLELISM`, and `AIDER_REVIEW_RATE_LIMIT_COOLDOWN_SECONDS` knobs if missing.
+- [x] Add runtime support in the Hermes review script for the documented `AIDER_REVIEW_MAX_RETRIES`, `AIDER_REVIEW_RETRY_*`, `AIDER_REVIEW_PARALLELISM`, and `AIDER_REVIEW_RATE_LIMIT_COOLDOWN_SECONDS` knobs if missing.
 - [x] Add a compact OpenRouter preflight command that checks auth, model availability, and rate-limit headers without running a full review.
 
 ## 2026-05-31 Issue Assignment Reliability Hardening

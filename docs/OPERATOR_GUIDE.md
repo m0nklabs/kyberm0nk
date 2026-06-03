@@ -141,8 +141,8 @@ Inspect what tables exist before querying:
 
 ```bash
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-SELECT name FROM sqlite_master 
-WHERE type='table' 
+SELECT name FROM sqlite_master
+WHERE type='table'
 ORDER BY name;
 SQL
 ```
@@ -163,8 +163,8 @@ sqlite3 ~/.hermes/issue_resolution.db "SELECT COUNT(*) FROM issue_runs WHERE sta
 
 ```bash
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-SELECT repo, issue_number, status, attempt_count, updated_at 
-FROM issue_runs 
+SELECT repo, issue_number, status, attempt_count, updated_at
+FROM issue_runs
 WHERE status IN ('running', 'queued', 'expanded')
 ORDER BY updated_at DESC;
 SQL
@@ -174,10 +174,10 @@ SQL
 
 ```bash
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-SELECT repo, issue_number, status, pr_number, attempt_count, completed_at 
-FROM issue_runs 
+SELECT repo, issue_number, status, pr_number, attempt_count, completed_at
+FROM issue_runs
 WHERE status IN ('completed', 'failed')
-ORDER BY completed_at DESC 
+ORDER BY completed_at DESC
 LIMIT 20;
 SQL
 ```
@@ -186,7 +186,7 @@ SQL
 
 ```bash
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-SELECT * FROM issue_runs 
+SELECT * FROM issue_runs
 WHERE issue_number=345 AND repo='cryptotrader'
 ORDER BY run_number DESC
 LIMIT 1;
@@ -204,7 +204,7 @@ If Hermes crashed mid-run and left it in `running` state:
 
 ```bash
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-UPDATE issue_runs 
+UPDATE issue_runs
 SET status='queued', attempt_count=attempt_count+1, updated_at=datetime('now')
 WHERE repo='cryptotrader' AND issue_number=345 AND status='running';
 SQL
@@ -378,7 +378,7 @@ If Hermes opens PR but merge step never completes:
 2. If `status='running'` with old timestamp → manual reset needed:
    ```bash
    sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-   UPDATE issue_runs SET status='queued' 
+   UPDATE issue_runs SET status='queued'
    WHERE pr_number=567 AND repo='cryptotrader';
    SQL
    ```
@@ -409,7 +409,7 @@ cp ~/.hermes/backups/issue_resolution.db.YYYYMMDD ~/.hermes/issue_resolution.db
 
 ```bash
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-DELETE FROM issue_runs 
+DELETE FROM issue_runs
 WHERE status='completed' AND completed_at < date('now', '-90 days');
 VACUUM;
 SQL
@@ -419,8 +419,8 @@ SQL
 
 ```bash
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-SELECT parent_issue, child_issue, child_status 
-FROM master_subissues 
+SELECT parent_issue, child_issue, child_status
+FROM master_subissues
 WHERE parent_issue=100;
 SQL
 ```

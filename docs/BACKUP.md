@@ -157,11 +157,11 @@ BACKUP=$(ls -t ~/.hermes/backups/*/secrets/kyberm0nk_github_token 2>/dev/null | 
 if [ -n "$BACKUP" ]; then
   echo "Restoring GitHub token from: $BACKUP"
   cp "$BACKUP" ~/.secrets/
-  
+
   # Restore launcher configs
   BACKUP_DIR=$(dirname "$BACKUP")
   cp "$BACKUP_DIR"/*.env ~/.config/claudecode/ 2>/dev/null || true
-  
+
   echo "Secrets restored. Verify: gh auth status"
   gh auth status
 else

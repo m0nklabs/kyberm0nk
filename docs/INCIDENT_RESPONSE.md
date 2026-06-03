@@ -36,8 +36,8 @@ systemctl --user stop hermes-gateway
 
 # 4. Inspect queue state
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-SELECT repo, issue_number, status, attempt_count, updated_at 
-FROM issue_runs 
+SELECT repo, issue_number, status, attempt_count, updated_at
+FROM issue_runs
 WHERE status IN ('running', 'queued')
 ORDER BY updated_at DESC;
 SQL
@@ -91,7 +91,7 @@ sqlite3 ~/.hermes/issue_resolution.db "SELECT COUNT(*) FROM issue_runs WHERE sta
 # 1. Inspect run history
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
 SELECT run_number, status, attempt_count, pr_number, error_message, updated_at
-FROM issue_runs 
+FROM issue_runs
 WHERE repo='<repo>' AND issue_number=<number>
 ORDER BY run_number DESC;
 SQL
@@ -99,7 +99,7 @@ SQL
 # 2. Check error details
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
 SELECT error_message, completed_at
-FROM issue_runs 
+FROM issue_runs
 WHERE repo='<repo>' AND issue_number=<number>
 ORDER BY run_number DESC
 LIMIT 1;
@@ -110,7 +110,7 @@ gh pr view <pr_number> --json state,title --repo <owner>/<repo>
 
 # 4. If issue should be retried (transient error)
 sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
-UPDATE issue_runs 
+UPDATE issue_runs
 SET status='queued', attempt_count=0, error_message=NULL
 WHERE repo='<repo>' AND issue_number=<number>;
 SQL
