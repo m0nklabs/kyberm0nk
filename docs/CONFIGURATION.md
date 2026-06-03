@@ -127,9 +127,10 @@ Guardian config lives in `~/.config/llama_cpp_guardian/config.yaml` and `models.
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `GUARDIAN_PORT` | `11434` | Guardian proxy port |
-| `GUARDIAN_BACKEND_PORT` | `11440` | llama-server backend port |
+| `GUARDIAN_BACKEND_PORT` | `11440` | Guardian backend port |
 | `GUARDIAN_CONTEXT` | `8192` | Default context window |
-| `GUARDIAN_NGL` | `99` | GPU layers (offload) |
+
+**Note:** GPU offload, VRAM, tensor split, and backend llama-server tuning live inside Guardian — Kyber calls only the proxy endpoint. See Guardian docs for those settings.
 
 ### Model Aliases
 

@@ -166,8 +166,11 @@ curl -s http://127.0.0.1:11434/v1/models | head -20
 ### Guardian is Down
 
 ```bash
-# Check if llama-server or Guardian daemon is running
-ps aux | grep -E 'llama-server|guardian' | grep -v grep
+# Check Guardian proxy status
+curl http://127.0.0.1:11434/healthz
+
+# Check Guardian daemon
+ps aux | grep -i guardian | grep -v grep
 
 # Restart Guardian if needed
 systemctl --user restart guardian  # or direct script
@@ -255,11 +258,11 @@ If Aider is stuck in a review-fix loop (3+ iterations):
 **Symptoms:** Issue marked `failed` with attempt_count > 1
 
 **Check:**
-1. Guardian has VRAM available? `nvidia-smi`
-2. Model alias exists? `curl http://127.0.0.1:11434/v1/models`
-3. No competing GPU jobs? Check if another llama-server instance is running
+1. Guardian proxy responding? `curl http://127.0.0.1:11434/v1/models`
+2. Model alias configured? Check Guardian logs for load errors
+3. Guardian slot available? Hermes enforces single-flight, so queue backs up during active jobs
 
-**Fix:** Retry after GPU is idle.
+**Fix:** Wait for current job to finish or restart Guardian if unresponsive.
 
 ### Reviewer Loop Hangs
 
@@ -287,15 +290,14 @@ If Aider is stuck in a review-fix loop (3+ iterations):
 
 ### Current Limits
 
-- **Single-flight coder**: Only one Aider job runs at a time (GPU constraint)
+- **Single-flight coder**: Only one Aider job runs at a time (Guardian slot constraint)
 - **Queue depth**: Unlimited SQLite rows, but expect 20-30 min per issue
-- **VRAM**: 28GB GPU runs 35B models with 100% offload
 - **Throughput**: ~2-3 issues/hour with full review+fix loop
 
 ### Bottlenecks
 
-1. **GPU contention**: Aider and reviewer compete for GPU; single-flight enforced
-2. **Context size**: 65536 tokens default; avoid 32768 output caps
+1. **Guardian slot**: Only one inference request at a time; Hermes queue enforces single-flight
+2. **Context size**: 65536 tokens default; avoid 32768 output caps for reliable completion
 3. **OpenRouter limits**: Tiered reviewers use cloud API; watch credit spend
 
 ## Recovery Procedures
