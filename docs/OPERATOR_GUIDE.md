@@ -88,9 +88,70 @@ Hermes Gateway exposes these slash commands via CLI, Telegram, and webhook:
 4. Queue via slash command
 5. Monitor `agent.log` for queue pick-up
 
+### Useful gh Commands
+
+Quick GitHub inspection from the CLI — pairs well with queue queries:
+
+```bash
+# Verify PR state and merge status
+gh pr view <number> --json state,mergedAt,title --repo <owner>/<repo>
+
+# Check CI status on a PR
+gh pr checks <number> --repo <owner>/<repo>
+
+# Post a quick comment
+gh issue comment <number> --body "Manual review: ..." --repo <owner>/<repo>
+
+# Inspect reviewer feedback
+gh pr review <number> --repo <owner>/<repo> 2>/dev/null | head -30
+
+# List labels on an issue
+gh issue view <number> --json labels --repo <owner>/<repo>
+```
+
+## Startup Checklist
+
+Run this before starting Hermes in production:
+
+```bash
+# 1. Guardian proxy healthy
+curl -sf http://127.0.0.1:11434/healthz || echo "FAIL: Guardian down"
+
+# 2. GitHub token authenticates
+gh auth status 2>&1 | grep -q 'Logged in' || echo "FAIL: `gh` not authenticated"
+
+# 3. OpenRouter reachable (if tiered reviewers are enabled)
+curl -sf https://openrouter.ai/api/v1/models -H "Authorization: Bearer $OPENROUTER_API_KEY" > /dev/null \
+  || echo "WARN: OpenRouter unreachable — cloud reviewers will fail"
+
+# 4. Hermes systemd unit status
+systemctl --user is-active hermes-gateway hermes-dashboard 2>/dev/null
+# Expected: active active
+```
+
+All four checks green → safe to start queueing issues.
+
 ## SQLite Queue Inspection
 
 The queue state lives in `~/.hermes/issue_resolution.db`.
+
+### Schema Overview
+
+Inspect what tables exist before querying:
+
+```bash
+sqlite3 ~/.hermes/issue_resolution.db <<'SQL'
+SELECT name FROM sqlite_master 
+WHERE type='table' 
+ORDER BY name;
+SQL
+```
+
+Common tables: `issue_runs`, `master_subissues`, `issue_run_logs`, `run_artifacts`. Column names can be listed:
+
+```bash
+sqlite3 ~/.hermes/issue_resolution.db "PRAGMA table_info(issue_runs);"
+```
 
 ### Check Queue Size
 
@@ -373,6 +434,46 @@ sqlite3 ~/.hermes/kanban.db "SELECT COUNT(*) FROM kanban_tasks;"
 ```
 
 Sync script: `~/.hermes/scripts/github_issue_kanban_sync.py`
+
+## Escalation Path
+
+When a queue run fails repeatedly or Hermes behavior is unexpected:
+
+### Record the Incident
+
+Create a local incident file before opening a Kyber issue:
+
+```bash
+INCIDENT_DIR=~/.hermes/incidents
+mkdir -p "$INCIDENT_DIR"
+cat > "$INCIDENT_DIR/$(date +%Y-%m-%d)-cryptotrader-345.txt" <<EOF
+Incident: $(date -Iseconds)
+Repo: cryptotrader
+Issue: 345
+Symptom: Queue stuck at attempt 3/3, Aider failing with model timeout
+Last log lines:
+$(tail -20 ~/.hermes/logs/errors.log)
+Recovery attempted: Manual retry via /retry, Guardian restart
+EOF
+```
+
+### Open a Kyber Issue
+
+```bash
+gh issue create \
+  --repo flip/kyberm0nk \
+  --title "incident: cryptotrader #345 stuck after 3 attempts" \
+  --label "incident" \
+  --body "See ~/.hermes/incidents/2026-06-03-cryptotrader-345.txt for details"
+```
+
+### Severity Classification
+
+| Severity | Criteria | Response |
+|----------|----------|----------|
+| **P1** | Hermes gateway crashing repeatedly, queue growing with no processing | Immediate: restart, check logs, file incident |
+| **P2** | Single issue stuck after max retries, PR orphaned | Within hours: inspect run, manual reset or close |
+| **P3** | Non-blocking bug, missing feature in docs or scripts | File issue, next planning cycle |
 
 ## See Also
 
