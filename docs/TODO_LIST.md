@@ -1,5 +1,17 @@
 # TODO List
 
+## 2026-06-04 Autonomous Pipeline E2E (CryptoTrader)
+
+- [x] Achieve first end-to-end autonomous run: issue → kanban → worker → branch → PR.
+- [x] Iron-strong system prompts per Aider role (researcher, coder, tier1 reviewer, tier2 reviewer).
+- [x] Co-Authored-By trailer includes model name (`$HERMES_MODEL`) — traceability works.
+- [x] Harden KANBAN_GUIDANCE: always branch first, use actual `#NNN` issue number, no `git add -A`.
+- [x] Clean workspace: remove `.aider.*` history, `.worktrees/pr325` artifacts, stale kanban tasks.
+- [ ] Add `Closes #NNN` format guard — validate worker actually extracts numeric issue ID.
+- [ ] Wire coder launcher `commit_changes()` to `co_author_trailer()` — already fixed, verify on real run.
+- [ ] Verify reviewer loop (Tier1 → coder fix → Tier1 clean → Tier2 adversarial → merge-ready).
+- [ ] Run `github_issue_kanban_sync.py` on a cron schedule to close the manual sync gap.
+
 ## 2026-06-02 Generic Architecture & Multi-Repo Scaling
 
 - [x] Formalize the KyberM0nk -> Hermes -> GitHub -> target-repository hierarchy in the front-door workspace docs.
