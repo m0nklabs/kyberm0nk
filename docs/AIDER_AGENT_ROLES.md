@@ -313,6 +313,37 @@ The two-tier review system ensures both obvious and subtle bugs are caught:
 4. If Tier2 finds issues → Coder fixes → **Back to Tier1** (not just Tier2!)
 5. Only when both tiers clean → PR ready for merge
 
+### Closed-PR Recovery (Agent Handoff)
+
+When a PR is **closed without merge** (by operator decision, CI failures, pollution), the review loop is broken — there is no open branch to route findings to. All three agent roles have explicit system-prompt guidance for this:
+
+| Agent | Behavior when PR is closed-without-merge |
+|-------|-----------------------------------------|
+| **Aider Reviewer Tier1** | Refuse to review. Emit `next_action: researcher-replan` in manager tag. Do NOT route to coder. |
+| **Aider Reviewer Tier2** | Refuse adversarial review. Same `researcher-replan` routing. |
+| **Aider Coder** | Refuse to code (cannot push to closed branch). Emit `status: refuse`, hand back to PR Manager. |
+| **Hermes (PR Manager)** | Before starting new work, run `gh pr list --state all` for the issue. If prior PR closed without merge, read prior attempt's failure mode, create fresh branch from current `master`, link closed PR in new PR body as `Supersedes #NNN`. |
+| **Aider Researcher** | Before planning, investigate why the prior attempt was closed. Differentiate the new approach, scope it tighter, branch from fresh master. |
+
+**Handoff sequence** when PR #337 closes without merge:
+```
+Operator closes PR #337
+    ↓
+Next reviewer cron tick sees PR closed
+    ↓
+Reviewer emits next_action: researcher-replan
+    ↓
+Coder cron sees closed PR → refuses
+    ↓
+Next issue dispatch picks up the open issue
+    ↓
+Hermes worker (or Researcher) reads closed PR's history
+    ↓
+Fresh branch from current master → new PR with "Supersedes #337"
+```
+
+**Anti-pattern**: Do NOT route closed-without-merge findings to the Coder. The branch is dead and pushing to it is impossible. Always hand back to research/planning.
+
 ---
 
 ## Cron Jobs Driving the Pipeline
@@ -399,7 +430,7 @@ When an agent behaves unexpectedly:
 
 1. **Check logs**: `~/.hermes/cron/logs/<script_name>.log`
 2. **Check state**: `~/.hermes/cron/<script_name>_state.json`
-3. **Run script manually**: 
+3. **Run script manually**:
    ```bash
    cd ~/.hermes
    python3 scripts/cryptotrader_pr_aider_reviewer_loop.py --dry-run
