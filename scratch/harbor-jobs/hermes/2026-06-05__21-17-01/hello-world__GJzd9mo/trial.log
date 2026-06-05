@@ -1,0 +1,5 @@
+Skipping image OS validation for hb__hello-world: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl git ripgrep xz-utils
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup && export PATH="$HOME/.local/bin:$PATH" && export HERMES_HOME="${HERMES_HOME:-/tmp/hermes}" && mkdir -p "$HERMES_HOME" "$HERMES_HOME/sessions" "$HERMES_HOME/skills" "$HERMES_HOME/memories" && hermes version
+Trial hello-world__GJzd9mo cancelled

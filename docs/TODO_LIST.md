@@ -1,5 +1,12 @@
 # TODO List
 
+## 2026-06-05 Harbor Framework Evaluations
+
+- [x] Install Harbor from `/home/flip/harbor` as the live editable CLI source.
+- [x] Validate the local Harbor installed-agent slice for Claude Code, Hermes, and Aider.
+- [x] Add a Kyber wrapper for direct Harbor runs against Claude Code, Hermes, and Aider.
+- [x] Document Harbor as a tracked workspace repo and evaluation harness in Kyber docs.
+
 ## 2026-06-04 Autonomous Pipeline E2E (CryptoTrader)
 
 - [x] Achieve first end-to-end autonomous run: issue → kanban → worker → branch → PR.

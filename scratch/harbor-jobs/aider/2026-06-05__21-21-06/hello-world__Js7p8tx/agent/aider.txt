@@ -1,0 +1,24 @@
+Warning: Input is not a terminal (fd=0).
+────────────────────────────────────────────────────────────────────────────────
+Warning for qwen3-35b-reasoning-agent: Unknown context window size and costs, 
+using sane defaults.
+You can skip this check with --no-show-model-warnings
+
+https://aider.chat/docs/llms/warnings.html
+
+Aider v0.86.2
+Model: qwen3-35b-reasoning-agent with whole edit format
+Git repo: none
+Repo-map: disabled
+
+
+https://aider.chat/HISTORY.html#release-notes
+
+litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you
+are trying to call. You passed model=qwen3-35b-reasoning-agent
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in 
+`completion(model='huggingface/starcoder',..)` Learn more: 
+https://docs.litellm.ai/docs/providers
+
+https://docs.litellm.ai/docs/providers
+

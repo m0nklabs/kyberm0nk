@@ -1,0 +1,116 @@
+{
+    "id": "89a6ba6b-3110-4773-95ad-7e1ae3627228",
+    "task_name": "harbor/hello-world",
+    "trial_name": "hello-world__Js7p8tx",
+    "trial_uri": "file:///home/flip/kyberm0nk/scratch/harbor-jobs/aider/2026-06-05__21-21-06/hello-world__Js7p8tx",
+    "task_id": {
+        "path": "/home/flip/harbor/examples/tasks/hello-world"
+    },
+    "source": null,
+    "task_checksum": "648226cd011957b259f655c06220da4aa584cc50a0788274135e82ee00e2ca97",
+    "config": {
+        "task": {
+            "path": "/home/flip/harbor/examples/tasks/hello-world",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "hello-world__Js7p8tx",
+        "trials_dir": "/home/flip/kyberm0nk/scratch/harbor-jobs/aider/2026-06-05__21-21-06",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "aider",
+            "import_path": null,
+            "model_name": "openai/qwen3-35b-reasoning-agent",
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "extra_allowed_hosts": [
+                "172.17.0.1"
+            ],
+            "kwargs": {},
+            "env": {
+                "OPENAI_API_BASE": "http://172.17.0.1:11434/v1",
+                "OPENAI_API_KEY": "aide****7e7"
+            },
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "env": {},
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "57e2f3c2-7277-4775-818a-44a743d31a8e"
+    },
+    "agent_info": {
+        "name": "aider",
+        "version": "0.86.2",
+        "model_info": {
+            "name": "qwen3-35b-reasoning-agent",
+            "provider": "openai"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": null,
+        "n_cache_tokens": null,
+        "n_output_tokens": null,
+        "cost_usd": null,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-06-05T21:21:09.863611Z",
+    "finished_at": "2026-06-05T21:22:29.721723Z",
+    "environment_setup": {
+        "started_at": "2026-06-05T21:21:09.878666Z",
+        "finished_at": "2026-06-05T21:21:15.555270Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-06-05T21:21:15.555397Z",
+        "finished_at": "2026-06-05T21:21:58.593566Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-06-05T21:21:58.593925Z",
+        "finished_at": "2026-06-05T21:22:07.293984Z"
+    },
+    "verifier": {
+        "started_at": "2026-06-05T21:22:08.068183Z",
+        "finished_at": "2026-06-05T21:22:16.888803Z"
+    },
+    "step_results": null
+}

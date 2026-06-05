@@ -1,0 +1,121 @@
+{
+    "id": "7c0067b6-f5df-4cf2-bada-dcc9ccc95116",
+    "task_name": "harbor/hello-world",
+    "trial_name": "hello-world__NbXtm4o",
+    "trial_uri": "file:///home/flip/kyberm0nk/scratch/harbor-jobs/claude-code/2026-06-05__21-10-42/hello-world__NbXtm4o",
+    "task_id": {
+        "path": "/home/flip/harbor/examples/tasks/hello-world"
+    },
+    "source": null,
+    "task_checksum": "648226cd011957b259f655c06220da4aa584cc50a0788274135e82ee00e2ca97",
+    "config": {
+        "task": {
+            "path": "/home/flip/harbor/examples/tasks/hello-world",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "hello-world__NbXtm4o",
+        "trials_dir": "/home/flip/kyberm0nk/scratch/harbor-jobs/claude-code/2026-06-05__21-10-42",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "claude-code",
+            "import_path": null,
+            "model_name": "qwen3.6-35b-uncensored",
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "extra_allowed_hosts": [
+                "host.docker.internal"
+            ],
+            "kwargs": {},
+            "env": {
+                "ANTHROPIC_BASE_URL": "http://host.docker.internal:11434",
+                "ANTHROPIC_API_KEY": "clau****8d9"
+            },
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "env": {},
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "bfe2c4fd-33d1-4c15-a584-98fd85c1e438"
+    },
+    "agent_info": {
+        "name": "claude-code",
+        "version": "2.1.165",
+        "model_info": {
+            "name": "qwen3.6-35b-uncensored",
+            "provider": null
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 0,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 0,
+        "cost_usd": null,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": {
+        "exception_type": "AgentTimeoutError",
+        "exception_message": "Agent execution timed out after 120.0 seconds",
+        "exception_traceback": "Traceback (most recent call last):\n  File \"/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/tasks.py\", line 488, in wait_for\n    return await fut\n           ^^^^^^^^^\n  File \"/home/flip/harbor/src/harbor/agents/installed/base.py\", line 39, in wrapper\n    return await fn(self, instruction, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/flip/harbor/src/harbor/agents/installed/claude_code.py\", line 1353, in run\n    await self.exec_as_agent(\n    ...<10 lines>...\n    )\n  File \"/home/flip/harbor/src/harbor/agents/installed/base.py\", line 354, in exec_as_agent\n    return await self._exec(\n           ^^^^^^^^^^^^^^^^^\n        environment, command, env=env, cwd=cwd, timeout_sec=timeout_sec\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/home/flip/harbor/src/harbor/agents/installed/base.py\", line 301, in _exec\n    result = await environment.exec(\n             ^^^^^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n    )\n    ^\n  File \"/home/flip/harbor/src/harbor/environments/docker/docker.py\", line 646, in exec\n    return await self._run_docker_compose_command(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        exec_command, check=False, timeout_sec=timeout_sec\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/home/flip/harbor/src/harbor/environments/docker/docker.py\", line 395, in _run_docker_compose_command\n    stdout_bytes, stderr_bytes = await process.communicate()\n                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/subprocess.py\", line 201, in communicate\n    stdin, stdout, stderr = await tasks.gather(stdin, stdout, stderr)\n                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/subprocess.py\", line 181, in _read_stream\n    output = await stream.read()\n             ^^^^^^^^^^^^^^^^^^^\n  File \"/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/streams.py\", line 723, in read\n    block = await self.read(self._limit)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/streams.py\", line 730, in read\n    await self._wait_for_data('read')\n  File \"/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/streams.py\", line 539, in _wait_for_data\n    await self._waiter\nasyncio.exceptions.CancelledError\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/home/flip/harbor/src/harbor/trial/trial.py\", line 376, in _run_agent_phase\n    await asyncio.wait_for(\n    ...<6 lines>...\n    )\n  File \"/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/tasks.py\", line 487, in wait_for\n    async with timeouts.timeout(timeout):\n               ~~~~~~~~~~~~~~~~^^^^^^^^^\n  File \"/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/timeouts.py\", line 114, in __aexit__\n    raise TimeoutError from exc_val\nTimeoutError\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/home/flip/harbor/src/harbor/trial/single_step.py\", line 63, in _run_agent\n    await self._run_agent_phase(\n    ...<4 lines>...\n    )\n  File \"/home/flip/harbor/src/harbor/trial/trial.py\", line 385, in _run_agent_phase\n    raise AgentTimeoutError(\n        f\"Agent execution timed out after {timeout_sec} seconds\"\n    ) from exc\nharbor.trial.errors.AgentTimeoutError: Agent execution timed out after 120.0 seconds\n",
+        "occurred_at": "2026-06-05T21:13:39.016189"
+    },
+    "started_at": "2026-06-05T21:10:50.157732Z",
+    "finished_at": "2026-06-05T21:14:03.934137Z",
+    "environment_setup": {
+        "started_at": "2026-06-05T21:10:50.199749Z",
+        "finished_at": "2026-06-05T21:11:01.722462Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-06-05T21:11:01.722583Z",
+        "finished_at": "2026-06-05T21:11:38.997788Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-06-05T21:11:38.998216Z",
+        "finished_at": "2026-06-05T21:13:39.002536Z"
+    },
+    "verifier": {
+        "started_at": "2026-06-05T21:13:39.754243Z",
+        "finished_at": "2026-06-05T21:13:51.831528Z"
+    },
+    "step_results": null
+}

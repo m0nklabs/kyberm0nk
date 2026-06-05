@@ -23,6 +23,7 @@ The rule is simple: do not describe a path as a repository checkout unless a rea
 | `/home/flip/opencode` | Repo | Yes | Real OpenCode source checkout using the upstream repo name. |
 | `/home/flip/crewAI` | Repo | Yes | Real CrewAI source checkout using the upstream repo name. |
 | `/home/flip/langgraph` | Repo | Yes | Real LangGraph source checkout using the upstream repo name. |
+| `/home/flip/harbor` | Repo | Yes | Real Harbor evaluation-framework checkout used for cross-framework benchmarking. |
 | `/home/flip/claudecode` | Tracked config root | No | Host-tracked Claude Code files live here, but the current workspace copy is not a normal Git checkout. Treat it as a managed config tree unless/until a real repo checkout is present. |
 | `/home/flip/.opencode` | Local install tree | No | Local OpenCode/OpenInterpreter install tree with package files and binaries, not a Git checkout. |
 | `/home/flip/crewai` | Runtime root | No | Current direct CrewAI runtime virtualenv, not a CrewAI source repo checkout. |
@@ -46,7 +47,7 @@ The rule is simple: do not describe a path as a repository checkout unless a rea
 
 ## Current Practical Meaning
 
-- `~/aider`, `~/superset`, `~/agentzero`, `~/hermes-agent`, `~/opencode`, `~/crewAI`, and `~/langgraph` are real repo checkouts.
+- `~/aider`, `~/superset`, `~/agentzero`, `~/hermes-agent`, `~/opencode`, `~/crewAI`, `~/langgraph`, and `~/harbor` are real repo checkouts.
 - `~/aider` still doubles as a runtime root because its active `.venv` stays inside the checkout.
 - `~/crewai` and `~/.opencode` are runtime/install trees, not source repos.
 - `~/langgraph-lab` is currently just a local lab directory.

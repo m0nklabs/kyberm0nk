@@ -1,0 +1,31 @@
+{
+  "schema_version": "ATIF-v1.7",
+  "session_id": "0509a621-5a27-4ad0-9b57-e5d69d98e682",
+  "agent": {
+    "name": "claude-code",
+    "version": "2.1.165",
+    "model_name": "qwen3.6-35b-uncensored",
+    "extra": {
+      "cwds": [
+        "/app"
+      ],
+      "git_branches": [
+        "HEAD"
+      ]
+    }
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "timestamp": "2026-06-05T21:11:40.389Z",
+      "source": "user",
+      "message": "Create a file called hello.txt with \"Hello, world!\" as the content.\n",
+      "extra": {
+        "is_sidechain": false
+      }
+    }
+  ],
+  "final_metrics": {
+    "total_steps": 1
+  }
+}

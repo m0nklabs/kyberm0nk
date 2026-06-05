@@ -1,0 +1,39 @@
+{
+    "id": "57e2f3c2-7277-4775-818a-44a743d31a8e",
+    "started_at": "2026-06-05T21:21:06.982167",
+    "updated_at": "2026-06-05T21:22:29.726117",
+    "finished_at": "2026-06-05T21:22:29.726117",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "aider__qwen3-35b-reasoning-agent__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "hello-world__Js7p8tx"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": null,
+        "n_cache_tokens": null,
+        "n_output_tokens": null,
+        "cost_usd": null
+    }
+}

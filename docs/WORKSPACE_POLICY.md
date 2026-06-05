@@ -35,6 +35,12 @@ These tools should run with their current working directory or configured active
 
 For Kyber's current host-native layout, Aider keeps its source checkout and runtime together under `~/aider`, OpenCode keeps its source checkout at `~/opencode` and its isolated worker runtime under `~/venvs/kyber-workers`, and both should still target the same explicit source workspace for any real task.
 
+### Harbor
+
+Harbor is the evaluation harness, not the source workspace being edited. Its own repo lives at `~/harbor`, but the tasks, datasets, and framework runs it launches should still point at explicit benchmark task directories or canonical source workspaces under test.
+
+When Harbor is used to compare Claude Code, Hermes, and Aider, keep the Harbor checkout distinct from the project being evaluated. Harbor owns the harness; the target repo still owns the actual source workspace.
+
 ### Superset
 
 Superset is the session and worktree cockpit. Its session, workspace, or imported project should still map to the same source workspace or to an explicit worktree created from that source workspace.
@@ -71,6 +77,7 @@ Before calling a framework integration "workspace-ready," verify these:
 - NewNexus source workspace: `/home/flip/NewNexus`
 - Aider host checkout + runtime: `/home/flip/aider`
 - OpenCode host checkout: `/home/flip/opencode`
+- Harbor host checkout: `/home/flip/harbor`
 - Superset host checkout: `/home/flip/superset`
 - CrewAI host checkout: `/home/flip/crewAI`
 - CrewAI runtime root: `/home/flip/crewai`

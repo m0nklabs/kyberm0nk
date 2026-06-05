@@ -1,0 +1,34 @@
+Traceback (most recent call last):
+  File "/home/flip/harbor/src/harbor/trial/single_step.py", line 63, in _run_agent
+    await self._run_agent_phase(
+    ...<4 lines>...
+    )
+  File "/home/flip/harbor/src/harbor/trial/trial.py", line 376, in _run_agent_phase
+    await asyncio.wait_for(
+    ...<6 lines>...
+    )
+  File "/home/flip/.local/share/uv/python/cpython-3.14-linux-x86_64-gnu/lib/python3.14/asyncio/tasks.py", line 488, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/home/flip/harbor/src/harbor/agents/installed/base.py", line 39, in wrapper
+    return await fn(self, instruction, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/flip/harbor/src/harbor/agents/installed/claude_code.py", line 1353, in run
+    await self.exec_as_agent(
+    ...<10 lines>...
+    )
+  File "/home/flip/harbor/src/harbor/agents/installed/base.py", line 354, in exec_as_agent
+    return await self._exec(
+           ^^^^^^^^^^^^^^^^^
+        environment, command, env=env, cwd=cwd, timeout_sec=timeout_sec
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/flip/harbor/src/harbor/agents/installed/base.py", line 317, in _exec
+    raise NonZeroAgentExitCodeError(
+    ...<3 lines>...
+    )
+harbor.agents.installed.base.NonZeroAgentExitCodeError: Command failed (exit 1): export PATH="$HOME/.local/bin:$PATH"; claude --verbose --output-format=stream-json --permission-mode=bypassPermissions --print -- 'Create a file called hello.txt with "Hello, world!" as the content.
+' 2>&1 </dev/null | tee /logs/agent/claude-code.txt
+stdout: {"type":"system","subtype":"init","cwd":"/app","session_id":"aed7bed6-2b0d-40bd-b316-e8a528bf08ad","tools":["Task","AskUserQuestion","Bash","CronCreate","CronDelete","CronList","Edit","EnterPlanMode","EnterWorktree","ExitPlanMode","ExitWorktree","NotebookEdit","Read","ScheduleWakeup","Skill","TaskCreate","TaskGet","TaskList","TaskOutput","TaskStop","TaskUpdate","WebFetch","WebSearch","Workflow","Write"],"mcp_servers":[],"model":"qwen3.6-35b-uncensored","permissionMode":"bypassPermissions","slash_commands":["deep-research","update-config","verify","debug","code-review","simplify","batch","fewer-permission-prompts","loop","claude-api","run","run-skill-generator","clear","compact","context","heapdump","init","reload-skills","review","security-review","usage","insights","goal","team-onboarding"],"apiKeySource":"ANTHROPIC_API_KEY","claude_code_version":"2.1.165","output_style":"default","agents":["claude","Explore","general-purpose","Plan","statusline-setup"],"skills":["deep-research","upda ... [truncated]
+stderr: None

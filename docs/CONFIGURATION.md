@@ -109,6 +109,27 @@ Claude Code uses three tier aliases (sonnet/opus/haiku) that map to actual model
 | `KYBERM0NK_GUARDIAN_API_KEY` | Fallback | Alternative Guardian key var |
 | `GUARDIAN_API_KEY` | Fallback | Alternative Guardian key var |
 
+## Harbor Evaluations
+
+These variables configure `scripts/harbor_eval.sh`, which wraps the local Harbor source install at `/home/flip/harbor`.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `HARBOR_DIR` | `/home/flip/harbor` | Harbor source checkout root |
+| `HARBOR_ENV_TYPE` | `docker` | Harbor environment type |
+| `HARBOR_TASK_PATH` | `/home/flip/harbor/examples/tasks` | Default Harbor task path |
+| `HARBOR_JOBS_DIR` | `/home/flip/kyberm0nk/scratch/harbor-jobs` | Harbor job output root |
+| `HARBOR_DOCKER_HOST` | Linux `docker0` bridge IP when available, else `host.docker.internal` | Host alias exposed to Harbor docker env |
+| `HARBOR_GUARDIAN_MODEL` | `DEFAULT_MODEL`, else `qwen3-35b-uncensored` | Shared local Guardian model alias |
+| `HARBOR_CLAUDE_BASE_URL` | `http://<detected-docker-host>:11434` | Claude Code Anthropic-compatible route |
+| `HARBOR_OPENAI_BASE_URL` | `http://<detected-docker-host>:11434/v1` | Hermes/Aider OpenAI-compatible route |
+| `HARBOR_CLAUDE_MODEL` | `CLAUDE_LOCAL_MODEL`, else `DEFAULT_MODEL` | Claude Code Harbor model override |
+| `HARBOR_HERMES_MODEL` | `openai/$DEFAULT_MODEL` | Hermes Harbor model override |
+| `HARBOR_AIDER_MODEL` | `openai/$AIDER_LOCAL_MODEL`, else `openai/$DEFAULT_MODEL` | Aider Harbor model override |
+| `HARBOR_CLAUDE_API_KEY` | `CLAUDECODE_GUARDIAN_API_KEY` fallback chain | Claude Code Harbor auth override |
+| `HARBOR_HERMES_API_KEY` | `KYBERM0NK_GUARDIAN_API_KEY` fallback chain | Hermes Harbor auth override |
+| `HARBOR_AIDER_API_KEY` | `AIDER_GUARDIAN_API_KEY` fallback chain | Aider Harbor auth override |
+
 ### Reviewer Loop
 
 | Variable | Default | Purpose |

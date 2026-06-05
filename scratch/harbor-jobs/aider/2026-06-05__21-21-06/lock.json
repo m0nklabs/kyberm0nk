@@ -1,0 +1,87 @@
+{
+    "schema_version": 1,
+    "created_at": "2026-06-05T21:21:06.996964Z",
+    "harbor": {
+        "version": "0.13.1",
+        "git_commit_hash": "48a577a47f4982e43e099051e015a0c5e2c37ddb",
+        "is_editable": true
+    },
+    "invocation": [
+        "/home/flip/.local/bin/harbor",
+        "run",
+        "--agent",
+        "aider",
+        "--yes",
+        "--env",
+        "docker",
+        "--jobs-dir",
+        "/home/flip/kyberm0nk/scratch/harbor-jobs/aider",
+        "--n-concurrent",
+        "1",
+        "--allow-agent-host",
+        "172.17.0.1",
+        "--model",
+        "openai/qwen3-35b-reasoning-agent",
+        "--agent-env",
+        "OPENAI_API_BASE=http://172.17.0.1:11434/v1",
+        "--agent-env",
+        "OPENAI_API_KEY=aide****7e7",
+        "--path",
+        "/home/flip/harbor/examples/tasks/hello-world"
+    ],
+    "n_concurrent_trials": 1,
+    "retry": {
+        "max_retries": 0,
+        "exclude_exceptions": [
+            "VerifierOutputParseError",
+            "VerifierTimeoutError",
+            "RewardFileEmptyError",
+            "AgentTimeoutError",
+            "RewardFileNotFoundError"
+        ],
+        "wait_multiplier": 1.0,
+        "min_wait_sec": 1.0,
+        "max_wait_sec": 60.0
+    },
+    "trials": [
+        {
+            "task": {
+                "name": "hello-world",
+                "type": "local",
+                "digest": "sha256:3eeb0ec4ab118507134899184bb604437d6b5e370a7359ddb4b50b89c0c44710",
+                "path": "/home/flip/harbor/examples/tasks/hello-world"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "name": "aider",
+                "model_name": "openai/qwen3-35b-reasoning-agent",
+                "skills": [],
+                "extra_allowed_hosts": [
+                    "172.17.0.1"
+                ],
+                "kwargs": {},
+                "env": {
+                    "OPENAI_API_BASE": "http://172.17.0.1:11434/v1",
+                    "OPENAI_API_KEY": "aide****7e7"
+                },
+                "mcp_servers": []
+            },
+            "skills": [],
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "cpu_enforcement_policy": "auto",
+                "memory_enforcement_policy": "auto",
+                "extra_docker_compose": [],
+                "env": {},
+                "kwargs": {},
+                "extra_allowed_hosts": []
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        }
+    ]
+}

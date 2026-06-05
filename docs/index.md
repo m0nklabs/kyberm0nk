@@ -25,6 +25,7 @@ Practical reference for running Hermes in production:
 - [Incident Response](INCIDENT_RESPONSE.md) — P1-P4 severity classification, runbooks for crashes, corruption, rate limits
 - [Backup and Recovery](BACKUP.md) — Auto-backup script, restore procedures, disaster recovery rebuild
 - [Configuration Reference](CONFIGURATION.md) — All environment variables for launchers, Hermes, Guardian, CryptoTrader
+- [Harbor Evaluations](HARBOR_EVALS.md) — Cross-framework Harbor wrapper and local Claude/Hermes/Aider benchmark defaults
 
 ## P3 Contracts
 

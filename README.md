@@ -52,6 +52,7 @@ Kyber and Hermes do not require an active editor session, editor plugin, browser
 | Orchestrator | Hermes | Durable event bus, issue triage, PR governance, cron loops, project maturity tracking |
 | Execution worker | Aider | Focused code-change worker — opens PRs, fixes issues, implements features |
 | Primary operator | Claude Code | High-trust repo work, review, and orchestration entry |
+| Benchmark harness | Harbor | Cross-framework evaluation of Claude Code, Hermes, Aider, and future workers |
 | Strategist | OpenCode | Planning and architecture (optional, not in default lane) |
 | Operator | Agent Zero | Sandbox task runner (optional, not in default lane) |
 | Gatekeeper | Guardian | Local model brokering (OpenAI-compatible endpoint) |
@@ -122,6 +123,7 @@ Start here:
 - [docs/WORKSPACE_POLICY.md](docs/WORKSPACE_POLICY.md)
 - [docs/WORKSPACE_INVENTORY.md](docs/WORKSPACE_INVENTORY.md)
 - [docs/SECURITY.md](docs/SECURITY.md)
+- [docs/HARBOR_EVALS.md](docs/HARBOR_EVALS.md)
 - [docs/kyber-tag.jsonschema](docs/kyber-tag.jsonschema)
 - [docs/audit-report.md](docs/audit-report.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
