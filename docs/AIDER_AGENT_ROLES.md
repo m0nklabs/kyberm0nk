@@ -6,8 +6,8 @@ This document describes the autonomous agent pipeline for CryptoTrader, where He
 
 The pipeline has three primary Aider agent roles:
 
-1. **Aider Researcher (ORC)** — Analyzes GitHub issues, understands codebase, creates implementation plans
-2. **Aider Coder** — Executes implementation plans, writes tested code, creates PRs
+1. **Aider Researcher (ORC)** — Analyzes GitHub issues, understands codebase, creates implementation plans, and owns PR creation/update
+2. **Aider Coder** — Executes implementation plans, writes tested code, and hands validated diffs back to the researcher lane
 3. **Aider Reviewer** (Tier1 & Tier2) — Reviews code for bugs, security, and subtle failures
 
 Each role has an "iron-strong" system prompt that defines its responsibilities, decision framework, and output format. These prompts are the single source of truth for agent behavior.
@@ -59,7 +59,7 @@ def _load_researcher_prompt() -> str:
 
 ## Role: Aider Researcher (ORC)
 
-**Purpose**: Transform vague GitHub issues into detailed, executable implementation plans.
+**Purpose**: Transform vague GitHub issues into detailed, executable implementation plans and own PR creation/update for CryptoTrader.
 
 **Prompt file**: `~/.hermes/prompts/aider/researcher.md`
 
@@ -71,6 +71,10 @@ def _load_researcher_prompt() -> str:
 4. **Implementation planning**: Step-by-step plan with file changes, edge cases, test strategy
 5. **Risk assessment**: Identifies risks and mitigation strategies
 6. **Output formatting**: Structured markdown plan ready for Coder execution
+7. **PR ownership**: Opens/updates the PR body/title and includes explicit researcher attribution
+8. **Scope discipline**: Investigates the issue first, then writes a PR assignment/checklist that stays strictly within the issue scope
+9. **Backlog discipline**: Opens a new CryptoTrader PR only when there are 3 or fewer open PRs; otherwise waits
+10. **Runtime guard awareness**: The generic Hermes tool surfaces refuse CryptoTrader PR creation attempts; only the dedicated researcher lane may open a new PR
 
 ### Output Format
 
@@ -109,7 +113,21 @@ def _load_researcher_prompt() -> str:
 ### Branch and PR Strategy
 **Branch name**: `hermes/issue-XYZ-description-YYYYMMDD`
 **Commit message**: ...
-**PR title/body**: ...
+**PR title/body**: Owned by the Researcher lane only. The PR body must begin with:
+
+```text
+**Agent:** aider-researcher | **Model:** <model_name> | **Tier:** tier1 | **Task:** pr-creation
+```
+
+and include:
+
+```text
+Co-Authored-By: Aider Researcher (tier1) <model_name>
+```
+
+The PR body must also include an issue-bounded checkbox checklist (`## Scope Checklist`) with concrete in-scope tasks only.
+
+The Researcher may create a new CryptoTrader PR only when the repository currently has 3 or fewer open PRs. If more than 3 PRs are already open, the Researcher must wait; existing PR updates on the same branch may continue.
 ```
 
 ### Key Principles
@@ -119,11 +137,17 @@ def _load_researcher_prompt() -> str:
 - **Edge cases**: Identify failure modes and how to handle them
 - **No ambiguity**: Plan must be executable by Coder without additional analysis
 
+### Runtime Guardrails
+
+- Researcher PR ownership is enforced twice: by prompt policy and by a local Hermes `pre_tool_call` blocker.
+- Generic `terminal` and `execute_code` attempts to run `gh pr create` or direct GitHub PR-create API calls for `m0nklabs/cryptotrader` are blocked before execution.
+- The approved path for opening or reusing a CryptoTrader PR remains the dedicated researcher flow in Hermes issue resolution, not ad-hoc shell commands.
+
 ---
 
 ## Role: Aider Coder
 
-**Purpose**: Execute implementation plans, write tested code, create PRs.
+**Purpose**: Execute implementation plans and produce tested code for researcher-managed PR handoff, without expanding scope beyond the issue or assigned review findings.
 
 **Prompt file**: `~/.hermes/prompts/aider/coder.md`
 
@@ -132,16 +156,15 @@ def _load_researcher_prompt() -> str:
 1. **Plan validation**: Reads plan, verifies prerequisites, identifies ambiguities
 2. **Implementation**: Executes steps sequentially, writes code, runs tests
 3. **Validation**: Full test suite, linters, manual checks
-4. **Commit & push**: Atomic commit with Co-Authored-By trailer, push to remote
-5. **PR creation**: Uses template from plan, captures PR URL
+4. **Handoff**: Leaves a validated diff for the researcher lane
 
 ### Two Modes
 
 **Mode 1: Full Implementation** (from Researcher plan)
-- Creates branch, implements all steps, runs tests, pushes, creates PR
+- Works on the prepared branch/worktree, implements all steps, runs tests, hands back a validated diff
 
 **Mode 2: Review Findings Fix** (from Reviewer)
-- Checks out PR branch, fixes specific findings, commits, pushes, updates PR
+- Uses the prepared PR worktree, fixes specific findings, validates, and hands back the diff
 
 ### Output Format
 
@@ -149,8 +172,7 @@ def _load_researcher_prompt() -> str:
 ```
 ## Implementation Complete
 **Branch**: hermes/issue-XYZ-description-YYYYMMDD
-**PR**: #123 (URL: ...)
-**Status**: Ready for review
+**Status**: Ready for researcher handoff
 **Tests passing**: 15/15
 ```
 
@@ -275,7 +297,7 @@ The two-tier review system ensures both obvious and subtle bugs are caught:
 
 ```
 ┌─────────────────────────────────────────────┐
-│  Hermes (PR Manager) creates/takes PR       │
+│  Hermes (PR Manager) routes only            │
 └──────────────────┬──────────────────────────┘
                    │
                    ▼
@@ -302,7 +324,8 @@ The two-tier review system ensures both obvious and subtle bugs are caught:
                         │
                         ▼
               ┌─────────────────┐
-              │  Ready to merge │
+              │  Ready for human │
+              │  review/merge    │
               └─────────────────┘
 ```
 
@@ -322,8 +345,8 @@ When a PR is **closed without merge** (by operator decision, CI failures, pollut
 | **Aider Reviewer Tier1** | Refuse to review. Emit `next_action: researcher-replan` in manager tag. Do NOT route to coder. |
 | **Aider Reviewer Tier2** | Refuse adversarial review. Same `researcher-replan` routing. |
 | **Aider Coder** | Refuse to code (cannot push to closed branch). Emit `status: refuse`, hand back to PR Manager. |
-| **Hermes (PR Manager)** | Before starting new work, run `gh pr list --state all` for the issue. If prior PR closed without merge, read prior attempt's failure mode, create fresh branch from current `master`, link closed PR in new PR body as `Supersedes #NNN`. |
-| **Aider Researcher** | Before planning, investigate why the prior attempt was closed. Differentiate the new approach, scope it tighter, branch from fresh master. |
+| **Hermes (PR Manager)** | Before starting new work, run `gh pr list --state all` for the issue. If prior PR closed without merge, read prior attempt's failure mode, route a fresh coding task from current `master`, and require the Researcher lane to open any replacement PR with `Supersedes #NNN`. Hermes itself must not author code, reviews, or PRs for CryptoTrader. |
+| **Aider Researcher** | Before planning, investigate why the prior attempt was closed. Differentiate the new approach, scope it tighter, branch from fresh master, and if a replacement PR is needed, create it with explicit researcher attribution in the PR body. |
 
 **Handoff sequence** when PR #337 closes without merge:
 ```
@@ -339,7 +362,7 @@ Next issue dispatch picks up the open issue
     ↓
 Hermes worker (or Researcher) reads closed PR's history
     ↓
-Fresh branch from current master → new PR with "Supersedes #337"
+Fresh branch from current master → Researcher opens new PR with "Supersedes #337"
 ```
 
 **Anti-pattern**: Do NOT route closed-without-merge findings to the Coder. The branch is dead and pushing to it is impossible. Always hand back to research/planning.
@@ -392,6 +415,13 @@ Co-Authored-By: Aider Coder (tier1) <openrouter/deepseek/deepseek-v4-flash>
 
 **PR body**:
 ```
+**Agent:** aider-researcher | **Model:** openai/qwen3-35b-uncensored | **Tier:** tier1 | **Task:** pr-creation
+
+## Scope Checklist
+- [ ] In-scope task 1
+- [ ] In-scope task 2
+- [ ] In-scope task 3
+
 Co-Authored-By: Aider Researcher (tier1) <openai/qwen3-35b-uncensored>
 ```
 

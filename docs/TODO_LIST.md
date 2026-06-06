@@ -1,3 +1,9 @@
+# 2026-06-06
+- [x] Mark CryptoTrader Hermes lane as orchestration-only in docs and runtime guidance; block coder follow-up on over-broad PRs.
+- [x] Harden researcher/coder/reviewer prompts so issue scope stays explicit and researcher PR bodies carry an in-scope checkbox checklist.
+- [x] Add a researcher-only CryptoTrader PR backlog rule: no new PR creation while more than 3 PRs are already open.
+- [x] Add a repo-wide CryptoTrader PR-create blocker on generic Hermes tool surfaces (`terminal` and `execute_code`) so only the dedicated Researcher lane can open or reuse PRs.
+
 # TODO List
 
 ## 2026-06-05 Harbor Framework Evaluations

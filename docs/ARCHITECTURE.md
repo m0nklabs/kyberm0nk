@@ -6,7 +6,7 @@ KyberM0nk is a project orchestration system. It takes a repository and matures i
 
 The active stack: **Hermes** (orchestration brain) + **Aider** (execution worker) + **Guardian** (local model). Cryptotrader is the testing playground — the same pipeline matures any project.
 
-Hermes assigns one issue at a time to the coding-agent lane, which resolves the issue in a PR and hands it off with `ready_for_review` before the review loop starts.
+Hermes assigns one issue at a time to the researcher-plus-coder lane: the Researcher owns the scoped plan and PR shell, the Coder implements and validates on the branch, and the review loop starts only after the Researcher updates the PR and marks it `ready_for_review`.
 
 ```text
 +--------------------------------------------------+
@@ -39,7 +39,8 @@ Hermes assigns one issue at a time to the coding-agent lane, which resolves the 
 | Aider (Execution Worker)          |
 | - single-flight lease             |
 | - active project worktree         |
-| - opens PRs, fixes issues         |
+| - implements scoped branch work   |
+| - fixes review findings           |
 +----------------+------------------+
                  |
                  v
@@ -72,12 +73,12 @@ flowchart TD
     A[GitHub issue created manually or by Hermes/Kanban] --> B[Hermes intake validates repo allowlist and priority]
     B --> C[Hermes claims issue and persists issue_run]
     C --> D[Aider Researcher analyzes issue scope and approach]
-    D --> E[Researcher creates detailed implementation plan PR]
+    D --> E[Researcher creates scoped implementation plan and PR assignment]
     E --> F[Create feature branch from plan]
     F --> G[Aider Coder implements solution following plan]
-    G --> H[Coder adds summary comment to PR]
-    H --> I[Run local validation]
-    I --> J[Push branch and open PR]
+    G --> H[Run local validation]
+    H --> I[Push branch and hand validated diff back]
+    I --> J[Researcher opens or updates PR]
     J --> K[Request Kyber review]
     K --> L[Tier1 fast reviewer]
     L -->|clean| M[Tier2 stronger reviewer]
@@ -86,9 +87,9 @@ flowchart TD
     M -->|inconclusive| O[kyber-tag: rerun_reviewer]
     M -->|clean| P[kyber-tag: ready_for_merge]
     N --> Q[Hermes applies review fixes on same branch]
-    Q --> I
+    Q --> H
     O --> K
-    P --> R[Hermes merges PR]
+    P --> R[Human maintainer merges PR]
     R --> S[Close issue and mark Kanban task done]
 ```
 
@@ -138,18 +139,20 @@ on `master`/`main` are treated as pipeline violations. Recovery work must be
 moved to a feature branch, pushed, reviewed through a PR, and merged only after
 review gates pass.
 
+CryptoTrader also runs a fail-closed PR creation guard on the generic Hermes tool surfaces. Ad-hoc `terminal` and `execute_code` calls that try to create a `m0nklabs/cryptotrader` PR are blocked before execution, so only the dedicated Researcher lane in issue resolution may open or reuse a PR.
+
 ### Autonomous pipeline responsibilities
 
 | Stage | Owner | Required behavior |
 |-------|-------|-------------------|
 | Intake | Hermes Gateway / GitHub sync | Detect eligible open issues and sync them to Kanban with repo, issue, priority, and workspace metadata. |
 | Claim | Hermes queue | Claim one eligible issue at a time, persist `issue_runs`, and avoid duplicate active work for the same issue. |
-| Branch | Hermes implementation lane | Create or reuse a feature branch named for the issue/task; never implement directly on CryptoTrader `master`/`main`. |
+| Branch | Dedicated coding lane | Create or reuse a feature branch named for the issue/task; never implement directly on CryptoTrader `master`/`main`. Hermes routes but does not author. |
 | Implement | Aider/local coding worker | Apply scoped changes on the branch, commit atomically, and push to GitHub. |
-| PR | Hermes PR manager | Open or update a PR with issue link, summary, validation, and risk notes. |
+| PR | Researcher lane | Open or update a PR with issue link, summary, validation, risk notes, explicit researcher attribution, and a report comment. Hermes PR manager is orchestration-only. |
 | Review | Kyber review agent | Run bounded Tier1/Tier2 review, post inline/anchored findings when possible, and emit `kyber-tag` routing. |
-| Fix loop | Hermes + coding worker | Convert `review_findings` into concrete branch edits, push fixes, and rerun review until clean or blocked. |
-| Merge | Hermes PR manager | Merge only after `ready_for_merge`, passing checks, and no unresolved review-findings tag. |
+| Fix loop | Coding worker + Hermes routing | Convert `review_findings` into concrete branch edits, push fixes, and rerun review until clean or blocked. Hermes routes but does not write code or reviews. |
+| Merge | Human maintainer | Merge only after `ready_for_merge`, passing checks, and no unresolved review-findings tag. Locked default branches stay manual until explicitly unlocked. |
 | Closure | Hermes/Kanban sync | Close the source issue, write audit comments, and mark the Kanban task done. |
 
 Manual intervention is reserved for explicit blockers: missing credentials,
